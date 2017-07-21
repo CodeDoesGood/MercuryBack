@@ -1,7 +1,7 @@
 const _ = require('lodash');
 
-const DatabaseWrapper = require('../components/DatabaseWrapper/DatabaseWrapper');
 const ConfigurationWrapper = require('../components/Configuration/ConfigurationWrapper');
+const DatabaseWrapper = require('../components/DatabaseWrapper/DatabaseWrapper');
 const logger = require('../components/Logger/Logger');
 
 const config = new ConfigurationWrapper('mercury', 'mercury.json');
@@ -56,7 +56,7 @@ function validateUsernameDoesExist(req, res, next) {
   } else if (!_.isNil(req.username)) {
     username = req.username;
   } else {
-    res.status(400).send({ error: 'Invalid pass', message: 'The usename paramter was not passed' });
+    res.status(400).send({ error: 'Username validation', message: 'The username parameter was not passed' });
   }
 
   databaseWrapper.doesUsernameExist(username)
@@ -65,7 +65,11 @@ function validateUsernameDoesExist(req, res, next) {
       req.username = username;
       next();
     })
-    .catch(() => res.status(400).send({ error: 'Username does not exists', description: `The username ${username} does not exists` }));
+    .catch(() => {
+      if (!res.headersSent) {
+        res.status(400).send({ error: 'Username does not exists', description: `The username ${username} does not exists` });
+      }
+    });
 }
 
 /**
@@ -170,7 +174,16 @@ function createPasswordResetCode(req, res, next) {
  * there password has been updated.
  */
 function updateUsersPassword(req, res) {
-  res.status(500).send({ error: 'Currently unavailable', description: 'This service is currently unavailable' });
+  const username = req.username;
+  const userId = req.id;
+  const password = req.password;
+
+  databaseWrapper.updateVolunteerPasswordById(userId, password)
+    .then(() => res.status(200).send({ message: `Volunteer ${username} password now updated` }))
+    .catch((error) => {
+      logger.error(`Failed to update password for ${username}, error=${JSON.stringify(error)}`);
+      res.status(500).send({ error: 'Password updating', description: `Failed to update password for ${username}` });
+    });
 }
 
 /**

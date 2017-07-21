@@ -1,7 +1,7 @@
-const knex = require('knex');
-const Promise = require('bluebird');
 const _ = require('lodash');
 const crypto = require('crypto');
+const knex = require('knex');
+const Promise = require('bluebird');
 
 const logger = require('../Logger/Logger');
 
@@ -14,8 +14,8 @@ class DatabaseWrapper {
     }
 
     this.filename = filename;
-    this.online = false;
     this.iterations = 28000;
+    this.online = false;
 
     this.connect();
 
@@ -24,7 +24,6 @@ class DatabaseWrapper {
 
   /**
    * Makes a connection to the postgres database
-   * @returns {Promise.<T>}
    */
   connect() {
     this.knex = knex({ client: 'sqlite3', connection: { filename: this.filename }, useNullAsDefault: true });
@@ -109,12 +108,17 @@ class DatabaseWrapper {
   }
 
   /**
-   * returns the id, password and salt for the volunteer being logged in.
-   * @param userId The use id of the user being logged in.
+   * Gets volunteer login details by username or id, but if you pass the id, you will have to make
+   * sure that its passed as number and not a string
+   * @param userIdOrUsername The username (string) or userId (number);
    */
-  getVolunteerLoginDetails(userId) {
+  getVolunteerLoginDetails(userIdOrUsername) {
+    let searchType = 'id';
+
+    if (_.isString(userIdOrUsername)) { searchType = 'username'; }
+
     return new Promise((resolve, reject) => {
-      this.knex('volunteer').where('id', userId).select('id', 'password', 'salt').first()
+      this.knex('volunteer').where(searchType, userIdOrUsername).select('id', 'password', 'salt').first()
         .then(volunteer => resolve(volunteer))
         .catch(error => reject(error));
     });
@@ -236,6 +240,19 @@ class DatabaseWrapper {
   }
 
   /**
+   * Compares users password with stored password after salting.
+   * @param volunteerPassword The password being salted.
+   * @param storedPassword The stored password.
+   * @param salt The stored salt.
+   * @returns {boolean} true if matched.
+   */
+  compareVolunteerLoggingInPasswords(volunteerPassword, storedPassword, salt) {
+    const hashedPassword = this.saltAndHash(volunteerPassword, salt);
+    return hashedPassword.hashedPassword === storedPassword;
+  }
+
+
+  /**
    * Generates a verification code that will be used in the email to generate the link. The link
    * when clicked will take them to a web page which will call down to the api to verify the code.
    *
@@ -284,6 +301,23 @@ class DatabaseWrapper {
     return new Promise((resolve, reject) => {
       this.knex('project').where('id', id).update(content)
         .then(updated => resolve(updated))
+        .catch(error => reject(error));
+    });
+  }
+
+  /**
+   * Updates a volunteer password by id.
+   * @param id The id of the volunteer.
+   * @param password The password being updated.
+   */
+  updateVolunteerPasswordById(id, password) {
+    return new Promise((resolve, reject) => {
+      const salted = this.saltAndHash(password);
+      this.knex('volunteer').where('id', id).update({
+        password: salted.hashedPassword,
+        salt: salted.salt,
+      })
+        .then(() => resolve())
         .catch(error => reject(error));
     });
   }

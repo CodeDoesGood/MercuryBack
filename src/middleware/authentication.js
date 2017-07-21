@@ -1,8 +1,8 @@
 const _ = require('lodash');
 const jwt = require('jsonwebtoken');
 
-const DatabaseWrapper = require('../components/DatabaseWrapper/DatabaseWrapper');
 const ConfigurationWrapper = require('../components/Configuration/ConfigurationWrapper');
+const DatabaseWrapper = require('../components/DatabaseWrapper/DatabaseWrapper');
 const logger = require('../components/Logger/Logger');
 
 const config = new ConfigurationWrapper('mercury', 'mercury.json');
@@ -34,14 +34,28 @@ function validateAuthenticationDetails(req, res, next) {
 }
 
 /**
- * Autehenticates but calls next if the user can authetnicate by validating the salted password
+ * Authenticates but calls next if the user can authenticate by validating the salted password
  * with the passed password that would be salted and hashed before comparing. If the passwords
  * match up then it will call next, otherwise send a 401 back.
  *
- * This would be used when updating a existing password but not asctually logging in.
+ * This would be used when updating a existing password but not actually logging in.
  */
 function ValidateUserCredentials(req, res, next) {
-  next();
+  const username = req.username;
+  const password = req.oldPassword;
+
+  databaseWrapper.getVolunteerLoginDetails(username)
+    .then((vol) => {
+      if (databaseWrapper.compareVolunteerLoggingInPasswords(password, vol.password, vol.salt)) {
+        next();
+      } else {
+        res.status(401).send({ error: 'Validate user credentials', message: 'Password provided was incorrect' });
+      }
+    })
+    .catch((error) => {
+      logger.error(`Failed to gather volunteer login details by username while validating user credentials, error=${error}`);
+      res.status(500).send({ error: 'Validate user credentials', message: 'Failed to validate volunteer credentials' });
+    });
 }
 
 /**
@@ -81,17 +95,15 @@ function checkAdminAuthenticationLevel(req, res, next) {
 function authenticateLoggingInUser(req, res) {
   const username = req.username;
   const password = req.password;
-  const userId = req.id;
+  const userId = parseInt(req.id, 10);
 
   databaseWrapper.getVolunteerLoginDetails(userId)
-    .then((details) => {
-      const storedPassword = details.password;
-      const storedSalt = details.salt;
-      const hashedPassword = databaseWrapper.saltAndHash(password, storedSalt);
-
-      if (hashedPassword.hashedPassword === storedPassword) {
+    .then((vol) => {
+      if (databaseWrapper.compareVolunteerLoggingInPasswords(password, vol.password, vol.salt)) {
         const token = jwt.sign({ username, id: userId }, config.getKey('secret'), { expiresIn: '1h' });
         res.status(200).send({ message: `Volunteer ${username} authenticated`, content: { token } });
+      } else {
+        res.status(401).send({ error: 'Volunteer authentication', message: 'Password provided was incorrect' });
       }
     })
     .catch((error) => {
