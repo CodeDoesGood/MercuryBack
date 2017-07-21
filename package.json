@@ -1,8 +1,8 @@
 {
   "name": "mercury-web",
   "version": "0.0.1",
-  "author": "Stephen Lineker-Miller <smmstephenmiller@gmail.com>",
-  "description": "application template for react",
+  "author": "CodeDoesGood",
+  "description": "Merucry webapp",
   "scripts": {
     "test": "node ./node_modules/mocha/bin/mocha ./src/tests/index.test.js",
     "inspect": "node --inspect ./src/index.js",
