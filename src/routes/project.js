@@ -1,6 +1,6 @@
-const project = require('../middleware/project');
-const database = require('../middleware/database');
 const authentication = require('../middleware/authentication');
+const database = require('../middleware/database');
+const project = require('../middleware/project');
 
 const Router = require('express').Router;
 

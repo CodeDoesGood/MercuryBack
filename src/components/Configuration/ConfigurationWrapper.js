@@ -1,4 +1,5 @@
 const fs = require('fs');
+
 const defaultConfiguration = require('./defaults');
 
 let instance = null;

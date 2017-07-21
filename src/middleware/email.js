@@ -1,7 +1,7 @@
 const _ = require('lodash');
 
-const EmailClient = require('../components/Email/Email');
 const ConfigurationWrapper = require('../components/Configuration/ConfigurationWrapper');
+const EmailClient = require('../components/Email/Email');
 const logger = require('../components/Logger/Logger');
 
 const config = new ConfigurationWrapper('mercury', 'mercury.json');

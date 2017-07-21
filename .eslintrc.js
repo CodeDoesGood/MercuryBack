@@ -7,8 +7,12 @@ module.exports = {
   },
   extends: 'airbnb',
   // required to lint *.vue files
-  plugins: [],
+  plugins: ["sort-requires"],
   // add your custom rules here
-  rules: {},
-  globals: {}
+  rules: {
+    'linebreak-style': 0,
+    'sort-requires/sort-requires': 2
+  },
+  globals: {
+  }
 }

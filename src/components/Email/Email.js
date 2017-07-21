@@ -1,6 +1,6 @@
+const _ = require('lodash');
 const nodemailer = require('nodemailer');
 const Promise = require('bluebird');
-const _ = require('lodash');
 
 const logger = require('../Logger/Logger');
 

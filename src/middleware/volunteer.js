@@ -56,13 +56,15 @@ function validateRequestResetDetails(req, res, next) {
  */
 function validatePasswordDetails(req, res, next) {
   const password = req.body.password;
-  const oldPasword = req.body.oldPassword;
+  const oldPassword = req.body.oldPassword;
 
-  if (password < 6) {
+  if (_.isNil(password) || _.isNil(oldPassword)) {
+    res.status(400).send({ error: 'Param not provided', description: 'Both oldPassword and password need to be provided' });
+  } else if (password.length < 6 || oldPassword.length < 6) {
     res.status(400).send({ error: 'Invalid Credentials', description: 'Password can not be less than 6 characters' });
   } else {
     req.password = password;
-    req.oldPassword = oldPasword;
+    req.oldPassword = oldPassword;
     next();
   }
 }
