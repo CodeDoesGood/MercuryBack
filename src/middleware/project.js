@@ -27,7 +27,7 @@ function validateProjectId(req, res, next) {
  */
 function validateProjectUpdateContent(req, res, next) {
   const project = req.body.project;
-  const projectRequirements = ['id', 'data_entry_date', 'data_entry_time', 'data_entry_user_id', 'title', 'status', 'project_category', 'hidden', 'image_directory', 'summary', 'description'];
+  const projectRequirements = ['id', 'data_entry_date', 'data_entry_time', 'data_entry_user_id', 'title', 'status', 'project_category', 'image_directory', 'summary', 'description'];
 
   if (_.isNil(project) || !_.isObject(project)) {
     return res.status(400).send({ error: 'Project Validation', description: 'Project provided is not in a valid format' });
@@ -39,6 +39,15 @@ function validateProjectUpdateContent(req, res, next) {
     }
     return 1;
   });
+
+  /**
+   * hidden is checked outside of the forEach because when you check !project[requirement]
+   * with a boolean it would return true if the value is set to true, making it throw a
+   * non existing error, wich in fact it does exit but the value is true, and not false.
+   */
+  if (!_.isBoolean(project.hidden)) {
+    return res.status(400).send({ error: 'Project Validation', description: 'Project must contain hidden' });
+  }
 
   if (!res.headersSent) {
     req.projectId = project.id;

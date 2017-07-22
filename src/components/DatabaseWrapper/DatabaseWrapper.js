@@ -66,7 +66,7 @@ class DatabaseWrapper {
    */
   getAllActiveProjects() {
     return new Promise((resolve, reject) => {
-      this.knex('project').where('status', 'active')
+      this.knex('project').where('status', 'active').andWhere('hidden', false)
         .then(projects => resolve(projects))
         .catch(error => reject(error));
     });
