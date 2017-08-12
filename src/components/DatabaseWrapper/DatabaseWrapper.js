@@ -15,7 +15,8 @@ class DatabaseWrapper {
 
     this.filename = filename;
     this.iterations = 28000;
-    this.online = false;
+    this.online = true;
+    this.showMessage = true;
 
     this.connect();
 
@@ -30,10 +31,12 @@ class DatabaseWrapper {
 
     return this.knex.raw('select 1+1 AS answer')
       .then(() => {
-        this.online = true;
-        logger.info(`Successfully connected to knex: database=${this.filename}`);
+        if (this.showMessage) {
+          logger.info(`Successfully connected to knex: database=${this.filename}`);
+        }
       })
       .catch((error) => {
+        this.online = false;
         logger.error(`Could not connect to knex database=${this.filename}, error=${JSON.stringify(error)}`);
       });
   }
