@@ -14,5 +14,7 @@ module.exports = {
     'sort-requires/sort-requires': 2
   },
   globals: {
+    'describe': 0,
+    'it': 0,
   }
 }
