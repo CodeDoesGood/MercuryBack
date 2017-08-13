@@ -15,7 +15,8 @@ class DatabaseWrapper {
 
     this.filename = filename;
     this.iterations = 28000;
-    this.online = false;
+    this.online = true;
+    this.showMessage = true;
 
     this.connect();
 
@@ -30,10 +31,12 @@ class DatabaseWrapper {
 
     return this.knex.raw('select 1+1 AS answer')
       .then(() => {
-        this.online = true;
-        logger.info(`Successfully connected to knex: database=${this.filename}`);
+        if (this.showMessage) {
+          logger.info(`Successfully connected to knex: database=${this.filename}`);
+        }
       })
       .catch((error) => {
+        this.online = false;
         logger.error(`Could not connect to knex database=${this.filename}, error=${JSON.stringify(error)}`);
       });
   }
@@ -44,6 +47,10 @@ class DatabaseWrapper {
    */
   getProjectById(id) {
     return new Promise((resolve, reject) => {
+      if (!_.isNumber(id)) {
+        reject(`userId "${id}" passed is not a valid number`);
+      }
+
       this.knex('project').where('id', id).first()
         .then(project => resolve(Object.assign({}, project)))
         .catch(error => reject(error));
@@ -78,6 +85,10 @@ class DatabaseWrapper {
    */
   getAllProjectsByStatus(status) {
     return new Promise((resolve, reject) => {
+      if (!_.isString(status)) {
+        reject(`userId "${status}" passed is not a valid string`);
+      }
+
       this.knex('project').where('status', status)
         .then(projects => resolve(projects))
         .catch(error => reject(error));
@@ -90,6 +101,10 @@ class DatabaseWrapper {
    */
   getAllProjectsByCategory(category) {
     return new Promise((resolve, reject) => {
+      if (!_.isString(category)) {
+        reject(`userId "${category}" passed is not a valid string`);
+      }
+
       this.knex('project').where('project_category', category)
         .then(projects => resolve(projects))
         .catch(error => reject(error));
@@ -130,6 +145,10 @@ class DatabaseWrapper {
    */
   getVerificationCode(userId) {
     return new Promise((resolve, reject) => {
+      if (!_.isNumber(userId)) {
+        reject(`userId "${userId}" passed is not a valid number`);
+      }
+
       this.knex('verification_codes').where('id', userId).first()
         .then(details => resolve(details))
         .catch(error => reject(error));
@@ -142,6 +161,10 @@ class DatabaseWrapper {
    */
   doesVerificationCodeExist(userId) {
     return new Promise((resolve, reject) => {
+      if (!_.isNumber(userId)) {
+        reject(`userId "${userId}" passed is not a valid number`);
+      }
+
       this.knex('volunteer').select('id').where('id', userId).first()
         .then((result) => {
           if (_.isNil(result.id)) { reject(0); } else { resolve(result.id); }
@@ -156,6 +179,10 @@ class DatabaseWrapper {
    */
   doesUsernameExist(username) {
     return new Promise((resolve, reject) => {
+      if (!_.isString(username)) {
+        reject(`userId "${username}" passed is not a valid string`);
+      }
+
       this.knex('volunteer').select('id').where('username', username).first()
         .then((result) => {
           if (_.isNil(result.id)) { reject(0); } else { resolve(result.id); }
@@ -170,6 +197,10 @@ class DatabaseWrapper {
    */
   doesEmailExist(email) {
     return new Promise((resolve, reject) => {
+      if (!_.isString(email)) {
+        reject(`userId "${email}" passed is not a valid string`);
+      }
+
       this.knex('volunteer').select('id').where('email_address', email).first()
         .then((result) => {
           if (_.isNil(result.id)) { reject(0); } else { resolve(result.id); }
@@ -209,6 +240,10 @@ class DatabaseWrapper {
    */
   markVolunteerAsVerified(userId) {
     return new Promise((resolve, reject) => {
+      if (!_.isNumber(userId)) {
+        reject(`userId "${userId}" passed is not a valid number`);
+      }
+
       this.knex('volunteer').where('id', userId).update({
         verified: true,
       })
@@ -287,7 +322,11 @@ class DatabaseWrapper {
    * @param userId The id of the user where the email verification code is being removed
    */
   removeVerificationCode(userId) {
-    this.knex('verification_codes').where('id', userId).del()
+    if (!_.isNumber(userId)) {
+      return `userId "${userId}" passed is not a valid number`;
+    }
+
+    return this.knex('verification_codes').where('id', userId).del()
       .then()
       .catch(error => logger.error(`Failed to remove verification code for user ${userId} error=${JSON.stringify(error)}`));
   }
@@ -299,6 +338,10 @@ class DatabaseWrapper {
    */
   updateProjectById(id, content) {
     return new Promise((resolve, reject) => {
+      if (!_.isNumber(id)) {
+        reject(`userId "${id}" passed is not a valid number`);
+      }
+
       this.knex('project').where('id', id).update(content)
         .then(updated => resolve(updated))
         .catch(error => reject(error));
@@ -312,6 +355,10 @@ class DatabaseWrapper {
    */
   updateVolunteerPasswordById(id, password) {
     return new Promise((resolve, reject) => {
+      if (!_.isNumber(id) || !_.isString(password)) {
+        reject('password or id passed was not a valid number or string');
+      }
+
       const salted = this.saltAndHash(password);
       this.knex('volunteer').where('id', id).update({
         password: salted.hashedPassword,
