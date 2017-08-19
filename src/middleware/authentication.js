@@ -49,12 +49,12 @@ function ValidateUserCredentials(req, res, next) {
       if (databaseWrapper.compareVolunteerLoggingInPasswords(password, vol.password, vol.salt)) {
         next();
       } else {
-        res.status(401).send({ error: 'Validate user credentials', message: 'Password provided was incorrect' });
+        res.status(401).send({ error: 'Validate user credentials', description: 'Password provided was incorrect' });
       }
     })
     .catch((error) => {
       logger.error(`Failed to gather volunteer login details by username while validating user credentials, error=${error}`);
-      res.status(500).send({ error: 'Validate user credentials', message: 'Failed to validate volunteer credentials' });
+      res.status(500).send({ error: 'Validate user credentials', description: 'Failed to validate volunteer credentials' });
     });
 }
 
@@ -103,7 +103,7 @@ function authenticateLoggingInUser(req, res) {
         const token = jwt.sign({ username, id: userId }, config.getKey('secret'), { expiresIn: '1h' });
         res.status(200).send({ message: `Volunteer ${username} authenticated`, content: { token } });
       } else {
-        res.status(401).send({ error: 'Volunteer authentication', message: 'Password provided was incorrect' });
+        res.status(401).send({ error: 'Volunteer authentication', description: 'Password provided was incorrect' });
       }
     })
     .catch((error) => {
