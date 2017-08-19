@@ -66,27 +66,27 @@ function validateProjectUpdateContentTypes(req, res, next) {
   const projectId = req.projectId;
 
   if (!_.isInteger(projectId)) {
-    res.status(400).send({ error: 'Project Type Validation', message: 'id type is invalid, must be a int' });
+    res.status(400).send({ error: 'Project Type Validation', description: 'id type is invalid, must be a int' });
   } else if (!_.isString(project.data_entry_date)) {
-    res.status(400).send({ error: 'Project Type Validation', message: 'data_entry_date type is invalid, must be a string' });
+    res.status(400).send({ error: 'Project Type Validation', description: 'data_entry_date type is invalid, must be a string' });
   } else if (!_.isString(project.data_entry_time)) {
-    res.status(400).send({ error: 'Project Type Validation', message: 'data_entry_time type is invalid, must be a string' });
+    res.status(400).send({ error: 'Project Type Validation', description: 'data_entry_time type is invalid, must be a string' });
   } else if (!_.isInteger(project.data_entry_user_id)) {
-    res.status(400).send({ error: 'Project Type Validation', message: 'data_entry_user_id type is invalid, must be a int' });
+    res.status(400).send({ error: 'Project Type Validation', description: 'data_entry_user_id type is invalid, must be a int' });
   } else if (!_.isString(project.title)) {
-    res.status(400).send({ error: 'Project Type Validation', message: 'title type is invalid, must be a string' });
+    res.status(400).send({ error: 'Project Type Validation', description: 'title type is invalid, must be a string' });
   } else if (!_.isString(project.status)) {
-    res.status(400).send({ error: 'Project Type Validation', message: 'status type is invalid, must be a string' });
+    res.status(400).send({ error: 'Project Type Validation', description: 'status type is invalid, must be a string' });
   } else if (!_.isInteger(project.project_category)) {
-    res.status(400).send({ error: 'Project Type Validation', message: 'project_category type is invalid, must be a int' });
+    res.status(400).send({ error: 'Project Type Validation', description: 'project_category type is invalid, must be a int' });
   } else if (!_.isBoolean(project.hidden)) {
-    res.status(400).send({ error: 'Project Type Validation', message: 'hidden type is invalid, must be a bool' });
+    res.status(400).send({ error: 'Project Type Validation', description: 'hidden type is invalid, must be a bool' });
   } else if (!_.isString(project.image_directory)) {
-    res.status(400).send({ error: 'Project Type Validation', message: 'image_directory type is invalid, must be a string' });
+    res.status(400).send({ error: 'Project Type Validation', description: 'image_directory type is invalid, must be a string' });
   } else if (!_.isString(project.summary)) {
-    res.status(400).send({ error: 'Project Type Validation', message: 'summary type is invalid, must be a string' });
+    res.status(400).send({ error: 'Project Type Validation', description: 'summary type is invalid, must be a string' });
   } else if (!_.isString(project.description)) {
-    res.status(400).send({ error: 'Project Type Validation', message: 'description type is invalid, must be a string' });
+    res.status(400).send({ error: 'Project Type Validation', description: 'description type is invalid, must be a string' });
   } else {
     next();
   }

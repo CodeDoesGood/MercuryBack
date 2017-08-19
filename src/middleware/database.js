@@ -56,7 +56,7 @@ function validateUsernameDoesExist(req, res, next) {
   } else if (!_.isNil(req.username)) {
     username = req.username;
   } else {
-    res.status(400).send({ error: 'Username validation', message: 'The username parameter was not passed' });
+    res.status(400).send({ error: 'Username validation', description: 'The username parameter was not passed' });
   }
 
   databaseWrapper.doesUsernameExist(username)
@@ -107,7 +107,7 @@ function validateVerifyCodeAuthenticity(req, res, next) {
       if (hashedCode.hashedPassword === storedCode) {
         next();
       } else {
-        res.status(401).send({ error: 'Invalid Code', message: 'The code passed was not the correct code for verification' });
+        res.status(401).send({ error: 'Invalid Code', description: 'The code passed was not the correct code for verification' });
       }
     })
     .catch(error => res.status(500).send({ error: 'Verification', description: `Failed to get verification code, error=${JSON.stringify(error)}` }));
