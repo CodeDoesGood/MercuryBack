@@ -15,7 +15,7 @@ function validateConnectionStatus(req, res, next) {
   if (emailClient.getStatus()) {
     next();
   } else {
-    res.status(500).send({ error: 'Email Service', description: 'The email service is currently unavailable, your email will be sent later' });
+    res.status(503).send({ error: 'Email Service', description: 'The email service is currently unavailable, your email will be sent later' });
   }
 }
 
@@ -44,7 +44,7 @@ function sendVerificationEmail(req, res) {
       res.status(503).send({ error: 'Unavailable Service', description: 'Email service is currently unavailable or down' });
     });
 
-  res.status(500).send({ error: 'Currently unavailable', description: 'This service is currently unavailable' });
+  res.status(503).send({ error: 'Currently unavailable', description: 'This service is currently unavailable' });
 }
 
 /**
@@ -53,7 +53,7 @@ function sendVerificationEmail(req, res) {
  * to reset the users password.
  */
 function sendPasswordResetLinkToRequestingEmail(req, res) {
-  res.status(500).send({ error: 'Currently unavailable', description: 'This service is currently unavailable' });
+  res.status(503).send({ error: 'Currently unavailable', description: 'This service is currently unavailable' });
 }
 
 /**
