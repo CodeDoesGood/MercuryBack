@@ -17,15 +17,15 @@ function validateAuthenticationDetails(req, res, next) {
   const password = req.body.password;
 
   if (_.isNil(username)) {
-    res.status(400).send({ error: 'Authentication', description: 'The username is required' });
+    res.status(401).send({ error: 'Authentication', description: 'The username is required' });
   } else if (_.isNil(password)) {
-    res.status(400).send({ error: 'Authentication', description: 'The password is required' });
+    res.status(401).send({ error: 'Authentication', description: 'The password is required' });
   } else if (username < 4) {
-    res.status(400).send({ error: 'Invalid Credentials', description: 'Username can not be less than 4 characters' });
+    res.status(401).send({ error: 'Invalid Credentials', description: 'Username can not be less than 4 characters' });
   } else if (username > 16) {
-    res.status(400).send({ error: 'Invalid Credentials', description: 'Username can not be greater than 16 characters' });
+    res.status(401).send({ error: 'Invalid Credentials', description: 'Username can not be greater than 16 characters' });
   } else if (password < 6) {
-    res.status(400).send({ error: 'Invalid Credentials', description: 'Password can not be less than 6 characters' });
+    res.status(401).send({ error: 'Invalid Credentials', description: 'Password can not be less than 6 characters' });
   } else {
     req.username = username;
     req.password = password;

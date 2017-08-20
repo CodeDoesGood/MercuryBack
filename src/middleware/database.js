@@ -15,7 +15,7 @@ function validateConnectionStatus(req, res, next) {
   if (databaseWrapper.getOnlineStatus()) {
     return next();
   }
-  return res.status(500).send({ error: 'Database Connection', description: 'The database service is currently unavailable' });
+  return res.status(503).send({ error: 'Database Connection', description: 'The database service is currently unavailable' });
 }
 
 /**
@@ -26,7 +26,7 @@ function validateUsernameDoesNotExist(req, res, next) {
   const username = req.volunteer.username;
 
   databaseWrapper.doesUsernameExist(username)
-    .then(() => res.status(400).send({ error: 'Username exists', description: `The username ${username} already exists` }))
+    .then(() => res.status(403).send({ error: 'Username exists', description: `The username ${username} already exists` }))
     .catch(() => next());
 }
 
@@ -38,7 +38,7 @@ function validateEmailDoesNotExist(req, res, next) {
   const email = req.volunteer.email_address;
 
   databaseWrapper.doesEmailExist(email)
-    .then(() => res.status(400).send({ error: 'Email exists', description: `The email ${email} already exist` }))
+    .then(() => res.status(403).send({ error: 'Email exists', description: `The email ${email} already exist` }))
     .catch(() => next());
 }
 
@@ -138,7 +138,7 @@ function validateVerifyCodeExists(req, res, next) {
  * otherwise throws a 401 invalid authentication.
  */
 function validateVerificationCode(req, res, next) {
-  res.status(500).send({ error: 'Currently unavailable', description: 'This service is currently unavailable' });
+  res.status(503).send({ error: 'Currently unavailable', description: 'This service is currently unavailable' });
   next();
 }
 
@@ -165,7 +165,7 @@ function createNewVolunteer(req, res, next) {
  * will allow them to to send a reset request with the code and there new password.
  */
 function createPasswordResetCode(req, res, next) {
-  res.status(500).send({ error: 'Currently unavailable', description: 'This service is currently unavailable' });
+  res.status(503).send({ error: 'Currently unavailable', description: 'This service is currently unavailable' });
   next();
 }
 
