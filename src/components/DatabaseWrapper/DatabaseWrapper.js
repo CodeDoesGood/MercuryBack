@@ -47,8 +47,8 @@ class DatabaseWrapper {
    */
   getProjectById(id) {
     return new Promise((resolve, reject) => {
-      if (!_.isNumber(id)) {
-        reject(`userId "${id}" passed is not a valid number`);
+      if (!_.isNumber(parseInt(id, 10))) {
+        reject(`projectId '${id}' passed is not a valid number`);
       }
 
       this.knex('project').where('id', id).first()
