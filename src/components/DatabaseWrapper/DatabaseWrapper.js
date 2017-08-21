@@ -165,7 +165,7 @@ class DatabaseWrapper {
         reject(`volunteerId "${volunteerId}" passed is not a valid number`);
       }
 
-      this.knex('position').select('name', 'description', 'value').where('id', volunteerId).first()
+      this.knex('position').where('id', volunteerId).select('name', 'description', 'value').first()
         .then(position => resolve(position))
         .catch(error => reject(error));
     });
@@ -181,7 +181,7 @@ class DatabaseWrapper {
         reject(`volunteerId "${volunteerId}" passed is not a valid number`);
       }
 
-      this.knex('volunteer_assignment').select().where('id', volunteerId).first()
+      this.knex('volunteer_assignment').where('id', volunteerId).select().first()
         .then(assignments => resolve(assignments))
         .catch(error => reject(error));
     });
@@ -197,7 +197,7 @@ class DatabaseWrapper {
         reject(`volunteerId "${volunteerId}" passed is not a valid number`);
       }
 
-      this.knex('volunteer_comment').select().where('id', volunteerId).first()
+      this.knex('volunteer_comment').where('id', volunteerId).select().first()
         .then(comments => resolve(comments))
         .catch(error => reject(error));
     });
@@ -213,7 +213,7 @@ class DatabaseWrapper {
         reject(`commentId "${commentId}" passed is not a valid number`);
       }
 
-      this.knex('comment').select().where('id', commentId).first()
+      this.knex('comment').where('id', commentId).select().first()
         .then(comment => resolve(comment))
         .catch(error => reject(error));
     });
@@ -229,7 +229,7 @@ class DatabaseWrapper {
         reject(`teamId "${teamId}" passed is not a valid number`);
       }
 
-      this.knex('project_team').select().where('id', teamId).first()
+      this.knex('project_team').where('id', teamId).select().first()
         .then(projectTeam => resolve(projectTeam))
         .catch(error => reject(error));
     });
@@ -245,7 +245,7 @@ class DatabaseWrapper {
         reject(`projectId "${projectId}" passed is not a valid number`);
       }
 
-      this.knex('project_team').select().where('project', projectId).first()
+      this.knex('project_team').where('project', projectId).first().select()
         .then(comment => resolve(comment))
         .catch(error => reject(error));
     });
@@ -261,7 +261,7 @@ class DatabaseWrapper {
         reject(`projectActivityId "${projectActivityId}" passed is not a valid number`);
       }
 
-      this.knex('project_activity').select().where('id', projectActivityId).first()
+      this.knex('project_activity').where('id', projectActivityId).select().first()
         .then(comment => resolve(comment))
         .catch(error => reject(error));
     });
@@ -277,11 +277,120 @@ class DatabaseWrapper {
         reject(`projectId "${projectId}" passed is not a valid number`);
       }
 
-      this.knex('project_activity').select().where('project', projectId).first()
+      this.knex('project_activity').where('project', projectId).select()
         .then(comment => resolve(comment))
         .catch(error => reject(error));
     });
   }
+
+  /**
+   * Get volunteer announcement by id
+   * @param announcementId
+   */
+  getVolunteerAnnouncementById(announcementId) {
+    return new Promise((resolve, reject) => {
+      if (!_.isNumber(announcementId)) {
+        reject(`announcementId "${announcementId}" passed is not a valid number`);
+      }
+
+      this.knex('volunteer_announcement').where('id', announcementId).select().first()
+        .then(comment => resolve(comment))
+        .catch(error => reject(error));
+    });
+  }
+
+  /**
+   * Get all volunteer announcements by volunteer id
+   * @param volunteerId
+   */
+  GetAllVolunteerAnnouncementsById(volunteerId) {
+    return new Promise((resolve, reject) => {
+      if (!_.isNumber(volunteerId)) {
+        reject(`volunteerId "${volunteerId}" passed is not a valid number`);
+      }
+
+      this.knex('volunteer_announcement').where('volunteer_id', volunteerId).select()
+        .then(comment => resolve(comment))
+        .catch(error => reject(error));
+    });
+  }
+
+  /**
+   * Get voluntere project announcement by id
+   * @param projectAnnouncementId
+   */
+  getVolunteerProjectAnnouncementById(projectAnnouncementId) {
+    return new Promise((resolve, reject) => {
+      if (!_.isNumber(projectAnnouncementId)) {
+        reject(`projectAnnouncementId "${projectAnnouncementId}" passed is not a valid number`);
+      }
+
+      this.knex('volunteer_project_announcement').where('id', projectAnnouncementId).select().first()
+        .then(comment => resolve(comment))
+        .catch(error => reject(error));
+    });
+  }
+
+  getAllVolunteerProjectAnnouncementsById(volunteerId) {
+    return new Promise((resolve, reject) => {
+      if (!_.isNumber(volunteerId)) {
+        reject(`volunteerId "${volunteerId}" passed is not a valid number`);
+      }
+
+      this.knex('volunteer_project_announcement').where('volunteer_id', volunteerId).select()
+        .then(comment => resolve(comment))
+        .catch(error => reject(error));
+    });
+  }
+
+  /**
+   * Get the project activity announcement by id
+   * @param activiityId
+   */
+  getProjectActivityAnnouncement(activiityId) {
+    return new Promise((resolve, reject) => {
+      if (!_.isNumber(activiityId)) {
+        reject(`activiityId "${activiityId}" passed is not a valid number`);
+      }
+
+      this.knex('project_project_announcement').where('id', activiityId).select()
+        .then(comment => resolve(comment))
+        .catch(error => reject(error));
+    });
+  }
+
+  /**
+   * Get all project activity announcements for a activity by id
+   * @param projectId
+   */
+  getAllProjectActivityAnnouncementsByProjectId(projectActivityId) {
+    return new Promise((resolve, reject) => {
+      if (!_.isNumber(projectActivityId)) {
+        reject(`projectActivityId "${projectActivityId}" passed is not a valid number`);
+      }
+
+      this.knex('project_project_announcement').where('project_activity', projectActivityId).select()
+        .then(comment => resolve(comment))
+        .catch(error => reject(error));
+    });
+  }
+
+  /**
+   * Get a single announcement from the announcement table
+   * @param annoucementId
+   */
+  getAnnouncementById(announcementId) {
+    return new Promise((resolve, reject) => {
+      if (!_.isNumber(announcementId)) {
+        reject(`projectActivityId "${announcementId}" passed is not a valid number`);
+      }
+
+      this.knex('announcement').where('id', announcementId).select()
+        .then(comment => resolve(comment))
+        .catch(error => reject(error));
+    });
+  }
+
   /**
    * Resolves the volunteers id if the verification code exists exists otherwise rejects.
    * @param volunteerId The volunteerId being checked
