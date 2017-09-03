@@ -103,7 +103,7 @@ describe('Database Wrapper', () => {
   });
 
   describe('#getAllProjectsByCategory', () => {
-    it.only('Should return projects with correct category passed', (done) => {
+    it('Should return projects with correct category passed', (done) => {
       databaseWrapper.getAllProjectsByCategory('1')
         .then((result) => {
           _.forEach(result, (project) => {
