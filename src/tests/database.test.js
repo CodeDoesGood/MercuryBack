@@ -103,8 +103,8 @@ describe('Database Wrapper', () => {
   });
 
   describe('#getAllProjectsByCategory', () => {
-    it('Should return projects with correct category passed', (done) => {
-      databaseWrapper.getAllProjectsByStatus(1)
+    it.only('Should return projects with correct category passed', (done) => {
+      databaseWrapper.getAllProjectsByCategory('1')
         .then((result) => {
           _.forEach(result, (project) => {
             assert.equal(project.project_category, 1);
