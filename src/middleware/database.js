@@ -35,7 +35,7 @@ function validateUsernameDoesNotExist(req, res, next) {
  * calls next.
  */
 function validateEmailDoesNotExist(req, res, next) {
-  const email = req.volunteer.email_address;
+  const email = req.volunteer.email;
 
   databaseWrapper.doesEmailExist(email)
     .then(() => res.status(403).send({ error: 'Email exists', description: `The email ${email} already exist` }))
@@ -77,7 +77,7 @@ function validateUsernameDoesExist(req, res, next) {
  * throws a bad request.
  */
 function validateEmailDoesExist(req, res, next) {
-  const email = req.body.email_address;
+  const email = req.body.email;
 
   databaseWrapper.doesEmailExist(email)
     .then(() => next())

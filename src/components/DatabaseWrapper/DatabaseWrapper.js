@@ -8,12 +8,11 @@ const logger = require('../Logger/Logger');
 let instance = null;
 
 class DatabaseWrapper {
-  constructor(filename) {
+  constructor() {
     if (instance) {
       return instance;
     }
 
-    this.filename = filename;
     this.iterations = 28000;
     this.online = true;
     this.showMessage = true;
@@ -27,17 +26,23 @@ class DatabaseWrapper {
    * Makes a connection to the postgres database
    */
   connect() {
-    this.knex = knex({ client: 'sqlite3', connection: { filename: this.filename }, useNullAsDefault: true });
+    this.knex = knex({ client: 'mysql',
+      connection: {
+        host: '127.0.0.1',
+        user: 'root',
+        password: 'password',
+        database: 'mercury',
+      } });
 
     return this.knex.raw('select 1+1 AS answer')
       .then(() => {
         if (this.showMessage) {
-          logger.info(`Successfully connected to knex: database=${this.filename}`);
+          logger.info(`Successfully connected to knex: database`);
         }
       })
       .catch((error) => {
         this.online = false;
-        logger.error(`Could not connect to knex database=${this.filename}, error=${JSON.stringify(error)}`);
+        logger.error(`Could not connect to knex database, error=${JSON.stringify(error)}`);
       });
   }
 
@@ -133,7 +138,7 @@ class DatabaseWrapper {
     if (_.isString(volunteerIdOrUsername)) { searchType = 'username'; }
 
     return new Promise((resolve, reject) => {
-      this.knex('volunteer').where(searchType, volunteerIdOrUsername).select('id', 'password', 'salt').first()
+      this.knex('volunteer').where(searchType, volunteerIdOrUsername).select('id', 'username', 'password', 'salt').first()
         .then(volunteer => resolve(volunteer))
         .catch(error => reject(error));
     });
@@ -437,7 +442,7 @@ class DatabaseWrapper {
         reject(`volunteerId "${email}" passed is not a valid string`);
       }
 
-      this.knex('volunteer').select('id').where('email_address', email).first()
+      this.knex('volunteer').select('id').where('email', email).first()
         .then((result) => {
           if (_.isNil(result.id)) { reject(0); } else { resolve(result.id); }
         })
@@ -456,7 +461,6 @@ class DatabaseWrapper {
 
       const volunteer = Object.assign(volunteerDetails, {
         data_entry_date: `${date.getFullYear()}-${date.getMonth()}-${date.getDay()}`,
-        data_entry_time: `${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}`,
         password: hashedPassword.hashedPassword,
         salt: hashedPassword.salt,
       });

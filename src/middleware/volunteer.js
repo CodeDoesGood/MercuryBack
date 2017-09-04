@@ -5,7 +5,7 @@ const _ = require('lodash');
  * including password length, username length, email type etc
  */
 function validateVolunteerCreationDetails(req, res, next) {
-  const volunteerRequirements = ['username', 'password', 'name', 'email_address', 'data_entry_user_id'];
+  const volunteerRequirements = ['username', 'password', 'name', 'email', 'data_entry_user_id'];
   const volunteer = _.pick(req.body.volunteer, volunteerRequirements);
 
   if (_.isNil(volunteer) || !_.isObject(volunteer)) {
@@ -36,7 +36,7 @@ function validateVolunteerCreationDetails(req, res, next) {
     } else if (volunteer.password < 6) {
       return res.status(400).send({ error: 'Invalid Credentials', description: 'Password can not be less than 6 characters' });
     }
-    volunteer.email_address = volunteer.email_address.toLowerCase();
+    volunteer.email = volunteer.email.toLowerCase();
     req.volunteer = volunteer;
     return next();
   }
