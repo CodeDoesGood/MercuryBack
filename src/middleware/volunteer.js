@@ -165,6 +165,23 @@ function validateVerifyCodeExists(req, res, next) {
     .catch(() => res.status(400).send({ error: 'Code existence', description: 'Verification Code Does not exist' }));
 }
 
+/**
+ * Creates a new Volunteer within the database.
+ */
+function createNewVolunteer(req, res, next) {
+  const volunteer = req.volunteer;
+
+  const volunteer = new Volunteer();
+
+  volunteer.create(volunteer.name, volunteer.username, volunteer.email, volunteer.password, 1)
+    .then((details) => {
+      req.volunteer.id = details.id;
+      req.verificationCode = details.code;
+      next();
+    })
+    .catch(error => res.status(500).send({ error: `${JSON.stringify(error)}`, description: `Failed to create the user ${volunteer.username}` }));
+}
+
 
 module.exports = {
   validateVolunteerCreationDetails,
@@ -174,4 +191,5 @@ module.exports = {
   updateUsersPassword,
   verifyVolunteerAccount,
   validateVerifyCodeExists,
+  createNewVolunteer,
 };

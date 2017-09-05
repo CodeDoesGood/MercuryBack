@@ -16,7 +16,7 @@ router.post('/volunteer/create', [
   database.validateConnectionStatus.bind(this),
   database.validateUsernameDoesNotExist.bind(this),
   database.validateEmailDoesNotExist.bind(this),
-  database.createNewVolunteer.bind(this),
+  volunteer.createNewVolunteer.bind(this),
   email.validateConnectionStatus.bind(this),
   email.sendVerificationEmail.bind(this),
 ]);

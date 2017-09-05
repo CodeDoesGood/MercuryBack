@@ -95,21 +95,6 @@ function validateVerificationCode(req, res, next) {
 }
 
 /**
- * Creates a new Volunteer within the database.
- */
-function createNewVolunteer(req, res, next) {
-  const volunteer = req.volunteer;
-
-  databaseWrapper.createNewVolunteer(volunteer)
-    .then((details) => {
-      req.volunteer.id = details.id;
-      req.verificationCode = details.code;
-      next();
-    })
-    .catch(error => res.status(500).send({ error: `${JSON.stringify(error)}`, description: `Failed to create the user ${volunteer.username}` }));
-}
-
-/**
  * Generates a random number and a salt, salts and hashes a number and stores that in the database
  * under the password reset table with the id of the user, the salt and hashed code and the salt
  * that was used to salt and hash the stored code for use when validating the requesting code.
@@ -129,5 +114,4 @@ module.exports = {
   validateEmailDoesExist,
   validateVerificationCode,
   createPasswordResetCode,
-  createNewVolunteer,
 };

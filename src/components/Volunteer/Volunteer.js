@@ -89,6 +89,7 @@ class Volunteer extends Database {
         .then((id) => {
           const code = this.createNewVerificationCode(id[0]);
 
+          this.id = id[0];
           this.name = name;
           this.username = username;
           this.email = email;
