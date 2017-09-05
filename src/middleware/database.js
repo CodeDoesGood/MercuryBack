@@ -1,8 +1,7 @@
 const _ = require('lodash');
 
 const ConfigurationWrapper = require('../components/Configuration/ConfigurationWrapper');
-const DatabaseWrapper = require('../components/DatabaseWrapper/DatabaseWrapper');
-const logger = require('../components/Logger/Logger');
+const DatabaseWrapper = require('../components/DatabaseWrapper/Database');
 
 const config = new ConfigurationWrapper('mercury', 'mercury.json');
 const databaseWrapper = new DatabaseWrapper(config.getKey('databasePath'));
