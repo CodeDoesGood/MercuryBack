@@ -12,7 +12,8 @@ class Projects extends Database {
    */
   getAllProjects() {
     return new Promise((resolve, reject) => {
-      this.knex.select().from('project')
+      this.connect()
+        .then(() => this.knex.select().from('project'))
         .then(projects => resolve(projects))
         .catch(error => reject(error));
     });
@@ -23,7 +24,8 @@ class Projects extends Database {
    */
   getAllActiveProjects() {
     return new Promise((resolve, reject) => {
-      this.knex('project').where('status', 'active').andWhere('hidden', false)
+      this.connect()
+        .then(() => this.knex('project').where('status', 'active').andWhere('hidden', false))
         .then(projects => resolve(projects))
         .catch(error => reject(error));
     });
@@ -39,7 +41,8 @@ class Projects extends Database {
         reject(`volunteerId "${status}" passed is not a valid string`);
       }
 
-      this.knex('project').where('status', status)
+      this.connect()
+        .then(() => this.knex('project').where('status', status))
         .then(projects => resolve(projects))
         .catch(error => reject(error));
     });
@@ -55,7 +58,8 @@ class Projects extends Database {
         reject(`volunteerId "${category}" passed is not a valid string`);
       }
 
-      this.knex('project').where('project_category', category)
+      this.connect()
+        .then(() => this.knex('project').where('project_category', category))
         .then(projects => resolve(projects))
         .catch(error => reject(error));
     });
@@ -66,7 +70,8 @@ class Projects extends Database {
    */
   getAllHiddenProjects() {
     return new Promise((resolve, reject) => {
-      this.knex('project').where('hidden', true)
+      this.connect()
+        .then(() => this.knex('project').where('hidden', true))
         .then(projects => resolve(projects))
         .catch(error => reject(error));
     });

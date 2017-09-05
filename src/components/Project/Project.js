@@ -34,7 +34,8 @@ class Project extends Database {
         reject(`id '${this.id}' passed is not a valid number`);
       }
 
-      this.knex('project').where('id', this.id).first()
+      this.connect()
+        .then(() => this.knex('project').where('id', this.id).first())
         .then((project) => {
           if (_.isNil(project)) {
             reject(`Project ${this.id} does not exist`);
@@ -63,7 +64,8 @@ class Project extends Database {
         reject(`id "${this.id}" passed is not a valid number`);
       }
 
-      this.knex('project').where('id', this.id).update(content)
+      this.connect()
+        .then(() => this.knex('project').where('id', this.id).update(content))
         .then(updated => resolve(updated))
         .catch(error => reject(error));
     });
