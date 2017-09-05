@@ -123,6 +123,26 @@ function updateUsersPassword(req, res) {
     });
 }
 
+/**
+ * Marks the account in the database as a verified account, allowing the user to login after the
+ * set time period.
+ */
+function verifyVolunteerAccount(req, res) {
+  const userId = req.id;
+  const username = req.username;
+
+  const volunteer = new Volunteer(req.id, req.username);
+
+  volunteer.exists()
+    .then(() => volunteer.removeVerificationCode())
+    .then(() => volunteer.verify())
+    .then(() => res.status(200).send({ message: `Volunteer ${username} email is now verified` }))
+    .catch((error) => {
+      logger.error(`Failed to mark account ${username} as verified, error=${JSON.stringify(error)}`);
+      res.status(500).send({ error: 'Failed Verifing', description: `Failed to mark account ${username} as verified` });
+    });
+}
+
 
 module.exports = {
   validateVolunteerCreationDetails,
@@ -130,4 +150,5 @@ module.exports = {
   validatePasswordDetails,
   validateVerifyCodeAuthenticity,
   updateUsersPassword,
+  verifyVolunteerAccount,
 };

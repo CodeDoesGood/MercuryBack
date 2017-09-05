@@ -102,9 +102,9 @@ class Volunteer extends Database {
   }
 
   /**
-   * Marks the provided usersId as email verified in the database
+   * Marks the provided usersId as verified in the database
    */
-  Verify() {
+  verify() {
     return new Promise((resolve, reject) => {
       if (!_.isNumber(this.id)) {
         reject(`volunteerId "${this.id}" passed is not a valid number`);

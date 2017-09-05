@@ -12,7 +12,6 @@ const router = Router();
  */
 
 router.post('/volunteer/create', [
-  volunteer.volunteerTest.bind(this),
   volunteer.validateVolunteerCreationDetails.bind(this),
   database.validateConnectionStatus.bind(this),
   database.validateUsernameDoesNotExist.bind(this),
@@ -31,7 +30,7 @@ router.post('/volunteer/verify/:username/:code', [
   database.validateUsernameDoesExist.bind(this),
   database.validateVerifyCodeExists.bind(this),
   volunteer.validateVerifyCodeAuthenticity.bind(this),
-  database.verifyVolunteerAccount.bind(this),
+  volunteer.verifyVolunteerAccount.bind(this),
 ]);
 
 /**
@@ -53,7 +52,7 @@ router.post('/volunteer/password/reset', [
   database.validateConnectionStatus.bind(this),
   database.validateUsernameDoesExist.bind(this),
   database.validateVerificationCode.bind(this),
-  database.updateUsersPassword.bind(this),
+  volunteer.updateUsersPassword.bind(this),
 ]);
 
 /**
@@ -65,7 +64,7 @@ router.post('/volunteer/password/update', [
   database.validateConnectionStatus.bind(this),
   database.validateUsernameDoesExist.bind(this),
   authentication.ValidateUserCredentials.bind(this),
-  database.updateUsersPassword.bind(this),
+  volunteer.updateUsersPassword.bind(this),
 ]);
 
 module.exports = router;
