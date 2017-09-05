@@ -158,6 +158,27 @@ class Volunteer extends Database {
       .then()
       .catch(error => logger.error(`Failed to remove verification code for user ${this.id} error=${JSON.stringify(error)}`));
   }
+
+  /**
+   * Update the volunteers password with the new password, this process will do the salting and
+   * hashing of the password, storing the new salt and new hashed password.
+   * @param password
+   */
+  updatePassword(password) {
+    return new Promise((resolve, reject) => {
+      if (!_.isNumber(this.id) || !_.isString(password)) {
+        reject('password or id passed was not a valid number or string');
+      }
+
+      const salted = this.saltAndHash(password);
+      this.knex('volunteer').where('id', this.id).update({
+        password: salted.hashedPassword,
+        salt: salted.salt,
+      })
+        .then(() => resolve())
+        .catch(error => reject(`Unable to update password for volunteer ${this.id}, error=${JSON.stringify(error)}`));
+    });
+  }
 }
 
 module.exports = Volunteer;
