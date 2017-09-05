@@ -78,7 +78,6 @@ class Volunteer extends Database {
         name,
         username,
         email,
-        password,
         data_entry_user_id: dataEntryUserId },
         {
           data_entry_date: `${date.getFullYear()}-${date.getMonth()}-${date.getDay()}`,
@@ -89,6 +88,13 @@ class Volunteer extends Database {
       this.knex('volunteer').insert(volunteer)
         .then((id) => {
           const code = this.createNewVerificationCode(id[0]);
+
+          this.name = name;
+          this.username = username;
+          this.email = email;
+          this.password = hashedPassword.hashedPassword;
+          this.salt = hashedPassword.salt;
+
           resolve({ id: id[0], code });
         })
         .catch(error => reject(error));
