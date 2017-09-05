@@ -1,7 +1,7 @@
 const _ = require('lodash');
 const Promise = require('bluebird');
 
-const Database = require('../DatabaseWrapper/Database');
+const Database = require('../DatabaseWrapper/DatabaseWrapper');
 
 /**
  * Interface for everything that is needed for a Projects

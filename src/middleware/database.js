@@ -1,10 +1,8 @@
 const _ = require('lodash');
 
-const ConfigurationWrapper = require('../components/Configuration/ConfigurationWrapper');
-const DatabaseWrapper = require('../components/DatabaseWrapper/Database');
+const DatabaseWrapper = require('../components/DatabaseWrapper/DatabaseWrapper');
 
-const config = new ConfigurationWrapper('mercury', 'mercury.json');
-const databaseWrapper = new DatabaseWrapper(config.getKey('databasePath'));
+const databaseWrapper = new DatabaseWrapper();
 
 /**
  * Gets the current online status of the database wrapper, if online calls next otherwise sends

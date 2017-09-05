@@ -1,7 +1,7 @@
 const _ = require('lodash');
 const Promise = require('bluebird');
 
-const Database = require('../DatabaseWrapper/Database');
+const Database = require('../DatabaseWrapper/DatabaseWrapper');
 const logger = require('../Logger/Logger');
 
 /**
