@@ -28,7 +28,7 @@ router.post('/volunteer/create', [
 router.post('/volunteer/verify/:username/:code', [
   database.validateConnectionStatus.bind(this),
   database.validateUsernameDoesExist.bind(this),
-  database.validateVerifyCodeExists.bind(this),
+  volunteer.validateVerifyCodeExists.bind(this),
   volunteer.validateVerifyCodeAuthenticity.bind(this),
   volunteer.verifyVolunteerAccount.bind(this),
 ]);

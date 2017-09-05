@@ -143,6 +143,28 @@ function verifyVolunteerAccount(req, res) {
     });
 }
 
+/**
+ * Checks to see that the validation code already exists in the verification table and calls next
+ * otherwise sends a bad request.
+ */
+function validateVerifyCodeExists(req, res, next) {
+  const code = req.params.code;
+  const userId = req.id;
+
+  if (_.isNil(code) || _.isNil(userId)) {
+    res.status(500).send({ error: 'Validate Verify Code', description: 'The code provided was invalid' });
+  }
+
+  req.code = code;
+
+  const volunteer = new Volunteer(req.id, req.username);
+
+  volunteer.exists()
+    .then(() => volunteer.doesVerificationCodeExist())
+    .then(() => next())
+    .catch(() => res.status(400).send({ error: 'Code existence', description: 'Verification Code Does not exist' }));
+}
+
 
 module.exports = {
   validateVolunteerCreationDetails,
@@ -151,4 +173,5 @@ module.exports = {
   validateVerifyCodeAuthenticity,
   updateUsersPassword,
   verifyVolunteerAccount,
+  validateVerifyCodeExists,
 };
