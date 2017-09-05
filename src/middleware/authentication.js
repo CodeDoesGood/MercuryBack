@@ -2,11 +2,10 @@ const _ = require('lodash');
 const jwt = require('jsonwebtoken');
 
 const ConfigurationWrapper = require('../components/Configuration/ConfigurationWrapper');
-const DatabaseWrapper = require('../components/DatabaseWrapper/DatabaseWrapper');
 const logger = require('../components/Logger/Logger');
+const Volunteer = require('../components/Volunteer/Volunteer');
 
 const config = new ConfigurationWrapper('mercury', 'mercury.json');
-const databaseWrapper = new DatabaseWrapper(config.getKey('databasePath'));
 
 /**
  * Validates that the details provided are a valid type, format and content. If all true then next
@@ -44,9 +43,11 @@ function ValidateUserCredentials(req, res, next) {
   const username = req.username;
   const password = req.oldPassword;
 
-  databaseWrapper.getVolunteerLoginDetails(username)
-    .then((vol) => {
-      if (databaseWrapper.compareVolunteerLoggingInPasswords(password, vol.password, vol.salt)) {
+  const volunteer = new Volunteer(null, username);
+
+  volunteer.exists('username')
+    .then(() => {
+      if (volunteer.compareAuthenticatingPassword(password)) {
         next();
       } else {
         res.status(401).send({ error: 'Validate user credentials', description: 'Password provided was incorrect' });
@@ -97,9 +98,11 @@ function authenticateLoggingInUser(req, res) {
   const password = req.password;
   const userId = parseInt(req.id, 10);
 
-  databaseWrapper.getVolunteerLoginDetails(userId)
-    .then((vol) => {
-      if (databaseWrapper.compareVolunteerLoggingInPasswords(password, vol.password, vol.salt)) {
+  const volunteer = new Volunteer(userId, username);
+
+  volunteer.exists()
+    .then(() => {
+      if (volunteer.compareAuthenticatingPassword(password)) {
         const token = jwt.sign({ username, id: userId }, config.getKey('secret'), { expiresIn: '1h' });
         res.status(200).send({ message: `Volunteer ${username} authenticated`, content: { token } });
       } else {
@@ -111,7 +114,6 @@ function authenticateLoggingInUser(req, res) {
       res.status(500).send({ error: 'Authentication', description: 'Failed to get Volunteer login details' });
     });
 }
-
 
 module.exports = {
   validateAuthenticationDetails,

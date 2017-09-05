@@ -128,71 +128,6 @@ class DatabaseWrapper {
   }
 
   /**
-   * Gets volunteer login details by username or id, but if you pass the id, you will have to make
-   * sure that its passed as number and not a string
-   * @param volunteerIdOrUsername The username (string) or volunteerId (number);
-   */
-  getVolunteerLoginDetails(volunteerIdOrUsername) {
-    let searchType = 'id';
-
-    if (_.isString(volunteerIdOrUsername)) { searchType = 'username'; }
-
-    return new Promise((resolve, reject) => {
-      this.knex('volunteer').where(searchType, volunteerIdOrUsername).select('id', 'username', 'password', 'salt').first()
-        .then(volunteer => resolve(volunteer))
-        .catch(error => reject(error));
-    });
-  }
-
-  /**
-   * Get the volunteers position details from the position table
-   * @param volunteerId
-   */
-  getVolunteerPosition(volunteerId) {
-    return new Promise((resolve, reject) => {
-      if (!_.isNumber(volunteerId)) {
-        reject(`volunteerId "${volunteerId}" passed is not a valid number`);
-      }
-
-      this.knex('position').where('id', volunteerId).select('name', 'description', 'value').first()
-        .then(position => resolve(position))
-        .catch(error => reject(error));
-    });
-  }
-
-  /**
-   * Gets all the current assignments for that volunteer by id
-   * @param volunteerId
-   */
-  getVolunteerAssignments(volunteerId) {
-    return new Promise((resolve, reject) => {
-      if (!_.isNumber(volunteerId)) {
-        reject(`volunteerId "${volunteerId}" passed is not a valid number`);
-      }
-
-      this.knex('volunteer_assignment').where('id', volunteerId).select().first()
-        .then(assignments => resolve(assignments))
-        .catch(error => reject(error));
-    });
-  }
-
-  /**
-   * Get all the volunteers comments by id
-   * @param volunteerId
-   */
-  getVolunteerComments(volunteerId) {
-    return new Promise((resolve, reject) => {
-      if (!_.isNumber(volunteerId)) {
-        reject(`volunteerId "${volunteerId}" passed is not a valid number`);
-      }
-
-      this.knex('volunteer_comment').where('id', volunteerId).select().first()
-        .then(comments => resolve(comments))
-        .catch(error => reject(error));
-    });
-  }
-
-  /**
    * Get a comment by the comment id
    * @param commentId
    */
@@ -414,18 +349,6 @@ class DatabaseWrapper {
         })
         .catch(() => reject(0));
     });
-  }
-
-  /**
-   * Compares users password with stored password after salting.
-   * @param volunteerPassword The password being salted.
-   * @param storedPassword The stored password.
-   * @param salt The stored salt.
-   * @returns {boolean} true if matched.
-   */
-  compareVolunteerLoggingInPasswords(volunteerPassword, storedPassword, salt) {
-    const hashedPassword = this.saltAndHash(volunteerPassword, salt);
-    return hashedPassword.hashedPassword === storedPassword;
   }
 
   /**

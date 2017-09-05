@@ -1,6 +1,5 @@
 const _ = require('lodash');
 
-// Stephen Test
 const Volunteer = require('../components/Volunteer/Volunteer');
 
 /**
@@ -88,11 +87,11 @@ function validateVerifyCodeAuthenticity(req, res, next) {
     .then(() => {
       return volunteer.getVerificationCode();
     })
-    .then((code) => {
+    .then((details) => {
       const storedCode = details.code;
       const storedSalt = details.salt;
 
-      const hashedCode = databaseWrapper.saltAndHash(code, storedSalt);
+      const hashedCode = volunteer.saltAndHash(code, storedSalt);
 
       if (hashedCode.hashedPassword === storedCode) {
         next();
@@ -131,7 +130,7 @@ function verifyVolunteerAccount(req, res) {
   const userId = req.id;
   const username = req.username;
 
-  const volunteer = new Volunteer(req.id, req.username);
+  const volunteer = new Volunteer(userId, username);
 
   volunteer.exists()
     .then(() => volunteer.removeVerificationCode())
@@ -169,11 +168,11 @@ function validateVerifyCodeExists(req, res, next) {
  * Creates a new Volunteer within the database.
  */
 function createNewVolunteer(req, res, next) {
-  const volunteer = req.volunteer;
+  const volunteerDetails = req.volunteer;
 
   const volunteer = new Volunteer();
 
-  volunteer.create(volunteer.name, volunteer.username, volunteer.email, volunteer.password, 1)
+  volunteer.create(volunteerDetails.name, volunteerDetails.username, volunteerDetails.email, volunteerDetails.password, 1)
     .then((details) => {
       req.volunteer.id = details.id;
       req.verificationCode = details.code;

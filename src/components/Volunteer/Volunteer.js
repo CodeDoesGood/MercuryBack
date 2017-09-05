@@ -62,6 +62,16 @@ class Volunteer extends Database {
   }
 
   /**
+   * Takes in the attempting users password and returns true or false if the details match.
+   * @param password The password being used to attempt the login.
+   * @returns {boolean}
+   */
+  compareAuthenticatingPassword(password) {
+    const hashedPassword = this.saltAndHash(password, this.salt);
+    return hashedPassword.hashedPassword === this.password;
+  }
+
+  /**
    * Creates the volunteer with the provided details.
    * @param name
    * @param username
