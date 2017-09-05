@@ -1,5 +1,6 @@
 const _ = require('lodash');
 
+const logger = require('../components/Logger/Logger');
 const Volunteer = require('../components/Volunteer/Volunteer');
 
 /**
@@ -84,13 +85,10 @@ function validateVerifyCodeAuthenticity(req, res, next) {
   const volunteer = new Volunteer(userId);
 
   volunteer.exists()
-    .then(() => {
-      return volunteer.getVerificationCode();
-    })
+    .then(() => volunteer.getVerificationCode())
     .then((details) => {
       const storedCode = details.code;
       const storedSalt = details.salt;
-
       const hashedCode = volunteer.saltAndHash(code, storedSalt);
 
       if (hashedCode.hashedPassword === storedCode) {
@@ -99,19 +97,19 @@ function validateVerifyCodeAuthenticity(req, res, next) {
         res.status(401).send({ error: 'Invalid Code', description: 'The code passed was not the correct code for verification' });
       }
     })
-    .catch((error) => res.status(500).send({ error: 'Verification', description: `Failed to get verification code, error=${JSON.stringify(error)}`)
+    .catch(error => res.status(500).send({ error: 'Verification', descripion: `Failed to get verification code, error=${JSON.stringify(error)}` }));
 }
 
 /**
- * Updates the volunteers password with the new password by the users id and then tells the client that
- * there password has been updated.
+ * Updates the volunteers password with the new password by the
+ * users id and then tells the client that there password has been updated.
  */
 function updateUsersPassword(req, res) {
   const username = req.username;
   const userId = req.id;
   const password = req.password;
 
-  const volunteer = new Volunteer(req.id, req.username);
+  const volunteer = new Volunteer(userId, username);
 
   volunteer.exists()
     .then(() => volunteer.updatePassword(password))
@@ -168,11 +166,11 @@ function validateVerifyCodeExists(req, res, next) {
  * Creates a new Volunteer within the database.
  */
 function createNewVolunteer(req, res, next) {
-  const volunteerDetails = req.volunteer;
+  const vol = req.volunteer;
 
   const volunteer = new Volunteer();
 
-  volunteer.create(volunteerDetails.name, volunteerDetails.username, volunteerDetails.email, volunteerDetails.password, 1)
+  volunteer.create(vol.name, vol.username, vol.email, vol.password, 1)
     .then((details) => {
       req.volunteer.id = details.id;
       req.verificationCode = details.code;

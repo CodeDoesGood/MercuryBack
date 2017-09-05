@@ -1,3 +1,5 @@
+/* eslint dot-notation: 0 */
+
 const _ = require('lodash');
 const Promise = require('bluebird');
 
