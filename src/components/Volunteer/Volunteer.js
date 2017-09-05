@@ -44,7 +44,7 @@ class Volunteer extends Database {
       this.knex('volunteer').where(type, this[type]).select('id', 'username', 'email', 'password', 'salt').first()
         .then((volunteer) => {
           if (_.isNil(volunteer)) {
-            resolve(false);
+            reject(false);
           } else {
             this.id = volunteer.id;
             this.username = volunteer.username;
@@ -157,6 +157,38 @@ class Volunteer extends Database {
     return this.knex('verification_codes').where('id', this.id).del()
       .then()
       .catch(error => logger.error(`Failed to remove verification code for user ${this.id} error=${JSON.stringify(error)}`));
+  }
+
+  /**
+   * Gets and returns all details for the volunteer in the verification codes table.
+   */
+  getVerificationCode() {
+    return new Promise((resolve, reject) => {
+      if (!_.isNumber(this.id)) {
+        reject(`volunteerId "${this.id}" passed is not a valid number`);
+      }
+
+      this.knex('verification_codes').where('id', this.id).first()
+        .then(details => resolve(details))
+        .catch(error => reject(error));
+    });
+  }
+
+  /**
+   * Resolves the volunteers id if the verification code exists exists otherwise rejects.
+   */
+  doesVerificationCodeExist() {
+    return new Promise((resolve, reject) => {
+      if (!_.isNumber(this.id)) {
+        reject(`volunteerId "${this.id}" passed is not a valid number`);
+      }
+
+      this.knex('volunteer').select('id').where('id', this.id).first()
+        .then((result) => {
+          if (_.isNil(result.id)) { reject(0); } else { resolve(result.id); }
+        })
+        .catch(() => reject(0));
+    });
   }
 
   /**

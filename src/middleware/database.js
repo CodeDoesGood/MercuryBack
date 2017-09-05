@@ -85,35 +85,6 @@ function validateEmailDoesExist(req, res, next) {
 }
 
 /**
- * Pulls the code, salt, hashes the code emailed to the client with the stores salt then compares
- * the newly salted and hashed code with the already salted and hashed stored code to see if they
- * match and if they match call next, otherwise said a 401 invalid authentication. (meaning that
- * the code used into trying to verify the account was not the correct code)
- * @param req
- * @param res
- * @param next
- */
-function validateVerifyCodeAuthenticity(req, res, next) {
-  const code = req.code;
-  const userId = req.id;
-
-  databaseWrapper.getVerificationCode(userId)
-    .then((details) => {
-      const storedCode = details.code;
-      const storedSalt = details.salt;
-
-      const hashedCode = databaseWrapper.saltAndHash(code, storedSalt);
-
-      if (hashedCode.hashedPassword === storedCode) {
-        next();
-      } else {
-        res.status(401).send({ error: 'Invalid Code', description: 'The code passed was not the correct code for verification' });
-      }
-    })
-    .catch(error => res.status(500).send({ error: 'Verification', description: `Failed to get verification code, error=${JSON.stringify(error)}` }));
-}
-
-/**
  * Checks to see that the validation code already exists in the verification table and calls next
  * otherwise sends a bad request.
  */
@@ -170,23 +141,6 @@ function createPasswordResetCode(req, res, next) {
 }
 
 /**
- * Updates the users password with the new password by the users id and then tells the client that
- * there password has been updated.
- */
-function updateUsersPassword(req, res) {
-  const username = req.username;
-  const userId = req.id;
-  const password = req.password;
-
-  databaseWrapper.updateVolunteerPasswordById(userId, password)
-    .then(() => res.status(200).send({ message: `Volunteer ${username} password now updated` }))
-    .catch((error) => {
-      logger.error(`Failed to update password for ${username}, error=${JSON.stringify(error)}`);
-      res.status(500).send({ error: 'Password updating', description: `Failed to update password for ${username}` });
-    });
-}
-
-/**
  * Marks the account in the database as a verified account, allowing the user to login after the
  * set time period.
  */
@@ -212,7 +166,6 @@ module.exports = {
   validateUsernameDoesExist,
   validateEmailDoesExist,
   validateVerifyCodeExists,
-  validateVerifyCodeAuthenticity,
   validateVerificationCode,
   verifyVolunteerAccount,
   createPasswordResetCode,

@@ -12,6 +12,7 @@ const router = Router();
  */
 
 router.post('/volunteer/create', [
+  volunteer.volunteerTest.bind(this),
   volunteer.validateVolunteerCreationDetails.bind(this),
   database.validateConnectionStatus.bind(this),
   database.validateUsernameDoesNotExist.bind(this),
@@ -29,7 +30,7 @@ router.post('/volunteer/verify/:username/:code', [
   database.validateConnectionStatus.bind(this),
   database.validateUsernameDoesExist.bind(this),
   database.validateVerifyCodeExists.bind(this),
-  database.validateVerifyCodeAuthenticity.bind(this),
+  volunteer.validateVerifyCodeAuthenticity.bind(this),
   database.verifyVolunteerAccount.bind(this),
 ]);
 

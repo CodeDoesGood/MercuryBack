@@ -1,5 +1,8 @@
 const _ = require('lodash');
 
+// Stephen Test
+const Volunteer = require('../components/Volunteer/Volunteer');
+
 /**
  * Validates that the user creation details are all there and contain all the correct information
  * including password length, username length, email type etc
@@ -69,8 +72,62 @@ function validatePasswordDetails(req, res, next) {
   }
 }
 
+/**
+ * Pulls the code, salt, hashes the code emailed to the client with the stores salt then compares
+ * the newly salted and hashed code with the already salted and hashed stored code to see if they
+ * match and if they match call next, otherwise said a 401 invalid authentication. (meaning that
+ * the code used into trying to verify the account was not the correct code)
+ */
+function validateVerifyCodeAuthenticity(req, res, next) {
+  const code = req.code;
+  const userId = req.id;
+
+  const volunteer = new Volunteer(userId);
+
+  volunteer.exists()
+    .then(() => {
+      return volunteer.getVerificationCode();
+    })
+    .then((code) => {
+      const storedCode = details.code;
+      const storedSalt = details.salt;
+
+      const hashedCode = databaseWrapper.saltAndHash(code, storedSalt);
+
+      if (hashedCode.hashedPassword === storedCode) {
+        next();
+      } else {
+        res.status(401).send({ error: 'Invalid Code', description: 'The code passed was not the correct code for verification' });
+      }
+    })
+    .catch((error) => res.status(500).send({ error: 'Verification', description: `Failed to get verification code, error=${JSON.stringify(error)}`)
+}
+
+/**
+ * Updates the volunteers password with the new password by the users id and then tells the client that
+ * there password has been updated.
+ */
+function updateUsersPassword(req, res) {
+  const username = req.username;
+  const userId = req.id;
+  const password = req.password;
+
+  const volunteer = new Volunteer(req.id, req.username);
+
+  volunteer.exists()
+    .then(() => volunteer.updatePassword(password))
+    .then(() => res.status(200).send({ message: `Volunteer ${username} password now updated` }))
+    .catch((error) => {
+      logger.error(`Failed to update password for ${username}, error=${JSON.stringify(error)}`);
+      res.status(500).send({ error: 'Password updating', description: `Failed to update password for ${username}` });
+    });
+}
+
+
 module.exports = {
   validateVolunteerCreationDetails,
   validateRequestResetDetails,
   validatePasswordDetails,
+  validateVerifyCodeAuthenticity,
+  updateUsersPassword,
 };
