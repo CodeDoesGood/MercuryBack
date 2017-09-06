@@ -2,6 +2,7 @@ const _ = require('lodash');
 const assert = require('assert');
 
 const DatabaseWrapper = require('../components/DatabaseWrapper/DatabaseWrapper');
+
 const databaseWrapper = new DatabaseWrapper();
 
 databaseWrapper.showMessage = false;
