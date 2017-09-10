@@ -1,10 +1,6 @@
 const _ = require('lodash');
 
-const ConfigurationWrapper = require('../components/Configuration/ConfigurationWrapper');
-const DatabaseWrapper = require('../components/DatabaseWrapper/DatabaseWrapper');
-
-const config = new ConfigurationWrapper('mercury', 'mercury.json');
-const databaseWrapper = new DatabaseWrapper(config.getKey('databasePath'));
+const Project = require('../components/Project/Project');
 
 /**
  * Validates that there is a project that exists by the id requested and calls next otherwise
@@ -99,10 +95,13 @@ function validateProjectUpdateContentTypes(req, res, next) {
  * validateProjectUpdateContent middleware.
  */
 function updateProjectById(req, res) {
-  const project = req.project;
+  const content = req.project;
   const projectId = req.projectId;
 
-  databaseWrapper.updateProjectById(projectId, project)
+  const project = new Project(projectId);
+
+  project.exists()
+    .then(() => project.updateContent(content))
     .then(() => res.status(200).send({ message: `Project updated id ${projectId}` }))
     .catch(error => res.status(500).send({ error: `${JSON.stringify(error)}`, description: `Unable to update project by id ${projectId}` }));
 }
@@ -113,8 +112,13 @@ function updateProjectById(req, res) {
 function getProjectById(req, res) {
   const projectId = req.projectId;
 
-  databaseWrapper.getProjectById(projectId)
-    .then(projects => res.status(200).send({ message: `Project By id ${projectId}`, content: { projects } }))
+  const project = new Project(projectId);
+
+  project.exists()
+    .then(() => {
+      const content = project.getContent();
+      res.status(200).send({ message: `Project By id ${projectId}`, content: { project: content } });
+    })
     .catch(error => res.status(500).send({ error: `${JSON.stringify(error)}`, description: `Unable to gather project by id ${projectId}` }));
 }
 

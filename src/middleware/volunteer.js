@@ -1,11 +1,14 @@
 const _ = require('lodash');
 
+const logger = require('../components/Logger/Logger');
+const Volunteer = require('../components/Volunteer/Volunteer');
+
 /**
  * Validates that the user creation details are all there and contain all the correct information
  * including password length, username length, email type etc
  */
 function validateVolunteerCreationDetails(req, res, next) {
-  const volunteerRequirements = ['username', 'password', 'name', 'email_address', 'data_entry_user_id'];
+  const volunteerRequirements = ['username', 'password', 'name', 'email', 'data_entry_user_id'];
   const volunteer = _.pick(req.body.volunteer, volunteerRequirements);
 
   if (_.isNil(volunteer) || !_.isObject(volunteer)) {
@@ -36,7 +39,7 @@ function validateVolunteerCreationDetails(req, res, next) {
     } else if (volunteer.password < 6) {
       return res.status(400).send({ error: 'Invalid Credentials', description: 'Password can not be less than 6 characters' });
     }
-    volunteer.email_address = volunteer.email_address.toLowerCase();
+    volunteer.email = volunteer.email.toLowerCase();
     req.volunteer = volunteer;
     return next();
   }
@@ -69,8 +72,121 @@ function validatePasswordDetails(req, res, next) {
   }
 }
 
+/**
+ * Pulls the code, salt, hashes the code emailed to the client with the stores salt then compares
+ * the newly salted and hashed code with the already salted and hashed stored code to see if they
+ * match and if they match call next, otherwise said a 401 invalid authentication. (meaning that
+ * the code used into trying to verify the account was not the correct code)
+ */
+function validateVerifyCodeAuthenticity(req, res, next) {
+  const code = req.code;
+  const userId = req.id;
+
+  const volunteer = new Volunteer(userId);
+
+  volunteer.exists()
+    .then(() => volunteer.getVerificationCode())
+    .then((details) => {
+      const storedCode = details.code;
+      const storedSalt = details.salt;
+      const hashedCode = volunteer.saltAndHash(code, storedSalt);
+
+      if (hashedCode.hashedPassword === storedCode) {
+        next();
+      } else {
+        res.status(401).send({ error: 'Invalid Code', description: 'The code passed was not the correct code for verification' });
+      }
+    })
+    .catch(error => res.status(500).send({ error: 'Verification', descripion: `Failed to get verification code, error=${JSON.stringify(error)}` }));
+}
+
+/**
+ * Updates the volunteers password with the new password by the
+ * users id and then tells the client that there password has been updated.
+ */
+function updateUsersPassword(req, res) {
+  const username = req.username;
+  const userId = req.id;
+  const password = req.password;
+
+  const volunteer = new Volunteer(userId, username);
+
+  volunteer.exists()
+    .then(() => volunteer.updatePassword(password))
+    .then(() => res.status(200).send({ message: `Volunteer ${username} password now updated` }))
+    .catch((error) => {
+      logger.error(`Failed to update password for ${username}, error=${JSON.stringify(error)}`);
+      res.status(500).send({ error: 'Password updating', description: `Failed to update password for ${username}` });
+    });
+}
+
+/**
+ * Marks the account in the database as a verified account, allowing the user to login after the
+ * set time period.
+ */
+function verifyVolunteerAccount(req, res) {
+  const userId = req.id;
+  const username = req.username;
+
+  const volunteer = new Volunteer(userId, username);
+
+  volunteer.exists()
+    .then(() => volunteer.removeVerificationCode())
+    .then(() => volunteer.verify())
+    .then(() => res.status(200).send({ message: `Volunteer ${username} email is now verified` }))
+    .catch((error) => {
+      logger.error(`Failed to mark account ${username} as verified, error=${JSON.stringify(error)}`);
+      res.status(500).send({ error: 'Failed Verifing', description: `Failed to mark account ${username} as verified` });
+    });
+}
+
+/**
+ * Checks to see that the validation code already exists in the verification table and calls next
+ * otherwise sends a bad request.
+ */
+function validateVerifyCodeExists(req, res, next) {
+  const code = req.params.code;
+  const userId = req.id;
+
+  if (_.isNil(code) || _.isNil(userId)) {
+    res.status(500).send({ error: 'Validate Verify Code', description: 'The code provided was invalid' });
+  }
+
+  req.code = code;
+
+  const volunteer = new Volunteer(req.id, req.username);
+
+  volunteer.exists()
+    .then(() => volunteer.doesVerificationCodeExist())
+    .then(() => next())
+    .catch(() => res.status(400).send({ error: 'Code existence', description: 'Verification Code Does not exist' }));
+}
+
+/**
+ * Creates a new Volunteer within the database.
+ */
+function createNewVolunteer(req, res, next) {
+  const vol = req.volunteer;
+
+  const volunteer = new Volunteer();
+
+  volunteer.create(vol.name, vol.username, vol.email, vol.password, 1)
+    .then((details) => {
+      req.volunteer.id = details.id;
+      req.verificationCode = details.code;
+      next();
+    })
+    .catch(error => res.status(500).send({ error: `${JSON.stringify(error)}`, description: `Failed to create the user ${volunteer.username}` }));
+}
+
+
 module.exports = {
   validateVolunteerCreationDetails,
   validateRequestResetDetails,
   validatePasswordDetails,
+  validateVerifyCodeAuthenticity,
+  updateUsersPassword,
+  verifyVolunteerAccount,
+  validateVerifyCodeExists,
+  createNewVolunteer,
 };

@@ -1,17 +1,16 @@
 const _ = require('lodash');
 const assert = require('assert');
 
-const ConfigurationWrapper = require('../components/Configuration/ConfigurationWrapper');
 const DatabaseWrapper = require('../components/DatabaseWrapper/DatabaseWrapper');
 
-const config = new ConfigurationWrapper('mercury', 'mercury.json');
-const databaseWrapper = new DatabaseWrapper(config.getKey('databasePath'));
+const databaseWrapper = new DatabaseWrapper();
 
 databaseWrapper.showMessage = false;
 
 describe('Database Wrapper', () => {
   describe('#getOnlineStatus', () => {
     it('Should return true if online', () => {
+      databaseWrapper.online = true;
       const onlineStatus = databaseWrapper.getOnlineStatus();
       assert.equal(onlineStatus, true);
     });
@@ -24,94 +23,37 @@ describe('Database Wrapper', () => {
     });
   });
 
-  describe('#getProjectById', () => {
-    it('Should return project details if the id is valid', (done) => {
-      databaseWrapper.getProjectById(1).then((result) => {
-        done(assert.equal(result.id, 1));
-      }).catch(error => done(error));
+  describe('#saltAndHash', () => {
+    const password = databaseWrapper.saltAndHash('password');
+
+    it('Should return a hashed pasword ands salt', () => {
+      assert.equal(!_.isNil(password.hashedPassword), true, 'Hashed password was not given when salting and hashing a string');
+      assert.equal(!_.isNil(password.salt), true, 'salt was not given when salting and hashing a string');
     });
-    it('Should return a empty object if the id is not a valid id', (done) => {
-      databaseWrapper.getProjectById(0).then((result) => {
-        done(assert.equal(Object.keys(result).length, 0));
-      }).catch(error => done(error));
+
+    it('Should both be strings, salt and hash', () => {
+      assert.equal(_.isString(password.hashedPassword), true, 'Hashed password was not a string when salting and hashing a string');
+      assert.equal(_.isString(password.salt), true, 'salt was not a string when salting and hashing a string');
     });
-    it('Should return a empty object if the id is not a valid number', (done) => {
-      databaseWrapper.getProjectById('invalid').then((result) => {
-        done(assert.equal(Object.keys(result).length, 0));
-      }).catch(error => done(error));
+
+    it('Should validate the salt and hash if the salt is passed', () => {
+      const compareablePassword = databaseWrapper.saltAndHash('password', password.salt);
+      assert.equal(compareablePassword.hashedPassword, password.hashedPassword, 'Password salted with stored salt do not match');
     });
-    it('Should return a empty object if the id is null or undefined', (done) => {
-      databaseWrapper.getProjectById(null).then((result) => {
-        done(assert.equal(Object.keys(result).length, 0));
-      }).catch(error => done(error));
+
+    it('Should be a invalid match when entering the wrong salt', () => {
+      const compareablePassword = databaseWrapper.saltAndHash('password', `${password.salt}wrongsalt`);
+      assert.equal(compareablePassword.hashedPassword === password.hashedPassword, false, 'Password salted with wrong salt should not match');
     });
-  });
 
-  describe('#GetAllProjects', () => {
-    it('Should return projects with information', (done) => {
-      databaseWrapper.getAllProjects()
-        .then((result) => {
-          assert.equal(result.length > 0, true);
-
-          _.forEach(result, (project) => {
-            assert.equal(_.isNil(project.id), false);
-          });
-
-          done();
-        }).catch(error => done(error));
+    it('Should be a invalid match when entering the wrong password but correct salt', () => {
+      const compareablePassword = databaseWrapper.saltAndHash('wrongpassword', password.salt);
+      assert.equal(compareablePassword.hashedPassword === password.hashedPassword, false, 'Password salted with wrong password should not match');
     });
-  });
 
-  describe('#getAllActiveProjects', () => {
-    it('Should return projects with active status', (done) => {
-      databaseWrapper.getAllActiveProjects()
-        .then((result) => {
-          _.forEach(result, (project) => {
-            assert.equal(project.status, 'active');
-          });
-
-          done();
-        }).catch(error => done(error));
-    });
-  });
-
-  describe('#getAllHiddenProjects', () => {
-    it('Should return projects with active status', (done) => {
-      databaseWrapper.getAllHiddenProjects()
-        .then((result) => {
-          _.forEach(result, (project) => {
-            assert.equal(project.hidden, true);
-          });
-
-          done();
-        }).catch(error => done(error));
-    });
-  });
-
-
-  describe('#getAllProjectsByStatus', () => {
-    it('Should return projects with active status passed', (done) => {
-      databaseWrapper.getAllProjectsByStatus('active')
-        .then((result) => {
-          _.forEach(result, (project) => {
-            assert.equal(project.status, 'active');
-          });
-
-          done();
-        }).catch(error => done(error));
-    });
-  });
-
-  describe('#getAllProjectsByCategory', () => {
-    it('Should return projects with correct category passed', (done) => {
-      databaseWrapper.getAllProjectsByCategory('1')
-        .then((result) => {
-          _.forEach(result, (project) => {
-            assert.equal(project.project_category, 1);
-          });
-
-          done();
-        }).catch(error => done(error));
+    it('Should be a invalid match when entering the wrong password and wrong salt', () => {
+      const compareablePassword = databaseWrapper.saltAndHash('wrongpassword', `${password.salt}wrongsalt`);
+      assert.equal(compareablePassword.hashedPassword === password.hashedPassword, false, 'Password salted with wrong password should not match');
     });
   });
 });

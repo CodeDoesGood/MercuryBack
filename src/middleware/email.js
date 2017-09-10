@@ -30,7 +30,7 @@ function sendVerificationEmail(req, res) {
   // This is currently here because we have no email service
   logger.debug('link for user', volunteer.username, verificationLink);
 
-  const to = req.volunteer.email_address;
+  const to = req.volunteer.email;
   const from = config.getKey(['email']).email;
   const subject = '[CodeDoesGood] Verification Email';
   const text = verificationLink;

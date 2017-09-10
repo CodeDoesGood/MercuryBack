@@ -16,7 +16,7 @@ router.post('/volunteer/create', [
   database.validateConnectionStatus.bind(this),
   database.validateUsernameDoesNotExist.bind(this),
   database.validateEmailDoesNotExist.bind(this),
-  database.createNewVolunteer.bind(this),
+  volunteer.createNewVolunteer.bind(this),
   email.validateConnectionStatus.bind(this),
   email.sendVerificationEmail.bind(this),
 ]);
@@ -28,9 +28,9 @@ router.post('/volunteer/create', [
 router.post('/volunteer/verify/:username/:code', [
   database.validateConnectionStatus.bind(this),
   database.validateUsernameDoesExist.bind(this),
-  database.validateVerifyCodeExists.bind(this),
-  database.validateVerifyCodeAuthenticity.bind(this),
-  database.verifyVolunteerAccount.bind(this),
+  volunteer.validateVerifyCodeExists.bind(this),
+  volunteer.validateVerifyCodeAuthenticity.bind(this),
+  volunteer.verifyVolunteerAccount.bind(this),
 ]);
 
 /**
@@ -52,7 +52,7 @@ router.post('/volunteer/password/reset', [
   database.validateConnectionStatus.bind(this),
   database.validateUsernameDoesExist.bind(this),
   database.validateVerificationCode.bind(this),
-  database.updateUsersPassword.bind(this),
+  volunteer.updateUsersPassword.bind(this),
 ]);
 
 /**
@@ -64,7 +64,7 @@ router.post('/volunteer/password/update', [
   database.validateConnectionStatus.bind(this),
   database.validateUsernameDoesExist.bind(this),
   authentication.ValidateUserCredentials.bind(this),
-  database.updateUsersPassword.bind(this),
+  volunteer.updateUsersPassword.bind(this),
 ]);
 
 module.exports = router;

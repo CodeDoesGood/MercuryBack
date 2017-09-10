@@ -1,10 +1,8 @@
 const _ = require('lodash');
 
-const ConfigurationWrapper = require('../components/Configuration/ConfigurationWrapper');
-const DatabaseWrapper = require('../components/DatabaseWrapper/DatabaseWrapper');
+const Projects = require('../components/Projects/Projects');
 
-const config = new ConfigurationWrapper('mercury', 'mercury.json');
-const databaseWrapper = new DatabaseWrapper(config.getKey('databasePath'));
+const projectsWrapper = new Projects();
 
 /**
  * Gets and sends every single project that is active, inactive, hidden
@@ -12,7 +10,7 @@ const databaseWrapper = new DatabaseWrapper(config.getKey('databasePath'));
  * every single project.
  */
 function getAllProjects(req, res) {
-  databaseWrapper.getAllProjects()
+  projectsWrapper.getAllProjects()
     .then(projects => res.status(200).send({ message: 'All Projects', content: { projects } }))
     .catch(() => res.send(500).send({ error: 'Project Gathering', description: 'Unable to gather all projects' }));
 }
@@ -23,7 +21,7 @@ function getAllProjects(req, res) {
  * details on active projects.
  */
 function getAllActiveProjects(req, res) {
-  databaseWrapper.getAllActiveProjects()
+  projectsWrapper.getAllActiveProjects()
     .then(projects => res.status(200).send({ message: 'All Active Projects', content: { projects } }))
     .catch(error => res.status(500).send({ error: `${JSON.stringify(error)}`, description: 'Unable to gather all active projects' }));
 }
@@ -69,7 +67,7 @@ function validateProjectCategory(req, res, next) {
 function getAllProjectsByStatus(req, res) {
   const status = req.status;
 
-  databaseWrapper.getAllProjectsByStatus(status)
+  projectsWrapper.getAllProjectsByStatus(status)
     .then(projects => res.status(200).send({ message: 'All projects by status', content: { projects } }))
     .catch(error => res.status(500).send({ error: `${JSON.stringify(error)}`, description: `Unable to gather all projects by status '${status}'` }));
 }
@@ -82,7 +80,7 @@ function getAllProjectsByStatus(req, res) {
 function getAllProjectsByCategory(req, res) {
   const category = req.category;
 
-  databaseWrapper.getAllProjectsByCategory(category)
+  projectsWrapper.getAllProjectsByCategory(category)
     .then(projects => res.status(200).send({ message: 'All projects by category', content: { projects } }))
     .catch(error => res.status(500).send({ error: `${JSON.stringify(error)}`, description: `Unable to gather all projects by category '${category}'` }));
 }
@@ -92,7 +90,7 @@ function getAllProjectsByCategory(req, res) {
  * @returns A array of objects containing all project details of projects that are hidden
  */
 function getAllHiddenProjects(req, res) {
-  databaseWrapper.getAllHiddenProjects()
+  projectsWrapper.getAllHiddenProjects()
     .then(projects => res.status(200).send({ message: 'All hidden projects', content: { projects } }))
     .catch(error => res.status(500).send({ error: `${JSON.stringify(error)}`, description: 'Unable to gather all hidden projects' }));
 }
