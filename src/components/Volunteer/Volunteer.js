@@ -29,7 +29,7 @@ class Volunteer extends Database {
     this.developerLevel = null;
     this.adminPortalAccess = null;
     this.adminOverallLevel = null;
-    this.verified = null;
+    this.verified = false;
     this.email = null;
     this.salt = null;
   }
@@ -41,6 +41,10 @@ class Volunteer extends Database {
    */
   exists(type = 'id') {
     return new Promise((resolve, reject) => {
+      if (_.isNil(this[type])) {
+        reject(`Type must be defined or valid, type=${this[type]}`);
+      }
+
       this.connect()
         .then(() => this.knex('volunteer').where(type, this[type]).select('id', 'username', 'email', 'password', 'salt').first())
         .then((volunteer) => {
@@ -68,27 +72,25 @@ class Volunteer extends Database {
    * @returns {boolean}
    */
   compareAuthenticatingPassword(password) {
+    if (_.isNil(password)) { return false; }
     const hashedPassword = this.saltAndHash(password, this.salt);
     return hashedPassword.hashedPassword === this.password;
   }
 
   /**
    * Creates the volunteer with the provided details.
-   * @param name
-   * @param username
-   * @param email
    * @param password
    * @param dataEntryUserId
    */
-  create(name, username, email, password, dataEntryUserId) {
+  create(password, dataEntryUserId) {
     return new Promise((resolve, reject) => {
       const hashedPassword = this.saltAndHash(password);
       const date = new Date();
 
       const volunteer = Object.assign({
-        name,
-        username,
-        email,
+        name: this.name,
+        username: this.username,
+        email: this.email,
         data_entry_user_id: dataEntryUserId },
         {
           data_entry_date: `${date.getFullYear()}-${date.getMonth()}-${date.getDay()}`,
@@ -99,12 +101,8 @@ class Volunteer extends Database {
       this.connect()
         .then(() => this.knex('volunteer').insert(volunteer))
         .then((id) => {
-          const code = this.createNewVerificationCode(id[0]);
-
+          const code = this.createVerificationCode(id[0]);
           this.id = id[0];
-          this.name = name;
-          this.username = username;
-          this.email = email;
           this.password = hashedPassword.hashedPassword;
           this.salt = hashedPassword.salt;
 

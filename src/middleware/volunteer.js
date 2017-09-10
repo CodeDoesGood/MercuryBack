@@ -168,15 +168,18 @@ function validateVerifyCodeExists(req, res, next) {
 function createNewVolunteer(req, res, next) {
   const vol = req.volunteer;
 
-  const volunteer = new Volunteer();
+  const volunteer = new Volunteer(null, vol.username);
 
-  volunteer.create(vol.name, vol.username, vol.email, vol.password, 1)
+  volunteer.name = vol.name;
+  volunteer.email = vol.email;
+
+  volunteer.create(vol.password, 1)
     .then((details) => {
       req.volunteer.id = details.id;
       req.verificationCode = details.code;
       next();
     })
-    .catch(error => res.status(500).send({ error: `${JSON.stringify(error)}`, description: `Failed to create the user ${volunteer.username}` }));
+    .catch(error => res.status(500).send({ error, description: `Failed to create the user ${volunteer.username}` }));
 }
 
 
