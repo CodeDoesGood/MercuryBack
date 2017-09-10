@@ -4,6 +4,8 @@ const DatabaseWrapper = require('../components/DatabaseWrapper/DatabaseWrapper')
 
 const databaseWrapper = new DatabaseWrapper();
 
+databaseWrapper.connect();
+
 /**
  * Gets the current online status of the database wrapper, if online calls next otherwise sends
  * a internal server error to the client.
