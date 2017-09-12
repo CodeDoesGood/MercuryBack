@@ -4,7 +4,7 @@ const assert = require('assert');
 const Volunter = require('../components/Volunteer/Volunteer');
 
 
-describe('Volunteer', () => {
+describe('Volunteer Component', () => {
   describe('#Constructor', () => {
     it('Should contain all database elements', () => {
       const volunteer = new Volunter();
