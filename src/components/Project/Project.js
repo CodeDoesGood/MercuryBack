@@ -14,7 +14,7 @@ class Project extends Database {
     this.doesExist = false;
 
     this.id = id;
-    this.dataEntryDate = null;
+    this.createdDateTime = null;
     this.title = null;
     this.status = null;
     this.projectCategory = null;
@@ -30,24 +30,26 @@ class Project extends Database {
    */
   exists() {
     return new Promise((resolve, reject) => {
-      if (!_.isNumber(parseInt(this.id, 10))) {
+      if (_.isNil(this.id) || !_.isNumber(parseInt(this.id, 10))) {
         reject(`id '${this.id}' passed is not a valid number`);
       }
 
       this.connect()
-        .then(() => this.knex('project').where('id', this.id).first())
+        .then(() => this.knex('project').where('project_id', this.id).first())
         .then((project) => {
           if (_.isNil(project)) {
             reject(`Project ${this.id} does not exist`);
           } else {
-            this.dataEntryDate = project['data_entry_date'];
+            this.createdDateTime = project['created_datetime'];
             this.title = project.title;
             this.status = project.status;
             this.projectCategory = project['project_category'];
             this.hidden = project.hidden;
-            this.imageDirectory = project.imageDirectory;
+            this.imageDirectory = project['image_directory'];
             this.summary = project.summary;
             this.description = project.description;
+            this.doesExist = true;
+            resolve();
           }
         })
         .catch(error => reject(error));
@@ -56,17 +58,26 @@ class Project extends Database {
 
   /**
    * Updates a project by id with the provided content
-   * @param content The content in a object form that is being updated
    */
-  updateContent(content) {
+  updateContent() {
     return new Promise((resolve, reject) => {
-      if (!_.isNumber(this.id)) {
-        reject(`id "${this.id}" passed is not a valid number`);
+      if (_.isNil(this.id) || !_.isNumber(this.id)) {
+        reject(`Id "${this.id}" passed is not a valid number`);
+      } else if (!this.doesExist) {
+        reject(`Project ${this.id} does not exist or has not been checked for existence yet`);
       }
 
       this.connect()
-        .then(() => this.knex('project').where('id', this.id).update(content))
-        .then(updated => resolve(updated))
+        .then(() => this.knex('project').where('id', this.id).update({
+          title: this.title,
+          status: this.status,
+          project_category: this.projectCategory,
+          hidden: this.hidden,
+          image_directory: this.imageDirectory,
+          summary: this.summary,
+          description: this.description,
+        }))
+        .then(() => resolve())
         .catch(error => reject(error));
     });
   }
@@ -77,7 +88,7 @@ class Project extends Database {
   getContent() {
     return {
       id: this.id,
-      dataEntryDate: this.dataEntryDate,
+      createdDateTime: this.createdDateTime,
       title: this.title,
       status: this.status,
       projectCategory: this.projectCategory,
