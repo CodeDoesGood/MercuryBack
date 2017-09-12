@@ -82,7 +82,7 @@ describe('Project Component', () => {
     });
   });
 
-  describe.only('#getContent', () => {
+  describe('#getContent', () => {
     it('Should return all contents for the project', () => {
       const project = new Project(1);
       const content = project.getContent();
