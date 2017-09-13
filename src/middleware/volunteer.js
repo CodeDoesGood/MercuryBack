@@ -159,7 +159,7 @@ function validateVerifyCodeExists(req, res, next) {
   volunteer.exists()
     .then(() => volunteer.doesVerificationCodeExist())
     .then(() => next())
-    .catch(() => res.status(400).send({ error: 'Code existence', description: 'Verification Code Does not exist' }));
+    .catch(error => res.status(400).send({ error: 'Code existence', description: 'Verification Code Does not exist', print: error }));
 }
 
 /**

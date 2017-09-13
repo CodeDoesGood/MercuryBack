@@ -39,19 +39,19 @@ class Volunteer extends Database {
    * of id, if the volunteer does already exist then it will update the username, email, password,
    * and salt that is being used in the class.
    */
-  exists(type = 'id') {
+  exists(type = 'volunteer_id') {
     return new Promise((resolve, reject) => {
-      if (_.isNil(this[type])) {
-        reject(`Type must be defined or valid, type=${this[type]}`);
+      if (_.isNil(this.id)) {
+        reject(`Type must be defined or valid, type=${this.id}`);
       }
 
       this.connect()
-        .then(() => this.knex('volunteer').where(type, this[type]).select('id', 'username', 'email', 'password', 'salt').first())
+        .then(() => this.knex('volunteer').where(type, this.id).select('volunteer_id', 'username', 'email', 'password', 'salt').first())
         .then((volunteer) => {
           if (_.isNil(volunteer)) {
             reject(false);
           } else {
-            this.id = volunteer.id;
+            this.id = volunteer.volunteer_id;
             this.username = volunteer.username;
             this.email = volunteer.email;
             this.password = volunteer.password;
@@ -93,7 +93,7 @@ class Volunteer extends Database {
         email: this.email,
         data_entry_user_id: dataEntryUserId },
         {
-          data_entry_date: `${date.getFullYear()}-${date.getMonth()}-${date.getDay()}`,
+          created_datetime: `${date.getFullYear()}-${date.getMonth()}-${date.getDay()}`,
           password: hashedPassword.hashedPassword,
           salt: hashedPassword.salt,
         });
@@ -121,7 +121,7 @@ class Volunteer extends Database {
         reject(`volunteerId "${this.id}" passed is not a valid number`);
       }
       this.connect()
-        .then(() => this.knex('volunteer').where('id', this.id).update({ verified: true }))
+        .then(() => this.knex('volunteer').where('volunteer_id', this.id).update({ verified: true }))
         .then(() => {
           this.verified = true;
           resolve();
@@ -146,11 +146,11 @@ class Volunteer extends Database {
     this.removeVerificationCode(parseInt(this.id, 10));
 
     this.connect()
-      .then(() => this.knex('verification_codes').insert({
-        id: this.id,
+      .then(() => this.knex('verification_code').insert({
+        verification_code_id: this.id,
         code: hashedNumber.hashedPassword,
         salt: hashedNumber.salt,
-        data_entry_date: date,
+        created_datetime: date,
       }))
       .then(() => logger.info(`Created verification Code for user ${this.id}, number=${number}`))
       .catch(error => logger.error(`Failed to create verification code for user ${this.id} error=${JSON.stringify(error)}`));
@@ -167,7 +167,7 @@ class Volunteer extends Database {
     }
 
     return this.connect()
-      .then(() => this.knex('verification_codes').where('id', this.id).del())
+      .then(() => this.knex('verification_code').where('verification_code_id', this.id).del())
       .then()
       .catch(error => logger.error(`Failed to remove verification code for user ${this.id} error=${JSON.stringify(error)}`));
   }
@@ -182,7 +182,7 @@ class Volunteer extends Database {
       }
 
       this.connect()
-        .then(() => this.knex('verification_codes').where('id', this.id).first())
+        .then(() => this.knex('verification_code').where('verification_code_id', this.id).first())
         .then(details => resolve(details))
         .catch(error => reject(error));
     });
@@ -198,9 +198,13 @@ class Volunteer extends Database {
       }
 
       this.connect()
-        .then(() => this.knex('volunteer').select('id').where('id', this.id).first())
+        .then(() => this.knex('verification_code').select('verification_code_id').where('verification_code_id', this.id).first())
         .then((result) => {
-          if (_.isNil(result.id)) { reject(0); } else { resolve(result.id); }
+          if (_.isNil(result.verification_code_id)) {
+            reject(0);
+          } else {
+            resolve(result.verification_code_id);
+          }
         })
         .catch(() => reject(0));
     });
@@ -220,7 +224,7 @@ class Volunteer extends Database {
       const salted = this.saltAndHash(password);
 
       this.connect()
-        .then(() => this.knex('volunteer').where('id', this.id).update({
+        .then(() => this.knex('volunteer').where('volunteer_id', this.id).update({
           password: salted.hashedPassword,
           salt: salted.salt,
         }))

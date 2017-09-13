@@ -23,7 +23,7 @@ function validateProjectId(req, res, next) {
  */
 function validateProjectUpdateContent(req, res, next) {
   const project = req.body.project;
-  const projectRequirements = ['id', 'data_entry_date', 'data_entry_time', 'data_entry_user_id', 'title', 'status', 'project_category', 'image_directory', 'summary', 'description'];
+  const projectRequirements = ['project_id', 'created_datetime', 'data_entry_time', 'data_entry_user_id', 'title', 'status', 'project_category', 'image_directory', 'summary', 'description'];
 
   if (_.isNil(project) || !_.isObject(project)) {
     return res.status(400).send({ error: 'Project Validation', description: 'Project provided is not in a valid format' });
@@ -63,10 +63,8 @@ function validateProjectUpdateContentTypes(req, res, next) {
 
   if (!_.isInteger(projectId)) {
     res.status(400).send({ error: 'Project Type Validation', description: 'id type is invalid, must be a int' });
-  } else if (!_.isString(project.data_entry_date)) {
-    res.status(400).send({ error: 'Project Type Validation', description: 'data_entry_date type is invalid, must be a string' });
-  } else if (!_.isString(project.data_entry_time)) {
-    res.status(400).send({ error: 'Project Type Validation', description: 'data_entry_time type is invalid, must be a string' });
+  } else if (!_.isString(project.created_datetime)) {
+    res.status(400).send({ error: 'Project Type Validation', description: 'created_datetime type is invalid, must be a string' });
   } else if (!_.isInteger(project.data_entry_user_id)) {
     res.status(400).send({ error: 'Project Type Validation', description: 'data_entry_user_id type is invalid, must be a int' });
   } else if (!_.isString(project.title)) {

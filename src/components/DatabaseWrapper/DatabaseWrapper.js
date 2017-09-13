@@ -3,6 +3,8 @@ const crypto = require('crypto');
 const knex = require('knex');
 const Promise = require('bluebird');
 
+const logger = require('../Logger/Logger');
+
 class Database {
   constructor() {
     this.online = false;
@@ -12,20 +14,29 @@ class Database {
    * Makes a connection to the database
    */
   connect() {
-    if (this.online) {
-      return this.knex.raw('select 1+1 AS answer');
-    }
-    this.knex = knex({ client: 'mysql',
-      connection: {
-        host: '127.0.0.1',
-        user: 'root',
-        password: 'password',
-        database: 'mercury',
-      } });
+    return new Promise((resolve, reject) => {
+      if (this.online) {
+        resolve();
+      } else {
+        this.knex = knex({
+          client: 'mysql',
+          connection: {
+            host: '127.0.0.1',
+            user: 'root',
+            password: 'password',
+            database: 'mercury',
+          },
+        });
 
-    this.online = true;
-
-    return this.knex.raw('select 1+1 AS answer');
+        this.online = true;
+        this.knex.raw('select 1+1 AS answer')
+          .then(() => resolve())
+          .catch((error) => {
+            logger.error(`failed to connect to the database, error=${error}`);
+            reject(error);
+          });
+      }
+    });
   }
 
   /**
@@ -61,9 +72,9 @@ class Database {
       }
 
       this.connect()
-        .then(() => this.knex('volunteer').select('id').where('username', username).first())
+        .then(() => this.knex('volunteer').select('volunteer_id').where('username', username).first())
         .then((result) => {
-          if (_.isNil(result.id)) { reject(0); } else { resolve(result.id); }
+          if (_.isNil(result.volunteer_id)) { reject(0); } else { resolve(result.volunteer_id); }
         })
         .catch((error) => {
           reject(error);
@@ -82,7 +93,7 @@ class Database {
       }
 
       this.connect()
-        .then(() => this.knex('volunteer').select('id').where('email', email).first())
+        .then(() => this.knex('volunteer').select('volunteer_id').where('email', email).first())
         .then((result) => {
           if (_.isNil(result.id)) { reject(0); } else { resolve(result.id); }
         })

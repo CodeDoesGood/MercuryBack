@@ -68,7 +68,7 @@ class Project extends Database {
       }
 
       this.connect()
-        .then(() => this.knex('project').where('id', this.id).update({
+        .then(() => this.knex('project').where('project_id', this.id).update({
           title: this.title,
           status: this.status,
           project_category: this.projectCategory,
