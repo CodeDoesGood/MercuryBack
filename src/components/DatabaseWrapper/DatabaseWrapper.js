@@ -28,9 +28,11 @@ class Database {
           },
         });
 
-        this.online = true;
         this.knex.raw('select 1+1 AS answer')
-          .then(() => resolve())
+          .then(() => {
+            this.online = true;
+            resolve();
+          })
           .catch((error) => {
             logger.error(`failed to connect to the database, error=${error}`);
             reject(error);
