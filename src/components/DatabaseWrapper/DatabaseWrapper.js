@@ -97,7 +97,7 @@ class Database {
       this.connect()
         .then(() => this.knex('volunteer').select('volunteer_id').where('email', email).first())
         .then((result) => {
-          if (_.isNil(result.id)) { reject(0); } else { resolve(result.id); }
+          if (_.isNil(result.volunteer_id)) { reject(0); } else { resolve(result.volunteer_id); }
         })
         .catch(() => reject(0));
     });

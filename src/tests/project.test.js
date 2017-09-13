@@ -30,12 +30,9 @@ describe('Project Component', () => {
           assert.equal(_.isNil(project.status), false, 'status should exist after pulling data from the database');
           assert.equal(_.isNil(project.projectCategory), false, 'projectCategory should exist after pulling data from the database');
           assert.equal(_.isNil(project.hidden), false, 'hidden should exist after pulling data from the database');
-          assert.equal(_.isNil(project.imageDirectory), false, 'imageDirectory should exist after pulling data from the database');
-          assert.equal(_.isNil(project.summary), false, 'summary should exist after pulling data from the database');
-          assert.equal(_.isNil(project.description), false, 'description should exist after pulling data from the database');
           done();
         })
-        .catch(error => done(error));
+        .catch(error => done(new Error(error)));
     });
 
     it('Should reject if no id is passed', (done) => {
