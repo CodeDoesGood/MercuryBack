@@ -25,7 +25,7 @@ class Projects extends Database {
   getAllActiveProjects() {
     return new Promise((resolve, reject) => {
       this.connect()
-        .then(() => this.knex('project').where('status', 'active').andWhere('hidden', false))
+        .then(() => this.knex('project').where('status', 1).andWhere('hidden', false))
         .then(projects => resolve(projects))
         .catch(error => reject(error));
     });
