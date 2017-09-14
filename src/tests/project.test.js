@@ -15,7 +15,7 @@ describe('Project Component', () => {
       project.exists()
         .then(() => done(new Error('Resolved when the project did not exist')))
         .catch((error) => {
-          if (error === (`Project ${project.id} does not exist`)) { done(); } else { done(error); }
+          if (error === (`Project ${project.project_id} does not exist`)) { done(); } else { done(error); }
         });
     });
 
@@ -24,7 +24,7 @@ describe('Project Component', () => {
 
       project.exists()
         .then(() => {
-          assert.equal(_.isNil(project.id), false, 'id should exist after pulling data from the database');
+          assert.equal(_.isNil(project.project_id), false, 'id should exist after pulling data from the database');
           assert.equal(_.isNil(project.createdDateTime), false, 'dataEntryDate should exist after pulling data from the database');
           assert.equal(_.isNil(project.title), false, 'title should exist after pulling data from the database');
           assert.equal(_.isNil(project.status), false, 'status should exist after pulling data from the database');
@@ -41,7 +41,7 @@ describe('Project Component', () => {
       project.exists()
         .then(() => done(new Error('Resolved when the project did not exist')))
         .catch((error) => {
-          if (error === (`id '${project.id}' passed is not a valid number`)) { done(); } else { done(error); }
+          if (error === (`id '${project.project_id}' passed is not a valid number`)) { done(); } else { done(error); }
         });
     });
   });
@@ -53,7 +53,7 @@ describe('Project Component', () => {
       project.updateContent()
         .then(() => done(new Error('Content should not update if project id was not passed, or project does not exist')))
         .catch((error) => {
-          if (error === (`Id "${project.id}" passed is not a valid number`)) { done(); } else { done(error); }
+          if (error === (`Id "${project.project_id}" passed is not a valid number`)) { done(); } else { done(error); }
         });
     });
 
@@ -63,7 +63,7 @@ describe('Project Component', () => {
       project.updateContent()
         .then(() => done(new Error('Content should not update if project id was not passed, or project does not exist')))
         .catch((error) => {
-          if (error === (`Project ${project.id} does not exist or has not been checked for existence yet`)) { done(); } else { done(error); }
+          if (error === (`Project ${project.project_id} does not exist or has not been checked for existence yet`)) { done(); } else { done(error); }
         });
     });
 
@@ -74,7 +74,7 @@ describe('Project Component', () => {
         .then(() => project.updateContent())
         .then(() => done(new Error('Content should not update if project id was not passed, or project does not exist')))
         .catch((error) => {
-          if (error === (`Project ${project.id} does not exist`)) { done(); } else { done(error); }
+          if (error === (`Project ${project.project_id} does not exist`)) { done(); } else { done(error); }
         });
     });
   });

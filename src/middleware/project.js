@@ -7,7 +7,7 @@ const Project = require('../components/Project/Project');
  * sends a bad request back to the server.
  */
 function validateProjectId(req, res, next) {
-  const projectId = req.params.id;
+  const projectId = req.params.project_id;
 
   if (_.isNil(projectId) || !_.isString(projectId)) {
     res.status(500).send({ error: 'Status Validation', description: `Id '${projectId}' is in a invalid format or not provided` });
@@ -46,8 +46,8 @@ function validateProjectUpdateContent(req, res, next) {
   }
 
   if (!res.headersSent) {
-    req.projectId = project.id;
-    delete project.id;
+    req.projectId = project.project_id;
+    delete project.project_id;
     req.project = project;
     return next();
   }
