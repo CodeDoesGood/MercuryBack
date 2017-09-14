@@ -58,17 +58,15 @@ function validateUsernameDoesExist(req, res, next) {
     res.status(400).send({ error: 'Username validation', description: 'The username parameter was not passed' });
   }
 
-  databaseWrapper.doesUsernameExist(username)
+  if (!res.headersSent) {
+    databaseWrapper.doesUsernameExist(username)
     .then((id) => {
       req.id = id;
       req.username = username;
       next();
     })
-    .catch(() => {
-      if (!res.headersSent) {
-        res.status(400).send({ error: 'Username does not exists', description: `The username ${username} does not exists` });
-      }
-    });
+    .catch(() => res.status(400).send({ error: 'Username does not exists', description: `The username ${username} does not exists` }));
+  }
 }
 
 /**
@@ -76,11 +74,23 @@ function validateUsernameDoesExist(req, res, next) {
  * throws a bad request.
  */
 function validateEmailDoesExist(req, res, next) {
-  const email = req.body.email;
+  let email;
 
-  databaseWrapper.doesEmailExist(email)
+  if (!_.isNil(req.params.email)) {
+    email = req.params.email;
+  } else if (!_.isNil(req.body.email)) {
+    email = req.body.email;
+  } else if (!_.isNil(req.email)) {
+    email = req.email;
+  } else {
+    res.status(400).send({ error: 'Email validation', description: 'The email parameter was not passed' });
+  }
+
+  if (!res.headersSent) {
+    databaseWrapper.doesEmailExist(email)
     .then(() => next())
     .catch(() => res.status(400).send({ error: 'Email Does not exists', description: `The email ${email} does not exist` }));
+  }
 }
 
 /**
