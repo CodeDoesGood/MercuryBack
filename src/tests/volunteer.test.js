@@ -9,7 +9,7 @@ describe('Volunteer Component', () => {
     it('Should contain all database elements', () => {
       const volunteer = new Volunter();
 
-      assert.equal(_.isUndefined(volunteer.id), false, 'Volunteer class must contain: "id"');
+      assert.equal(_.isUndefined(volunteer.volunteer_id), false, 'Volunteer class must contain: "id"');
       assert.equal(_.isUndefined(volunteer.username), false, 'Volunteer class must contain: "username"');
       assert.equal(_.isUndefined(volunteer.password), false, 'Volunteer class must contain: "password"');
       assert.equal(_.isUndefined(volunteer.position), false, 'Volunteer class must contain: "position"');
