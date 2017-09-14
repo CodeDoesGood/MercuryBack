@@ -103,18 +103,6 @@ function validateVerificationCode(req, res, next) {
   next();
 }
 
-/**
- * Generates a random number and a salt, salts and hashes a number and stores that in the database
- * under the password reset table with the id of the user, the salt and hashed code and the salt
- * that was used to salt and hash the stored code for use when validating the requesting code.
- * Then calls next where the code will be used to generate a link to send to the client which
- * will allow them to to send a reset request with the code and there new password.
- */
-function createPasswordResetCode(req, res, next) {
-  res.status(503).send({ error: 'Currently unavailable', description: 'This service is currently unavailable' });
-  next();
-}
-
 module.exports = {
   validateConnectionStatus,
   validateUsernameDoesNotExist,
@@ -122,5 +110,4 @@ module.exports = {
   validateUsernameDoesExist,
   validateEmailDoesExist,
   validateVerificationCode,
-  createPasswordResetCode,
 };

@@ -41,7 +41,7 @@ router.post('/volunteer/password/request_reset', [
   database.validateConnectionStatus.bind(this),
   database.validateUsernameDoesExist.bind(this),
   database.validateEmailDoesExist.bind(this),
-  database.createPasswordResetCode.bind(this),
+  volunteer.createPasswordResetCode.bind(this),
   email.sendPasswordResetLinkToRequestingEmail.bind(this),
 ]);
 

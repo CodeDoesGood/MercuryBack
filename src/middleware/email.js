@@ -53,6 +53,7 @@ function sendVerificationEmail(req, res) {
  * to reset the users password.
  */
 function sendPasswordResetLinkToRequestingEmail(req, res) {
+  const code = req.resetPasswordCode
   res.status(503).send({ error: 'Currently unavailable', description: 'This service is currently unavailable' });
 }
 

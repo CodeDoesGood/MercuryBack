@@ -54,6 +54,30 @@ function validateRequestResetDetails(req, res, next) {
 }
 
 /**
+ * Generates a random number and a salt, salts and hashes a number and stores that in the database
+ * under the password reset table with the id of the user, the salt and hashed code and the salt
+ * that was used to salt and hash the stored code for use when validating the requesting code.
+ * Then calls next where the code will be used to generate a link to send to the client which
+ * will allow them to to send a reset request with the code and there new password.
+ */
+function createPasswordResetCode(req, res, next) {
+  const username = req.username;
+  const email = req.email;
+
+  const volunteer = new Volunteer(null, username);
+  volunteer.email = email;
+
+  // TODO: Create a table called password_reset_code, copying verificaion_code
+  volunteer.exists('username')
+    .then(() => volunteer.createPasswordResetCode())
+    .then((code) => {
+      req.resetPasswordCode = code;
+      next();
+    })
+    .catch(error => res.status(500).send({ error: 'Password Creation', description: `unable to create password reset code, error=${error}` }));
+}
+
+/**
  * Checks and validates that the password being updated via the update ore reset code meets all
  * requirements otherwise sends 400.
  */
@@ -76,7 +100,7 @@ function validatePasswordDetails(req, res, next) {
  * Pulls the code, salt, hashes the code emailed to the client with the stores salt then compares
  * the newly salted and hashed code with the already salted and hashed stored code to see if they
  * match and if they match call next, otherwise said a 401 invalid authentication. (meaning that
- * the code used into trying to verify the account was not the correct code)
+ * the code used into trying to verify the account was not the correct code).
  */
 function validateVerifyCodeAuthenticity(req, res, next) {
   const code = req.code;
@@ -192,4 +216,5 @@ module.exports = {
   verifyVolunteerAccount,
   validateVerifyCodeExists,
   createNewVolunteer,
+  createPasswordResetCode,
 };
