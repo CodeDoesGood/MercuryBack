@@ -3,10 +3,11 @@ const crypto = require('crypto');
 const knex = require('knex');
 const Promise = require('bluebird');
 
-const logger = require('../Logger/Logger');
+const logger = require('./Logger');
 
 class Database {
-  constructor() {
+  constructor(info) {
+    this.info = info;
     this.online = false;
     this.interation = 28000;
   }
@@ -18,15 +19,7 @@ class Database {
       if (this.online) {
         resolve();
       } else {
-        this.knex = knex({
-          client: 'mysql',
-          connection: {
-            host: '127.0.0.1',
-            user: 'root',
-            password: 'password',
-            database: 'mercury',
-          },
-        });
+        this.knex = knex(this.info);
 
         this.knex.raw('select 1+1 AS answer')
           .then(() => {
@@ -76,7 +69,7 @@ class Database {
       this.connect()
         .then(() => this.knex('volunteer').select('volunteer_id').where('username', username).first())
         .then((result) => {
-          if (_.isNil(result.volunteer_id)) { reject(0); } else { resolve(result.volunteer_id); }
+          resolve(result.volunteer_id);
         })
         .catch((error) => {
           reject(error);
@@ -97,7 +90,7 @@ class Database {
       this.connect()
         .then(() => this.knex('volunteer').select('volunteer_id').where('email', email).first())
         .then((result) => {
-          if (_.isNil(result.volunteer_id)) { reject(0); } else { resolve(result.volunteer_id); }
+          resolve(result.volunteer_id);
         })
         .catch(() => reject(0));
     });
