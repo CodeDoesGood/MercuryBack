@@ -89,7 +89,7 @@ function createPasswordResetCode(req, res, next) {
 /**
  * Checks and validates that the password being updated via the update ore reset code meets all
  * requirements otherwise sends 400.
- * // TODO: this needs to be renamed to allow for updating password details ot just password details.
+ * TODO: this needs to be renamed to allow for updating password details ot just password details.
  */
 function validatePasswordDetails(req, res, next) {
   const password = req.body.password;
