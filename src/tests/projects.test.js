@@ -36,7 +36,7 @@ describe('Projects Component', () => {
       projects.info.connection.user = 'wrongusername';
 
       return projects.getAllProjects().then((content) => {
-        throw new Error(`getAllHiddenProjects Shouldn't of resolved when the connection details are wrong, ${content}`);
+        throw new Error(`getAllProjects Shouldn't of resolved when the connection details are wrong, ${content}`);
       }, (error) => {
         projects.info.connection.user = username;
         assert.equal(error.message.indexOf('ER_ACCESS_DENIED_ERROR') >= 0, true, error);
@@ -64,7 +64,7 @@ describe('Projects Component', () => {
       projects.info.connection.user = 'wrongusername';
 
       return projects.getAllActiveProjects().then((content) => {
-        throw new Error(`getAllHiddenProjects Shouldn't of resolved when the connection details are wrong, ${content}`);
+        throw new Error(`getAllActiveProjects Shouldn't of resolved when the connection details are wrong, ${content}`);
       }, (error) => {
         projects.info.connection.user = username;
         assert.equal(error.message.indexOf('ER_ACCESS_DENIED_ERROR') >= 0, true, error);
@@ -151,7 +151,7 @@ describe('Projects Component', () => {
       projects.info.connection.user = 'wrongusername';
 
       return projects.getAllProjectsByCategory(1).then((content) => {
-        throw new Error(`getAllHiddenProjects Shouldn't of resolved when the connection details are wrong, ${content}`);
+        throw new Error(`getAllProjectsByCategory Shouldn't of resolved when the connection details are wrong, ${content}`);
       }, (error) => {
         projects.info.connection.user = username;
         assert.equal(error.message.indexOf('ER_ACCESS_DENIED_ERROR') >= 0, true, error);

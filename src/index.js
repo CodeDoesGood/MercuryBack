@@ -2,7 +2,7 @@ const bodyParser = require('body-parser');
 const express = require('express');
 
 const error = require('./middleware/error');
-const logger = require('./components/Logger/Logger');
+const logger = require('./components/Logger');
 
 const routes = require('./routes');
 

@@ -1,7 +1,7 @@
 const _ = require('lodash');
 const assert = require('assert');
 
-const Volunter = require('../components/Volunteer/Volunteer');
+const Volunter = require('../components/Volunteer');
 
 
 describe('Volunteer Component', () => {
@@ -68,6 +68,158 @@ describe('Volunteer Component', () => {
       const volunteer = new Volunter();
       volunteer.salt = '5HomjhDxeSNT4H9JmD3iW7h0iUjLyDG7XnKbvQK+QYxN914GExndCEKI5azGaSNSZKcgPrjyxvO04GO/QN6FtRpaTYbOF3DAVU9U6i+1VfEMWcvOgb7sUmOb/OI48WRiPgcmatDmPMz89Ih0IspYq/Po+/UOnOMCEmDkfrfhlK8=';
       assert.equal(volunteer.compareAuthenticatingPassword(), false, 'Compare authentication password passed when the password was not even set');
+    });
+  });
+
+  if (!_.isNil(process.env.TRAVIS)) {
+    return;
+  }
+
+  describe('#updatePassword', () => {
+    it('Should update password for the volunteer if the password is given', (done) => {
+      const volunteer = new Volunter(null, 'user1');
+
+      volunteer.exists('username')
+        .then(() => volunteer.updatePassword('password'))
+        .then(() => done())
+        .catch(error => done(new Error(error)));
+    });
+
+    it('Should reject if no password is given', (done) => {
+      const volunteer = new Volunter(null, 'user1');
+
+      volunteer.exists('username')
+        .then(() => volunteer.updatePassword())
+        .then(() => done('Updated password when no password was given'))
+        .catch(() => done());
+    });
+
+    it('Should reject if the project_id is not a valid string or number', (done) => {
+      const volunteer = new Volunter(null, 'user1');
+
+      volunteer.exists('username')
+        .then(() => {
+          volunteer.project_id = null;
+          return volunteer.updatePassword();
+        })
+        .then(() => done('Updated password when the project_id was invalid'))
+        .catch(() => done());
+    });
+
+    it('Should reject if the connection details are wrong', () => {
+      const volunteer = new Volunter(null, 'user1');
+      const username = volunteer.info.connection.user;
+      volunteer.info.connection.user = 'wrongusername';
+      volunteer.volunteer_id = 1;
+
+      return volunteer.updatePassword('username').then((content) => {
+        throw new Error(`exists Shouldn't of resolved when the connection details are wrong, ${content}`);
+      }, (error) => {
+        volunteer.info.connection.user = username;
+        assert.equal(error.message.indexOf('ER_ACCESS_DENIED_ERROR') >= 0, true, error);
+      });
+    });
+  });
+
+  describe('#doesPasswordResetCodeExist', () => {
+    it('Should reject if no password reset code exists', (done) => {
+      const volunteer = new Volunter(null, 'user1');
+
+      volunteer.exists('username')
+        .then(() => volunteer.removePasswordResetCode())
+        .then(() => volunteer.doesPasswordResetCodeExist())
+        .then(() => done(new Error('Shouldn\'t resolve when no password reset code exists')))
+        .catch((error) => {
+          assert.equal(error, `No password reset code exists for user ${volunteer.volunteer_id}`, error);
+          done();
+        });
+    });
+
+    it('Should resolve if there is a existing reset code', (done) => {
+      const volunteer = new Volunter(null, 'user1');
+
+      volunteer.exists('username')
+        .then(() => volunteer.createPasswordResetCode())
+        .then(() => volunteer.doesPasswordResetCodeExist())
+        .then(() => done())
+        .catch(() => done(new Error('Shouldn\'t reject when a password reset code exists')))
+        .finally(() => volunteer.removePasswordResetCode());
+    });
+
+    it('Should reject if the project_id is invalid', (done) => {
+      const volunteer = new Volunter(null, 'user1');
+
+      volunteer.doesPasswordResetCodeExist()
+        .then(() => done(new Error('Shouldn\'t resolve when a the project_id is invalid')))
+        .catch((error) => {
+          assert.equal(error, `volunteerId "${volunteer.volunteer_id}" passed is not a valid number`, error);
+          done();
+        });
+    });
+
+    it('Should reject if the connection details are wrong', () => {
+      const volunteer = new Volunter(null, 'user1');
+      const username = volunteer.info.connection.user;
+      volunteer.info.connection.user = 'wrongusername';
+      volunteer.volunteer_id = 1;
+
+      return volunteer.doesPasswordResetCodeExist().then((content) => {
+        throw new Error(`doesPasswordResetCodeExist Shouldn't of resolved when the connection details are wrong, ${content}`);
+      }, (error) => {
+        volunteer.info.connection.user = username;
+        assert.equal(error.message.indexOf('ER_ACCESS_DENIED_ERROR') >= 0, true, error);
+      });
+    });
+  });
+
+  describe('#doesVerificationCodeExist', () => {
+    it('Should reject if no verification code exists', (done) => {
+      const volunteer = new Volunter(null, 'user1');
+
+      volunteer.exists('username')
+        .then(() => volunteer.removeVerificationCode())
+        .then(() => volunteer.doesVerificationCodeExist())
+        .then(() => done(new Error('Shouldn\'t resolve when no password reset code exists')))
+        .catch((error) => {
+          assert.equal(error, `No verification code exists for user ${volunteer.volunteer_id}`, error);
+          done();
+        });
+    });
+
+    it('Should resolve if there is a existing verification code code', (done) => {
+      const volunteer = new Volunter(null, 'user1');
+
+      volunteer.exists('username')
+        .then(() => volunteer.createVerificationCode())
+        .then(() => volunteer.doesVerificationCodeExist())
+        .then(() => done())
+        .catch(() => done(new Error('Shouldn\'t reject when a password reset code exists')))
+        .finally(() => volunteer.removeVerificationCode());
+    });
+
+    it('Should reject if the project_id is invalid', (done) => {
+      const volunteer = new Volunter(null, 'user1');
+
+      volunteer.doesVerificationCodeExist()
+        .then(() => done(new Error('Shouldn\'t resolve when a the project_id is invalid')))
+        .catch((error) => {
+          assert.equal(error, `volunteerId "${volunteer.volunteer_id}" passed is not a valid number`, error);
+          done();
+        });
+    });
+
+    it('Should reject if the connection details are wrong', () => {
+      const volunteer = new Volunter(null, 'user1');
+      const username = volunteer.info.connection.user;
+      volunteer.info.connection.user = 'wrongusername';
+      volunteer.volunteer_id = 1;
+
+      return volunteer.doesVerificationCodeExist().then((content) => {
+        throw new Error(`doesVerificationCodeExist Shouldn't of resolved when the connection details are wrong, ${content}`);
+      }, (error) => {
+        volunteer.info.connection.user = username;
+        assert.equal(error.message.indexOf('ER_ACCESS_DENIED_ERROR') >= 0, true, error);
+      });
     });
   });
 });

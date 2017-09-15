@@ -1,4 +1,4 @@
-const logger = require('../components/Logger/Logger');
+const logger = require('../components/Logger');
 
 /**
  * Middleware that will catch all express routing and error calls, logging them and passing them

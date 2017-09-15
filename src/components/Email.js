@@ -2,7 +2,7 @@ const _ = require('lodash');
 const nodemailer = require('nodemailer');
 const Promise = require('bluebird');
 
-const logger = require('../Logger/Logger');
+const logger = require('./Logger');
 
 class Email {
   constructor(options) {
@@ -43,7 +43,6 @@ class Email {
 
   /**
    * Verifies the connection the service.
-   * @param {function} callback The callback function to confirm the connection.
    */
   verify() {
     return new Promise((resolve, reject) => {

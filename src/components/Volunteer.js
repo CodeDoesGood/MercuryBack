@@ -1,15 +1,18 @@
 const _ = require('lodash');
 const Promise = require('bluebird');
 
-const Database = require('../DatabaseWrapper/DatabaseWrapper');
-const logger = require('../Logger/Logger');
+const Database = require('./DatabaseWrapper');
+const ConfigurationWrapper = require('./Configuration/ConfigurationWrapper');
+const logger = require('./Logger');
+
+const config = new ConfigurationWrapper('mercury', 'mercury.json');
 
 /**
  * Interface for everything that is needed for a volunteer
  */
 class Volunteer extends Database {
   constructor(VolunteerId = null, username = null) {
-    super();
+    super(config.getKey('database'));
     this.doesExist = false;
 
     this.volunteer_id = VolunteerId;
@@ -61,7 +64,7 @@ class Volunteer extends Database {
           }
         })
         .catch((error) => {
-          reject(`Failed to check if volunteer already exists, error=${JSON.stringify(error)}`);
+          reject(error);
         });
     });
   }
@@ -257,13 +260,13 @@ class Volunteer extends Database {
       this.connect()
         .then(() => this.knex('verification_code').select('verification_code_id').where('verification_code_id', this.volunteer_id).first())
         .then((result) => {
-          if (_.isNil(result.verification_code_id)) {
-            reject(0);
+          if (_.isNil(result) || _.isNil(result.verification_code_id)) {
+            reject(`No verification code exists for user ${this.volunteer_id}`);
           } else {
             resolve(result.verification_code_id);
           }
         })
-        .catch(() => reject(0));
+        .catch(error => reject(error));
     });
   }
 
@@ -279,13 +282,13 @@ class Volunteer extends Database {
       this.connect()
         .then(() => this.knex('password_reset_code').select('password_reset_code_id').where('password_reset_code_id', this.volunteer_id).first())
         .then((result) => {
-          if (_.isNil(result.password_reset_code_id)) {
-            reject(0);
+          if (_.isNil(result) || _.isNil(result.password_reset_code_id)) {
+            reject(`No password reset code exists for user ${this.volunteer_id}`);
           } else {
             resolve(result.password_reset_code_id);
           }
         })
-        .catch(() => reject(0));
+        .catch(error => reject(error));
     });
   }
 
@@ -308,7 +311,7 @@ class Volunteer extends Database {
           salt: salted.salt,
         }))
         .then(() => resolve())
-        .catch(error => reject(`Unable to update password for volunteer ${this.volunteer_id}, error=${JSON.stringify(error)}`));
+        .catch(error => reject(error));
     });
   }
 }

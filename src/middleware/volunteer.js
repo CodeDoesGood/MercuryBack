@@ -1,7 +1,7 @@
 const _ = require('lodash');
 
-const logger = require('../components/Logger/Logger');
-const Volunteer = require('../components/Volunteer/Volunteer');
+const logger = require('../components/Logger');
+const Volunteer = require('../components/Volunteer');
 
 /**
  * Validates that the user creation details are all there and contain all the correct information
