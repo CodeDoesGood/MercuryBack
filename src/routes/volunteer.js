@@ -39,9 +39,8 @@ router.post('/volunteer/verify/:username/:code', [
 router.post('/volunteer/password/request_reset', [
   volunteer.validateRequestResetDetails.bind(this),
   database.validateConnectionStatus.bind(this),
-  database.validateUsernameDoesExist.bind(this),
-  database.validateEmailDoesExist.bind(this),
-  database.createPasswordResetCode.bind(this),
+  volunteer.createPasswordResetCode.bind(this),
+  email.validateConnectionStatus.bind(this),
   email.sendPasswordResetLinkToRequestingEmail.bind(this),
 ]);
 
@@ -50,8 +49,10 @@ router.post('/volunteer/password/request_reset', [
  */
 router.post('/volunteer/password/reset', [
   database.validateConnectionStatus.bind(this),
-  database.validateUsernameDoesExist.bind(this),
-  database.validateVerificationCode.bind(this),
+  volunteer.validatePasswordResetDetails.bind(this),
+  volunteer.validatePasswordDetail.bind(this),
+  volunteer.validateResetCodeExists.bind(this),
+  volunteer.validatePasswordResetCodeAuthenticity.bind(this),
   volunteer.updateUsersPassword.bind(this),
 ]);
 
@@ -62,7 +63,6 @@ router.post('/volunteer/password/reset', [
 router.post('/volunteer/password/update', [
   volunteer.validatePasswordDetails.bind(this),
   database.validateConnectionStatus.bind(this),
-  database.validateUsernameDoesExist.bind(this),
   authentication.ValidateUserCredentials.bind(this),
   volunteer.updateUsersPassword.bind(this),
 ]);

@@ -49,7 +49,7 @@ class Volunteer extends Database {
         .then(() => this.knex('volunteer').where(type, this[type]).select('volunteer_id', 'username', 'email', 'password', 'salt').first())
         .then((volunteer) => {
           if (_.isNil(volunteer)) {
-            reject(false);
+            reject(`Volunteer does not exist by type=${type}`);
           } else {
             this.volunteer_id = volunteer.volunteer_id;
             this.username = volunteer.username;
@@ -152,7 +152,33 @@ class Volunteer extends Database {
         salt: hashedNumber.salt,
         created_datetime: date,
       }))
-      .then(() => logger.info(`Created verification Code for user ${this.volunteer_id}, number=${number}`))
+      .then(() => logger.info(`Created verification code for user ${this.volunteer_id}, number=${number}`))
+      .catch(error => logger.error(`Failed to create verification code for user ${this.volunteer_id} error=${JSON.stringify(error)}`));
+
+    return number;
+  }
+
+  /**
+   * Generates a password reset code that will be used in a clickable link to allow the user
+   * to reset there password, the username, email, password and code will be passed down. If
+   * the code matches the code in the database with the username nad email, then the new#
+   * password will be set (code is hashed and salted)
+   */
+  createPasswordResetCode() {
+    const number = Math.floor((Math.random() * ((9999999999999 - 1000000000000) + 1000000000000)));
+    const hashedNumber = this.saltAndHash(number.toString());
+    const date = new Date();
+
+    this.removePasswordResetCode(parseInt(this.volunteer_id, 10));
+
+    this.connect()
+      .then(() => this.knex('password_reset_code').insert({
+        password_reset_code_id: this.volunteer_id,
+        code: hashedNumber.hashedPassword,
+        salt: hashedNumber.salt,
+        created_datetime: date,
+      }))
+      .then()
       .catch(error => logger.error(`Failed to create verification code for user ${this.volunteer_id} error=${JSON.stringify(error)}`));
 
     return number;
@@ -173,6 +199,20 @@ class Volunteer extends Database {
   }
 
   /**
+   * removes the existing (if any) password reset codes for the user)
+   */
+  removePasswordResetCode() {
+    if (!_.isNumber(this.volunteer_id)) {
+      return `volunteerId "${this.volunteer_id}" passed is not a valid number`;
+    }
+
+    return this.connect()
+      .then(() => this.knex('password_reset_code').where('password_reset_code_id', this.volunteer_id).del())
+      .then()
+      .catch(error => logger.error(`Failed to remove password reset code for user ${this.volunteer_id} error=${JSON.stringify(error)}`));
+  }
+
+  /**
    * Gets and returns all details for the volunteer in the verification codes table.
    */
   getVerificationCode() {
@@ -187,6 +227,23 @@ class Volunteer extends Database {
         .catch(error => reject(error));
     });
   }
+
+  /**
+   * Gets the password reset code from the password_reset_code table if it exists
+   */
+  getPasswordResetCode() {
+    return new Promise((resolve, reject) => {
+      if (!_.isNumber(this.volunteer_id)) {
+        reject(`volunteerId "${this.volunteer_id}" passed is not a valid number`);
+      }
+
+      this.connect()
+        .then(() => this.knex('password_reset_code').where('password_reset_code_id', this.volunteer_id).first())
+        .then(details => resolve(details))
+        .catch(error => reject(error));
+    });
+  }
+
 
   /**
    * Resolves the volunteers id if the verification code exists exists otherwise rejects.
@@ -204,6 +261,28 @@ class Volunteer extends Database {
             reject(0);
           } else {
             resolve(result.verification_code_id);
+          }
+        })
+        .catch(() => reject(0));
+    });
+  }
+
+  /**
+   * Resolves the volunteers id if the password code exists exists otherwise rejects.
+   */
+  doesPasswordResetCodeExist() {
+    return new Promise((resolve, reject) => {
+      if (!_.isNumber(this.volunteer_id)) {
+        reject(`volunteerId "${this.volunteer_id}" passed is not a valid number`);
+      }
+
+      this.connect()
+        .then(() => this.knex('password_reset_code').select('password_reset_code_id').where('password_reset_code_id', this.volunteer_id).first())
+        .then((result) => {
+          if (_.isNil(result.password_reset_code_id)) {
+            reject(0);
+          } else {
+            resolve(result.password_reset_code_id);
           }
         })
         .catch(() => reject(0));

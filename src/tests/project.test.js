@@ -84,7 +84,7 @@ describe('Project Component', () => {
       const project = new Project(1);
       const content = project.getContent();
 
-      assert.equal(_.isUndefined(content.id), false, 'id should be returned within the object when calling getContent');
+      assert.equal(_.isUndefined(content.project_id), false, 'id should be returned within the object when calling getContent');
       assert.equal(_.isUndefined(content.createdDateTime), false, 'dataEntryDate should be returned within the object when calling getContent');
       assert.equal(_.isUndefined(content.title), false, 'title should be returned within the object when calling getContent');
       assert.equal(_.isUndefined(content.status), false, 'status should be returned within the object when calling getContent');

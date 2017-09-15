@@ -40,7 +40,7 @@ function validateAuthenticationDetails(req, res, next) {
  * This would be used when updating a existing password but not actually logging in.
  */
 function ValidateUserCredentials(req, res, next) {
-  const username = req.username;
+  const username = req.body.username;
   const password = req.oldPassword;
 
   const volunteer = new Volunteer(null, username);
@@ -48,6 +48,7 @@ function ValidateUserCredentials(req, res, next) {
   volunteer.exists('username')
     .then(() => {
       if (volunteer.compareAuthenticatingPassword(password)) {
+        req.volunteer = volunteer;
         next();
       } else {
         res.status(401).send({ error: 'Validate user credentials', description: 'Password provided was incorrect' });
@@ -55,7 +56,7 @@ function ValidateUserCredentials(req, res, next) {
     })
     .catch((error) => {
       logger.error(`Failed to gather volunteer login details by username while validating user credentials, error=${error}`);
-      res.status(500).send({ error: 'Validate user credentials', description: 'Failed to validate volunteer credentials' });
+      res.status(500).send({ error: 'Validate user credentials', description: `Failed to validate volunteer credentials, error=${error}` });
     });
 }
 
