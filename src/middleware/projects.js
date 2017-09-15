@@ -1,6 +1,6 @@
 const _ = require('lodash');
 
-const Projects = require('../components/Projects/Projects');
+const Projects = require('../components/Projects');
 
 const projectsWrapper = new Projects();
 
