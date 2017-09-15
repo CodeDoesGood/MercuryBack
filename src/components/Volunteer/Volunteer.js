@@ -164,24 +164,24 @@ class Volunteer extends Database {
    * the code matches the code in the database with the username nad email, then the new#
    * password will be set (code is hashed and salted)
    */
-  createPasswordResetCode () {
-    const number = Math.floor((Math.random() * ((9999999999999 - 1000000000000) + 1000000000000)))
-    const hashedNumber = this.saltAndHash(number.toString())
-    const date = new Date()
+  createPasswordResetCode() {
+    const number = Math.floor((Math.random() * ((9999999999999 - 1000000000000) + 1000000000000)));
+    const hashedNumber = this.saltAndHash(number.toString());
+    const date = new Date();
 
-    this.removePasswordResetCode(parseInt(this.volunteer_id, 10))
+    this.removePasswordResetCode(parseInt(this.volunteer_id, 10));
 
     this.connect()
       .then(() => this.knex('password_reset_code').insert({
-        verification_code_id: this.volunteer_id,
+        password_reset_code_id: this.volunteer_id,
         code: hashedNumber.hashedPassword,
         salt: hashedNumber.salt,
         created_datetime: date,
       }))
       .then(() => logger.info(`Created password reset code for user ${this.volunteer_id}, number=${number}`))
-      .catch(error => logger.error(`Failed to create verification code for user ${this.volunteer_id} error=${JSON.stringify(error)}`))
+      .catch(error => logger.error(`Failed to create verification code for user ${this.volunteer_id} error=${JSON.stringify(error)}`));
 
-    return number
+    return number;
   }
 
   /**
@@ -201,15 +201,15 @@ class Volunteer extends Database {
   /**
    * removes the existing (if any) password reset codes for the user)
    */
-  removePasswordResetCode () {
+  removePasswordResetCode() {
     if (!_.isNumber(this.volunteer_id)) {
-      return `volunteerId "${this.volunteer_id}" passed is not a valid number`
+      return `volunteerId "${this.volunteer_id}" passed is not a valid number`;
     }
 
     return this.connect()
       .then(() => this.knex('password_reset_code').where('password_reset_code_id', this.volunteer_id).del())
       .then()
-      .catch(error => logger.error(`Failed to remove password reset code for user ${this.volunteer_id} error=${JSON.stringify(error)}`))
+      .catch(error => logger.error(`Failed to remove password reset code for user ${this.volunteer_id} error=${JSON.stringify(error)}`));
   }
 
   /**

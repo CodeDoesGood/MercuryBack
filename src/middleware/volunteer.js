@@ -67,7 +67,6 @@ function createPasswordResetCode(req, res, next) {
   const volunteer = new Volunteer(null, username);
   volunteer.email = email;
 
-  // TODO: Create a table called password_reset_code, copying verificaion_code
   volunteer.exists('username')
     .then(() => volunteer.createPasswordResetCode())
     .then((code) => {
