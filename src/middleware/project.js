@@ -23,7 +23,7 @@ function validateProjectId(req, res, next) {
  */
 function validateProjectUpdateContent(req, res, next) {
   const project = req.body.project;
-  const projectRequirements = ['project_id', 'created_datetime', 'data_entry_time', 'data_entry_user_id', 'title', 'status', 'project_category', 'image_directory', 'summary', 'description'];
+  const projectRequirements = ['project_id', 'created_datetime', 'data_entry_user_id', 'title', 'status', 'project_category', 'image_directory', 'summary', 'description'];
 
   if (_.isNil(project) || !_.isObject(project)) {
     return res.status(400).send({ error: 'Project Validation', description: 'Project provided is not in a valid format' });

@@ -62,9 +62,12 @@ function validateRequestResetDetails(req, res, next) {
 
     volunteer.exists('username')
       .then(() => {
-        req.volunteer = volunteer;
-        req.email = email;
-        next();
+        if (volunteer.email === email) {
+          req.volunteer = volunteer;
+          next();
+        } else {
+          res.status(400).send({ error: 'Email validation', description: 'The email passed does not match the volunteer email' });
+        }
       })
       .catch(() => res.status(400).send({ error: 'User existence', message: 'Volunteer does not exist' }));
   }
@@ -148,12 +151,10 @@ function validatePasswordResetDetails(req, res, next) {
  */
 function validateVerifyCodeAuthenticity(req, res, next) {
   const code = req.code;
-  const userId = req.id;
 
-  const volunteer = new Volunteer(userId);
+  const volunteer = req.volunteer;
 
-  volunteer.exists()
-    .then(() => volunteer.getVerificationCode())
+  volunteer.getVerificationCode()
     .then((details) => {
       const storedCode = details.code;
       const storedSalt = details.salt;
@@ -216,13 +217,11 @@ function updateUsersPassword(req, res) {
  * set time period.
  */
 function verifyVolunteerAccount(req, res) {
-  const userId = req.id;
   const username = req.username;
 
-  const volunteer = new Volunteer(userId, username);
+  const volunteer = req.volunteer;
 
-  volunteer.exists()
-    .then(() => volunteer.removeVerificationCode())
+  volunteer.removeVerificationCode()
     .then(() => volunteer.verify())
     .then(() => res.status(200).send({ message: `Volunteer ${username} email is now verified` }))
     .catch((error) => {
@@ -246,6 +245,8 @@ function validateVerifyCodeExists(req, res, next) {
   req.code = code;
 
   const volunteer = new Volunteer(req.id, req.username);
+
+  req.volunteer = volunteer;
 
   volunteer.exists()
     .then(() => volunteer.doesVerificationCodeExist())

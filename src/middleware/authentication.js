@@ -40,7 +40,7 @@ function validateAuthenticationDetails(req, res, next) {
  * This would be used when updating a existing password but not actually logging in.
  */
 function ValidateUserCredentials(req, res, next) {
-  const username = req.username;
+  const username = req.body.username;
   const password = req.oldPassword;
 
   const volunteer = new Volunteer(null, username);
