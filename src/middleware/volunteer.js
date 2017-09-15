@@ -86,6 +86,7 @@ function createPasswordResetCode(req, res, next) {
 /**
  * Checks and validates that the password being updated via the update ore reset code meets all
  * requirements otherwise sends 400.
+ * // TODO: this needs to be renamed to allow for updating password details ot just password details.
  */
 function validatePasswordDetails(req, res, next) {
   const password = req.body.password;
@@ -98,6 +99,43 @@ function validatePasswordDetails(req, res, next) {
   } else {
     req.password = password;
     req.oldPassword = oldPassword;
+    next();
+  }
+}
+
+/**
+ * Checks if the password (req.password) meets the required needs.
+ */
+function validatePasswordDetail(req, res, next) {
+  const password = req.password;
+
+  if (_.isNil(password)) {
+    res.status(400).send({ error: 'Param not provided', description: 'password need to be provided' });
+  } else if (password.length < 6) {
+    res.status(400).send({ error: 'Invalid Credentials', description: 'Password can not be less than 6 characters' });
+  } else {
+    next();
+  }
+}
+
+/**
+ * Validates that all the required parts for resetting a password is given.
+ */
+function validatePasswordResetDetails(req, res, next) {
+  const resetCode = req.body.reset_code;
+  const username = req.body.username;
+  const password = req.body.password;
+
+  if (_.isNil(resetCode)) {
+    res.status(400).send({ error: 'Param not provided', description: 'reset_code must be provided' });
+  } else if (_.isNil(username)) {
+    res.status(400).send({ error: 'Param not provided', description: 'username must be provided' });
+  } else if (_.isNil(password)) {
+    res.status(400).send({ error: 'Param not provided', description: 'password must be provided' });
+  } else {
+    req.resetCode = resetCode;
+    req.username = username;
+    req.password = password;
     next();
   }
 }
@@ -131,18 +169,41 @@ function validateVerifyCodeAuthenticity(req, res, next) {
 }
 
 /**
+ * validates that the passed code matches up with the salt and hashed code in
+ * the password_reset_code table
+ */
+function validatePasswordResetCodeAuthenticity(req, res, next) {
+  const code = req.resetCode;
+
+  const volunteer = req.volunteer;
+
+  volunteer.getPasswordResetCode()
+    .then((details) => {
+      const storedCode = details.code;
+      const storedSalt = details.salt;
+      const hashedCode = volunteer.saltAndHash(code, storedSalt);
+
+      if (hashedCode.hashedPassword === storedCode) {
+        volunteer.removePasswordResetCode();
+        next();
+      } else {
+        res.status(401).send({ error: 'Invalid Code', description: 'The code passed was not the correct code for verification' });
+      }
+    })
+    .catch(error => res.status(500).send({ error: 'Verification', descripion: `Failed to get password reset code, error=${JSON.stringify(error)}` }));
+}
+
+/**
  * Updates the volunteers password with the new password by the
  * users id and then tells the client that there password has been updated.
  */
 function updateUsersPassword(req, res) {
-  const username = req.username;
-  const userId = req.id;
+  const volunteer = req.volunteer;
+
+  const username = volunteer.username;
   const password = req.password;
 
-  const volunteer = new Volunteer(userId, username);
-
-  volunteer.exists()
-    .then(() => volunteer.updatePassword(password))
+  volunteer.updatePassword(password)
     .then(() => res.status(200).send({ message: `Volunteer ${username} password now updated` }))
     .catch((error) => {
       logger.error(`Failed to update password for ${username}, error=${JSON.stringify(error)}`);
@@ -193,6 +254,22 @@ function validateVerifyCodeExists(req, res, next) {
 }
 
 /**
+ * Checks that the given code matches the code (if any) in the password_reset_code table
+ */
+function validateResetCodeExists(req, res, next) {
+  const username = req.username;
+
+  const volunteer = new Volunteer(null, username);
+
+  req.volunteer = volunteer;
+
+  volunteer.exists('username')
+    .then(() => volunteer.doesPasswordResetCodeExist())
+    .then(() => next())
+    .catch(error => res.status(400).send({ error: 'Code existence', description: `Verification Code Does not exist, error=${error}` }));
+}
+
+/**
  * Creates a new Volunteer within the database.
  */
 function createNewVolunteer(req, res, next) {
@@ -223,4 +300,8 @@ module.exports = {
   validateVerifyCodeExists,
   createNewVolunteer,
   createPasswordResetCode,
+  validatePasswordDetail,
+  validatePasswordResetDetails,
+  validateResetCodeExists,
+  validatePasswordResetCodeAuthenticity,
 };

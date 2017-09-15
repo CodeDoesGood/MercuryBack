@@ -48,6 +48,7 @@ function ValidateUserCredentials(req, res, next) {
   volunteer.exists('username')
     .then(() => {
       if (volunteer.compareAuthenticatingPassword(password)) {
+        req.volunteer = volunteer;
         next();
       } else {
         res.status(401).send({ error: 'Validate user credentials', description: 'Password provided was incorrect' });
@@ -55,7 +56,7 @@ function ValidateUserCredentials(req, res, next) {
     })
     .catch((error) => {
       logger.error(`Failed to gather volunteer login details by username while validating user credentials, error=${error}`);
-      res.status(500).send({ error: 'Validate user credentials', description: 'Failed to validate volunteer credentials' });
+      res.status(500).send({ error: 'Validate user credentials', description: `Failed to validate volunteer credentials, error=${error}` });
     });
 }
 

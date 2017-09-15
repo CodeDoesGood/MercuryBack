@@ -93,21 +93,10 @@ function validateEmailDoesExist(req, res, next) {
   }
 }
 
-/**
- * Pulls the users verify code and salt from the verify table. Salts and hashes the passed code
- * with the stored salt. Compares the stored code with the newly salted code and calls next,
- * otherwise throws a 401 invalid authentication.
- */
-function validateVerificationCode(req, res, next) {
-  res.status(503).send({ error: 'Currently unavailable', description: 'This service is currently unavailable' });
-  next();
-}
-
 module.exports = {
   validateConnectionStatus,
   validateUsernameDoesNotExist,
   validateEmailDoesNotExist,
   validateUsernameDoesExist,
   validateEmailDoesExist,
-  validateVerificationCode,
 };
