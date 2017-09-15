@@ -142,7 +142,7 @@ describe('Volunteer Component', () => {
         .then(() => volunteer.createPasswordResetCode())
         .then(() => volunteer.doesPasswordResetCodeExist())
         .then(() => done())
-        .catch(() => done(new Error('Shouldn\'t reject when a password reset code exists')))
+        .catch(error => done(new Error(`Shouldn't reject when a password reset code exists, error=${error}`)))
         .finally(() => volunteer.removePasswordResetCode());
     });
 
@@ -193,7 +193,7 @@ describe('Volunteer Component', () => {
         .then(() => volunteer.createVerificationCode())
         .then(() => volunteer.doesVerificationCodeExist())
         .then(() => done())
-        .catch(() => done(new Error('Shouldn\'t reject when a password reset code exists')))
+        .catch(error => done(new Error(`Shouldn't reject when a password reset code exists, error=${error}`)))
         .finally(() => volunteer.removeVerificationCode());
     });
 

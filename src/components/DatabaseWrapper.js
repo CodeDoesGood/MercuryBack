@@ -27,7 +27,6 @@ class Database {
             resolve();
           })
           .catch((error) => {
-            logger.error(`failed to connect to the database, error=${error}`);
             reject(error);
           });
       }
