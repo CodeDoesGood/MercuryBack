@@ -1,9 +1,8 @@
 const _ = require('lodash');
 const Promise = require('bluebird');
 
-const Database = require('./DatabaseWrapper');
 const ConfigurationWrapper = require('./Configuration/ConfigurationWrapper');
-const logger = require('./Logger');
+const Database = require('./DatabaseWrapper');
 
 const config = new ConfigurationWrapper('mercury', 'mercury.json');
 
@@ -85,8 +84,14 @@ class Volunteer extends Database {
    * @param password
    * @param dataEntryUserId
    */
-  create(password, dataEntryUserId) {
+  create(password, dataEntryUserId = 1) {
     return new Promise((resolve, reject) => {
+      if (_.isNil(this.name) || _.isNil(this.username) || _.isNil(this.email)) {
+        reject(`name, username, email and password are required, name=${this.name}, username=${this.username}, email=${this.email}`);
+      } else if (_.isNil(password)) {
+        reject(`You must provide a password to create the volunteer=${this.username}`);
+      }
+
       const hashedPassword = this.saltAndHash(password);
       const date = new Date();
 
@@ -161,7 +166,6 @@ class Volunteer extends Database {
         }))
         .then(() => resolve(number))
         .catch((error) => {
-          logger.error(`Failed to create verification code for user ${this.volunteer_id} error=${JSON.stringify(error)}`);
           reject(error);
         });
     });
@@ -170,7 +174,7 @@ class Volunteer extends Database {
   /**
    * Generates a password reset code that will be used in a clickable link to allow the user
    * to reset there password, the username, email, password and code will be passed down. If
-   * the code matches the code in the database with the username nad email, then the new#
+   * the code matches the code in the database with the username nad email, then the new
    * password will be set (code is hashed and salted)
    */
   createPasswordResetCode() {

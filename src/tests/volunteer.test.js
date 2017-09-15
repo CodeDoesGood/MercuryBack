@@ -75,6 +75,60 @@ describe('Volunteer Component', () => {
     return;
   }
 
+  describe('#exists', () => {
+    it('Should resolve if the volunteer exists', (done) => {
+      const volunteer = new Volunter(1);
+
+      volunteer.exists()
+        .then(() => done())
+        .catch(error => done(new Error(error)));
+    });
+
+    it('Should reject if the volunteer doesn\'t exists', (done) => {
+      const volunteer = new Volunter(99999);
+
+      volunteer.exists()
+        .then(() => done(new Error('Exist shouldn\'t resolve when the volunteer doesn\'t exist')))
+        .catch((error) => {
+          assert.equal(error, 'Volunteer does not exist by type=volunteer_id', error);
+          done();
+        });
+    });
+
+    it('Should reject if the volunteer_id is not passed', (done) => {
+      const volunteer = new Volunter();
+
+      volunteer.exists()
+        .then(() => done(new Error('Shouldn\'t resolve if the project_id is not set')))
+        .catch((error) => {
+          assert.equal(error, 'Type must be defined or valid, type=null', error);
+          done();
+        });
+    });
+
+    it('Should resolve when passing something other than the volunteer_id', (done) => {
+      const volunteer = new Volunter(null, 'user1');
+
+      volunteer.exists('username')
+        .then(() => done())
+        .catch(error => done(new Error(error)));
+    });
+
+    it('Should reject if the connection details are wrong', () => {
+      const volunteer = new Volunter(null, 'user1');
+      const username = volunteer.info.connection.user;
+      volunteer.info.connection.user = 'wrongusername';
+      volunteer.volunteer_id = 1;
+
+      return volunteer.exists('username').then((content) => {
+        throw new Error(`exists Shouldn't of resolved when the connection details are wrong, ${content}`);
+      }, (error) => {
+        volunteer.info.connection.user = username;
+        assert.equal(error.message.indexOf('ER_ACCESS_DENIED_ERROR') >= 0, true, error);
+      });
+    });
+  });
+
   describe('#updatePassword', () => {
     it('Should update password for the volunteer if the password is given', (done) => {
       const volunteer = new Volunter(null, 'user1');
@@ -114,6 +168,266 @@ describe('Volunteer Component', () => {
 
       return volunteer.updatePassword('username').then((content) => {
         throw new Error(`exists Shouldn't of resolved when the connection details are wrong, ${content}`);
+      }, (error) => {
+        volunteer.info.connection.user = username;
+        assert.equal(error.message.indexOf('ER_ACCESS_DENIED_ERROR') >= 0, true, error);
+      });
+    });
+  });
+
+  describe('#getVerificationCode', () => {
+    it('Should resolve a verification code when one exists', (done) => {
+      const volunteer = new Volunter(1);
+
+      volunteer.removeVerificationCode()
+        .then(() => volunteer.createVerificationCode())
+        .then(() => volunteer.getVerificationCode())
+        .then((code) => {
+          assert.equal(!_.isNil(code.code), true, 'Content should contain a code');
+          assert.equal(!_.isNil(code.verification_code_id), true, 'verification_code_id should be contained in the code');
+          assert.equal(!_.isNil(code.salt), true, 'salt should be contained in the code');
+          assert.equal(!_.isNil(code.created_datetime), true, 'created_datetime should be contained in the code');
+          done();
+        })
+        .catch(error => done(new Error(error)))
+        .finally(() => volunteer.removeVerificationCode());
+    });
+
+    it('Should resolve a null object if the volunteer does not exist', (done) => {
+      const volunteer = new Volunter(99999);
+
+      volunteer.getVerificationCode()
+        .then((code) => {
+          assert.equal(_.isNil(code), true, 'Code should be a null object if the volunteer does not exist');
+          done();
+        })
+        .catch(error => done(new Error(error)));
+    });
+
+    it('Should reject if the volunteer_id is null or undefined', (done) => {
+      const volunteer = new Volunter(null);
+
+      volunteer.getVerificationCode()
+        .then(() => done(new Error('Shoudln\'t resolve with a invalid volunteer_id')))
+        .catch((error) => {
+          assert.equal(error, `volunteerId "${volunteer.volunteer_id}" passed is not a valid number`, error);
+          done();
+        });
+    });
+
+    it('Should reject if the connection details are wrong', () => {
+      const volunteer = new Volunter(null, 'user1');
+      const username = volunteer.info.connection.user;
+      volunteer.info.connection.user = 'wrongusername';
+      volunteer.volunteer_id = 1;
+
+      return volunteer.getVerificationCode().then((content) => {
+        throw new Error(`getVerificationCode Shouldn't of resolved when the connection details are wrong, ${content}`);
+      }, (error) => {
+        volunteer.info.connection.user = username;
+        assert.equal(error.message.indexOf('ER_ACCESS_DENIED_ERROR') >= 0, true, error);
+      });
+    });
+  });
+
+  describe('#removeVerificationCode', () => {
+    it('Should reject if the volunteer_id is not valid', (done) => {
+      const volunteer = new Volunter();
+
+      volunteer.removeVerificationCode()
+        .then(() => done(new Error('Shouldn\'t resolve when the volunteer_id is invalid')))
+        .catch((error) => {
+          assert.equal(error, `volunteerId "${volunteer.volunteer_id}" passed is not a valid number`, error);
+          done();
+        });
+    });
+
+    it('Should resolve if a verification code exists', (done) => {
+      const volunteer = new Volunter(1);
+
+      volunteer.createVerificationCode()
+        .then(() => volunteer.removeVerificationCode())
+        .then(() => done())
+        .catch(error => done(new Error(error)));
+    });
+
+    it('Should resolve if a verification code does not exist', (done) => {
+      const volunteer = new Volunter(1);
+
+      volunteer.createVerificationCode()
+        .then(() => volunteer.removeVerificationCode())
+        .then(() => done())
+        .catch(error => done(new Error(error)));
+    });
+
+    it('Should reject if the connection details are wrong', () => {
+      const volunteer = new Volunter(null, 'user1');
+      const username = volunteer.info.connection.user;
+      volunteer.info.connection.user = 'wrongusername';
+      volunteer.volunteer_id = 1;
+
+      return volunteer.removeVerificationCode().then((content) => {
+        throw new Error(`removeVerificationCode Shouldn't of resolved when the connection details are wrong, ${content}`);
+      }, (error) => {
+        volunteer.info.connection.user = username;
+        assert.equal(error.message.indexOf('ER_ACCESS_DENIED_ERROR') >= 0, true, error);
+      });
+    });
+  });
+
+  describe('#createVerificationCode', () => {
+    it('Should resolve a verification code', (done) => {
+      const volunteer = new Volunter(1);
+
+      volunteer.removeVerificationCode()
+        .then(() => volunteer.createVerificationCode())
+        .then((code) => {
+          assert.equal(!_.isNil(code), true, 'Code returned should not be null or undefined');
+          assert.equal(_.isNumber(code), true, 'Code should be a valid number');
+          done();
+        })
+        .catch(error => done(new Error(error)))
+        .finally(() => volunteer.removeVerificationCode());
+    });
+
+    it('Should reject if the connection details are wrong', () => {
+      const volunteer = new Volunter(null, 'user1');
+      const username = volunteer.info.connection.user;
+      volunteer.info.connection.user = 'wrongusername';
+      volunteer.volunteer_id = 1;
+
+      return volunteer.createVerificationCode().then((content) => {
+        throw new Error(`createVerificationCode Shouldn't of resolved when the connection details are wrong, ${content}`);
+      }, (error) => {
+        volunteer.info.connection.user = username;
+        assert.equal(error.message.indexOf('ER_ACCESS_DENIED_ERROR') >= 0, true, error);
+      });
+    });
+  });
+
+  describe('#createPasswordResetCode', () => {
+    it('Should resolve a password reset code', (done) => {
+      const volunteer = new Volunter(1);
+
+      volunteer.removePasswordResetCode()
+        .then(() => volunteer.createPasswordResetCode())
+        .then((code) => {
+          assert.equal(!_.isNil(code), true, 'Code returned should not be null or undefined');
+          assert.equal(_.isNumber(code), true, 'Code should be a valid number');
+          done();
+        })
+        .catch(error => done(new Error(error)))
+        .finally(() => volunteer.removePasswordResetCode());
+    });
+
+    it('Should reject if the connection details are wrong', () => {
+      const volunteer = new Volunter(null, 'user1');
+      const username = volunteer.info.connection.user;
+      volunteer.info.connection.user = 'wrongusername';
+      volunteer.volunteer_id = 1;
+
+      return volunteer.createPasswordResetCode().then((content) => {
+        throw new Error(`createPasswordResetCode Shouldn't of resolved when the connection details are wrong, ${content}`);
+      }, (error) => {
+        volunteer.info.connection.user = username;
+        assert.equal(error.message.indexOf('ER_ACCESS_DENIED_ERROR') >= 0, true, error);
+      });
+    });
+  });
+
+  describe('#getPasswordResetCode', () => {
+    it('Should resolve a verification code when one exists', (done) => {
+      const volunteer = new Volunter(1);
+
+      volunteer.removePasswordResetCode()
+        .then(() => volunteer.createPasswordResetCode())
+        .then(() => volunteer.getPasswordResetCode())
+        .then((code) => {
+          assert.equal(!_.isNil(code.code), true, 'Content should contain a code');
+          assert.equal(!_.isNil(code.password_reset_code_id), true, 'verification_code_id should be contained in the code');
+          assert.equal(!_.isNil(code.salt), true, 'salt should be contained in the code');
+          assert.equal(!_.isNil(code.created_datetime), true, 'created_datetime should be contained in the code');
+          done();
+        })
+        .catch(error => done(new Error(error)))
+        .finally(() => volunteer.removePasswordResetCode());
+    });
+
+    it('Should resolve a null object if the volunteer does not exist', (done) => {
+      const volunteer = new Volunter(99999);
+
+      volunteer.getPasswordResetCode()
+        .then((code) => {
+          assert.equal(_.isNil(code), true, 'Code should be a null object if the volunteer does not exist');
+          done();
+        })
+        .catch(error => done(new Error(error)));
+    });
+
+    it('Should reject if the volunteer_id is null or undefined', (done) => {
+      const volunteer = new Volunter(null);
+
+      volunteer.getPasswordResetCode()
+        .then(() => done(new Error('Shoudln\'t resolve with a invalid volunteer_id')))
+        .catch((error) => {
+          assert.equal(error, `volunteerId "${volunteer.volunteer_id}" passed is not a valid number`, error);
+          done();
+        });
+    });
+
+    it('Should reject if the connection details are wrong', () => {
+      const volunteer = new Volunter(null, 'user1');
+      const username = volunteer.info.connection.user;
+      volunteer.info.connection.user = 'wrongusername';
+      volunteer.volunteer_id = 1;
+
+      return volunteer.getPasswordResetCode().then((content) => {
+        throw new Error(`getPasswordResetCode Shouldn't of resolved when the connection details are wrong, ${content}`);
+      }, (error) => {
+        volunteer.info.connection.user = username;
+        assert.equal(error.message.indexOf('ER_ACCESS_DENIED_ERROR') >= 0, true, error);
+      });
+    });
+  });
+
+  describe('#removePasswordResetCode', () => {
+    it('Should reject if the volunteer_id is not valid', (done) => {
+      const volunteer = new Volunter();
+
+      volunteer.removePasswordResetCode()
+        .then(() => done(new Error('Shouldn\'t resolve when the volunteer_id is invalid')))
+        .catch((error) => {
+          assert.equal(error, `volunteerId "${volunteer.volunteer_id}" passed is not a valid number`, error);
+          done();
+        });
+    });
+
+    it('Should resolve if a verification code exists', (done) => {
+      const volunteer = new Volunter(1);
+
+      volunteer.createPasswordResetCode()
+        .then(() => volunteer.removePasswordResetCode())
+        .then(() => done())
+        .catch(error => done(new Error(error)));
+    });
+
+    it('Should resolve if a verification code does not exist', (done) => {
+      const volunteer = new Volunter(1);
+
+      volunteer.createPasswordResetCode()
+        .then(() => volunteer.removePasswordResetCode())
+        .then(() => done())
+        .catch(error => done(new Error(error)));
+    });
+
+    it('Should reject if the connection details are wrong', () => {
+      const volunteer = new Volunter(null, 'user1');
+      const username = volunteer.info.connection.user;
+      volunteer.info.connection.user = 'wrongusername';
+      volunteer.volunteer_id = 1;
+
+      return volunteer.removePasswordResetCode().then((content) => {
+        throw new Error(`removeVerificationCode Shouldn't of resolved when the connection details are wrong, ${content}`);
       }, (error) => {
         volunteer.info.connection.user = username;
         assert.equal(error.message.indexOf('ER_ACCESS_DENIED_ERROR') >= 0, true, error);
@@ -165,6 +479,139 @@ describe('Volunteer Component', () => {
 
       return volunteer.doesPasswordResetCodeExist().then((content) => {
         throw new Error(`doesPasswordResetCodeExist Shouldn't of resolved when the connection details are wrong, ${content}`);
+      }, (error) => {
+        volunteer.info.connection.user = username;
+        assert.equal(error.message.indexOf('ER_ACCESS_DENIED_ERROR') >= 0, true, error);
+      });
+    });
+  });
+
+  describe('#verify', () => {
+    it('Should mark there account and object as verified', (done) => {
+      const volunteer = new Volunter(1);
+
+      volunteer.exists()
+        .then(() => volunteer.verify())
+        .then(() => volunteer.exists())
+        .then(() => {
+          assert.equal(volunteer.verified, true, 'After regathering the acccount, it should be verified');
+          done();
+        });
+    });
+
+    it('Should reject if the project_id is invalid', (done) => {
+      const volunteer = new Volunter();
+
+      volunteer.verify()
+        .then(() => done(new Error('shouldn\'t resolve when the project_id is invalid')))
+        .catch((error) => {
+          assert.equal(error, `volunteerId "${volunteer.volunteer_id}" passed is not a valid number`, error);
+          done();
+        });
+    });
+
+    it('Should reject if the connection details are wrong', () => {
+      const volunteer = new Volunter(null, 'user1');
+      const username = volunteer.info.connection.user;
+      volunteer.info.connection.user = 'wrongusername';
+      volunteer.volunteer_id = 1;
+
+      return volunteer.verify().then((content) => {
+        throw new Error(`verify Shouldn't of resolved when the connection details are wrong, ${content}`);
+      }, (error) => {
+        volunteer.info.connection.user = username;
+        assert.equal(error.message.indexOf('ER_ACCESS_DENIED_ERROR') >= 0, true, error);
+      });
+    });
+  });
+
+  describe('#create', () => {
+    it('Should create the user in the database and create a verification code', (done) => {
+      const volunteer = new Volunter(null, 'randomvalidusername');
+
+      volunteer.email = 'randomvalidemail@randomvalideamil.co.uk';
+      volunteer.name = 'random validname';
+
+      volunteer.create('thepassword', 1)
+        .then((verification) => {
+          assert.equal(!_.isNil(verification), true, 'Returned verification code cannot be null or undefined');
+          return volunteer.exists('username');
+        })
+        .then(() => volunteer.getVerificationCode())
+        .then((code) => {
+          assert.equal(!_.isNil(code), true, 'After creating the account a verification code should exit');
+          return volunteer.removeVerificationCode();
+        })
+        .then(() => volunteer.knex('volunteer').where('volunteer_id', volunteer.volunteer_id).del())
+        .then(() => done())
+        .catch(error => done(new Error(error)));
+    });
+
+    it('Should reject if the volunteer name is undefined or null', (done) => {
+      const volunteer = new Volunter(null, 'randomvalidusername');
+
+      volunteer.email = 'theemail@theemail.com';
+
+      volunteer.create()
+        .then(() => done(new Error('volunteer creation shouldn\'t create the name is not defined.')))
+        .catch((error) => {
+          assert.equal(error, `name, username, email and password are required, name=${volunteer.name}, username=${volunteer.username}, email=${volunteer.email}`, error);
+          done();
+        });
+    });
+
+    it('Should reject if the volunteer email is undefined or null', (done) => {
+      const volunteer = new Volunter(null, 'randomvalidusername');
+
+      volunteer.name = 'the name';
+
+      volunteer.create('thepassword')
+        .then(() => done(new Error('volunteer creation shouldn\'t create the name is not defined.')))
+        .catch((error) => {
+          assert.equal(error, `name, username, email and password are required, name=${volunteer.name}, username=${volunteer.username}, email=${volunteer.email}`, error);
+          done();
+        });
+    });
+
+    it('Should reject if the volunteer username is undefined or null', (done) => {
+      const volunteer = new Volunter();
+
+      volunteer.name = 'the name';
+      volunteer.email = 'theemail@themail.com';
+
+      volunteer.create('thepassword')
+        .then(() => done(new Error('volunteer creation shouldn\'t create the name is not defined.')))
+        .catch((error) => {
+          assert.equal(error, `name, username, email and password are required, name=${volunteer.name}, username=${volunteer.username}, email=${volunteer.email}`, error);
+          done();
+        });
+    });
+
+    it('Should reject if the password is not provided', (done) => {
+      const volunteer = new Volunter(null, 'theusername');
+
+      volunteer.name = 'the name';
+      volunteer.email = 'the email';
+
+      volunteer.create()
+        .then(() => done(new Error('Creation shouldn\'t resolve when no password is given')))
+        .catch((error) => {
+          assert.equal(error, `You must provide a password to create the volunteer=${volunteer.username}`, error);
+          done();
+        });
+    });
+
+    it('Should reject if the connection details are incorrect', () => {
+      const volunteer = new Volunter(null, 'user1');
+      const username = volunteer.info.connection.user;
+      volunteer.info.connection.user = 'wrongusername';
+      volunteer.volunteer_id = 1;
+
+      volunteer.name = 'the name';
+      volunteer.email = 'theemail@themail.com';
+
+      return volunteer.create('thepassword').then((content) => {
+        throw new Error(`create Shouldn't of resolved when the connection details are wrong, ${content}`);
       }, (error) => {
         volunteer.info.connection.user = username;
         assert.equal(error.message.indexOf('ER_ACCESS_DENIED_ERROR') >= 0, true, error);

@@ -3,8 +3,6 @@ const crypto = require('crypto');
 const knex = require('knex');
 const Promise = require('bluebird');
 
-const logger = require('./Logger');
-
 class Database {
   constructor(info) {
     this.info = info;
