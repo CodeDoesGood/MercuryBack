@@ -1,12 +1,18 @@
 const _ = require('lodash');
 const Promise = require('bluebird');
 
-const Database = require('../DatabaseWrapper/DatabaseWrapper');
+const ConfigurationWrapper = require('../components/Configuration/ConfigurationWrapper');
+const Database = require('./DatabaseWrapper');
+
+const config = new ConfigurationWrapper('mercury', 'mercury.json');
 
 /**
  * Interface for everything that is needed for a Projects
  */
 class Projects extends Database {
+  constructor() {
+    super(config.getKey('database'));
+  }
   /**
    * Returns all projects
    */

@@ -1,6 +1,6 @@
 const _ = require('lodash');
 
-const Project = require('../components/Project/Project');
+const Project = require('../components/Project');
 
 /**
  * Validates that there is a project that exists by the id requested and calls next otherwise

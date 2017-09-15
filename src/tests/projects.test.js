@@ -1,7 +1,7 @@
 const _ = require('lodash');
 const assert = require('assert');
 
-const Projects = require('../components/Projects/Projects');
+const Projects = require('../components/Projects');
 
 if (!_.isNil(process.env.TRAVIS)) {
   return;
@@ -29,6 +29,19 @@ describe('Projects Component', () => {
         .catch(error => done(new Error(error)))
         .finally(() => done());
     });
+
+    it('Should reject if the connection details are wrong', () => {
+      const projects = new Projects();
+      const username = projects.info.connection.user;
+      projects.info.connection.user = 'wrongusername';
+
+      return projects.getAllProjects().then((content) => {
+        throw new Error(`getAllProjects Shouldn't of resolved when the connection details are wrong, ${content}`);
+      }, (error) => {
+        projects.info.connection.user = username;
+        assert.equal(error.message.indexOf('ER_ACCESS_DENIED_ERROR') >= 0, true, error);
+      });
+    });
   });
 
   describe('#getAllActiveProjects', () => {
@@ -44,6 +57,19 @@ describe('Projects Component', () => {
         .catch(error => done(new Error(error)))
         .finally(() => done());
     });
+
+    it('Should reject if the connection details are wrong', () => {
+      const projects = new Projects();
+      const username = projects.info.connection.user;
+      projects.info.connection.user = 'wrongusername';
+
+      return projects.getAllActiveProjects().then((content) => {
+        throw new Error(`getAllActiveProjects Shouldn't of resolved when the connection details are wrong, ${content}`);
+      }, (error) => {
+        projects.info.connection.user = username;
+        assert.equal(error.message.indexOf('ER_ACCESS_DENIED_ERROR') >= 0, true, error);
+      });
+    });
   });
 
   describe('#getAllHiddenProjects', () => {
@@ -58,6 +84,19 @@ describe('Projects Component', () => {
         })
         .catch(error => done(new Error(error)))
         .finally(() => done());
+    });
+
+    it('Should reject if the connection details are wrong', () => {
+      const projects = new Projects();
+      const username = projects.info.connection.user;
+      projects.info.connection.user = 'wrongusername';
+
+      return projects.getAllHiddenProjects().then((content) => {
+        throw new Error(`getAllHiddenProjects Shouldn't of resolved when the connection details are wrong, ${content}`);
+      }, (error) => {
+        projects.info.connection.user = username;
+        assert.equal(error.message.indexOf('ER_ACCESS_DENIED_ERROR') >= 0, true, error);
+      });
     });
   });
 
@@ -104,6 +143,19 @@ describe('Projects Component', () => {
       projects.getAllProjectsByCategory()
         .then(() => done(new Error('Resolved when no category id was passed')))
         .catch(() => done());
+    });
+
+    it('Should reject if the connection details are wrong', () => {
+      const projects = new Projects();
+      const username = projects.info.connection.user;
+      projects.info.connection.user = 'wrongusername';
+
+      return projects.getAllProjectsByCategory(1).then((content) => {
+        throw new Error(`getAllProjectsByCategory Shouldn't of resolved when the connection details are wrong, ${content}`);
+      }, (error) => {
+        projects.info.connection.user = username;
+        assert.equal(error.message.indexOf('ER_ACCESS_DENIED_ERROR') >= 0, true, error);
+      });
     });
   });
 });

@@ -3,7 +3,10 @@
 const _ = require('lodash');
 const Promise = require('bluebird');
 
-const Database = require('../DatabaseWrapper/DatabaseWrapper');
+const ConfigurationWrapper = require('../components/Configuration/ConfigurationWrapper');
+const Database = require('./DatabaseWrapper');
+
+const config = new ConfigurationWrapper('mercury', 'mercury.json');
 
 /**
  * Interface for everything that is needed for a Project
@@ -11,7 +14,7 @@ const Database = require('../DatabaseWrapper/DatabaseWrapper');
  */
 class Project extends Database {
   constructor(projectId = null) {
-    super();
+    super(config.getKey('database'));
     this.doesExist = false;
 
     this.project_id = projectId;
@@ -51,8 +54,7 @@ class Project extends Database {
             this.doesExist = true;
             resolve();
           }
-        })
-        .catch(error => reject(error));
+        });
     });
   }
 

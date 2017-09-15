@@ -2,14 +2,22 @@ const defaultConfig = {
   // Email details
   email: {
     service: 'gmail',
-    email: 'noreply@codedoesgood.org',
+    email: 'contact@codedoesgood.org',
     password: null,
   },
 
+  database: {
+    client: 'mysql',
+    connection: {
+      host: '127.0.0.1',
+      user: 'root',
+      password: '',
+      database: 'mercury',
+    },
+  },
+
   // Secret used to authenticate tokens, this should be updated on the server to the real secret.
-  secret: 'secret',
-  // The path to the doddle database
-  databasePath: './src/database/database.db',
+  secret: null,
 };
 
 module.exports = defaultConfig;

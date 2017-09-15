@@ -1,15 +1,18 @@
 const _ = require('lodash');
 const Promise = require('bluebird');
 
-const Database = require('../DatabaseWrapper/DatabaseWrapper');
-const logger = require('../Logger/Logger');
+const Database = require('./DatabaseWrapper');
+const ConfigurationWrapper = require('./Configuration/ConfigurationWrapper');
+const logger = require('./Logger');
+
+const config = new ConfigurationWrapper('mercury', 'mercury.json');
 
 /**
  * Interface for everything that is needed for a volunteer
  */
 class Volunteer extends Database {
   constructor(VolunteerId = null, username = null) {
-    super();
+    super(config.getKey('database'));
     this.doesExist = false;
 
     this.volunteer_id = VolunteerId;
@@ -61,7 +64,7 @@ class Volunteer extends Database {
           }
         })
         .catch((error) => {
-          reject(`Failed to check if volunteer already exists, error=${JSON.stringify(error)}`);
+          reject(error);
         });
     });
   }
@@ -139,23 +142,29 @@ class Volunteer extends Database {
    * the stored already salted code, if they match we then mark the account as verified.
    */
   createVerificationCode() {
-    const number = Math.floor((Math.random() * ((9999999999999 - 1000000000000) + 1000000000000)));
-    const hashedNumber = this.saltAndHash(number.toString());
-    const date = new Date();
+    return new Promise((resolve, reject) => {
+      const maxNumber = 9999999999999;
+      const minNumber = 1000000000000;
 
-    this.removeVerificationCode(parseInt(this.volunteer_id, 10));
+      const number = Math.floor((Math.random() * ((maxNumber - minNumber) + 1000000000000)));
+      const hashedNumber = this.saltAndHash(number.toString());
+      const date = new Date();
 
-    this.connect()
-      .then(() => this.knex('verification_code').insert({
-        verification_code_id: this.volunteer_id,
-        code: hashedNumber.hashedPassword,
-        salt: hashedNumber.salt,
-        created_datetime: date,
-      }))
-      .then(() => logger.info(`Created verification code for user ${this.volunteer_id}, number=${number}`))
-      .catch(error => logger.error(`Failed to create verification code for user ${this.volunteer_id} error=${JSON.stringify(error)}`));
 
-    return number;
+      this.connect()
+        .then(() => this.removePasswordResetCode())
+        .then(() => this.knex('verification_code').insert({
+          verification_code_id: this.volunteer_id,
+          code: hashedNumber.hashedPassword,
+          salt: hashedNumber.salt,
+          created_datetime: date,
+        }))
+        .then(() => resolve(number))
+        .catch((error) => {
+          logger.error(`Failed to create verification code for user ${this.volunteer_id} error=${JSON.stringify(error)}`);
+          reject(error);
+        });
+    });
   }
 
   /**
@@ -165,51 +174,60 @@ class Volunteer extends Database {
    * password will be set (code is hashed and salted)
    */
   createPasswordResetCode() {
-    const number = Math.floor((Math.random() * ((9999999999999 - 1000000000000) + 1000000000000)));
-    const hashedNumber = this.saltAndHash(number.toString());
-    const date = new Date();
+    return new Promise((resolve, reject) => {
+      const maxNumber = 9999999999999;
+      const minNumber = 1000000000000;
 
-    this.removePasswordResetCode(parseInt(this.volunteer_id, 10));
+      const number = Math.floor((Math.random() * ((maxNumber - minNumber) + 1000000000000)));
+      const hashedNumber = this.saltAndHash(number.toString());
+      const date = new Date();
 
-    this.connect()
-      .then(() => this.knex('password_reset_code').insert({
-        password_reset_code_id: this.volunteer_id,
-        code: hashedNumber.hashedPassword,
-        salt: hashedNumber.salt,
-        created_datetime: date,
-      }))
-      .then()
-      .catch(error => logger.error(`Failed to create verification code for user ${this.volunteer_id} error=${JSON.stringify(error)}`));
 
-    return number;
+      this.connect()
+        .then(() => this.removePasswordResetCode())
+        .then(() => this.knex('password_reset_code').insert({
+          password_reset_code_id: this.volunteer_id,
+          code: hashedNumber.hashedPassword,
+          salt: hashedNumber.salt,
+          created_datetime: date,
+        }))
+        .then(() => resolve(number))
+        .catch((error) => {
+          reject(error);
+        });
+    });
   }
 
   /**
    * Removes the verification code by id for user
    */
   removeVerificationCode() {
-    if (!_.isNumber(this.volunteer_id)) {
-      return `volunteerId "${this.volunteer_id}" passed is not a valid number`;
-    }
+    return new Promise((resolve, reject) => {
+      if (!_.isNumber(this.volunteer_id)) {
+        reject(`volunteerId "${this.volunteer_id}" passed is not a valid number`);
+      }
 
-    return this.connect()
+      this.connect()
       .then(() => this.knex('verification_code').where('verification_code_id', this.volunteer_id).del())
-      .then()
-      .catch(error => logger.error(`Failed to remove verification code for user ${this.volunteer_id} error=${JSON.stringify(error)}`));
+      .then(() => resolve())
+      .catch(error => reject(error));
+    });
   }
 
   /**
    * removes the existing (if any) password reset codes for the user)
    */
   removePasswordResetCode() {
-    if (!_.isNumber(this.volunteer_id)) {
-      return `volunteerId "${this.volunteer_id}" passed is not a valid number`;
-    }
+    return new Promise((resolve, reject) => {
+      if (!_.isNumber(this.volunteer_id)) {
+        reject(`volunteerId "${this.volunteer_id}" passed is not a valid number`);
+      }
 
-    return this.connect()
-      .then(() => this.knex('password_reset_code').where('password_reset_code_id', this.volunteer_id).del())
-      .then()
-      .catch(error => logger.error(`Failed to remove password reset code for user ${this.volunteer_id} error=${JSON.stringify(error)}`));
+      this.connect()
+        .then(() => this.knex('password_reset_code').where('password_reset_code_id', this.volunteer_id).del())
+        .then(() => resolve())
+        .catch(error => reject(error));
+    });
   }
 
   /**
@@ -257,13 +275,13 @@ class Volunteer extends Database {
       this.connect()
         .then(() => this.knex('verification_code').select('verification_code_id').where('verification_code_id', this.volunteer_id).first())
         .then((result) => {
-          if (_.isNil(result.verification_code_id)) {
-            reject(0);
+          if (_.isNil(result) || _.isNil(result.verification_code_id)) {
+            reject(`No verification code exists for user ${this.volunteer_id}`);
           } else {
             resolve(result.verification_code_id);
           }
         })
-        .catch(() => reject(0));
+        .catch(error => reject(error));
     });
   }
 
@@ -279,13 +297,13 @@ class Volunteer extends Database {
       this.connect()
         .then(() => this.knex('password_reset_code').select('password_reset_code_id').where('password_reset_code_id', this.volunteer_id).first())
         .then((result) => {
-          if (_.isNil(result.password_reset_code_id)) {
-            reject(0);
+          if (_.isNil(result) || _.isNil(result.password_reset_code_id)) {
+            reject(`No password reset code exists for user ${this.volunteer_id}`);
           } else {
             resolve(result.password_reset_code_id);
           }
         })
-        .catch(() => reject(0));
+        .catch(error => reject(error));
     });
   }
 
@@ -308,7 +326,7 @@ class Volunteer extends Database {
           salt: salted.salt,
         }))
         .then(() => resolve())
-        .catch(error => reject(`Unable to update password for volunteer ${this.volunteer_id}, error=${JSON.stringify(error)}`));
+        .catch(error => reject(error));
     });
   }
 }

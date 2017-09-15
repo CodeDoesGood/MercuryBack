@@ -2,8 +2,8 @@ const _ = require('lodash');
 const jwt = require('jsonwebtoken');
 
 const ConfigurationWrapper = require('../components/Configuration/ConfigurationWrapper');
-const logger = require('../components/Logger/Logger');
-const Volunteer = require('../components/Volunteer/Volunteer');
+const logger = require('../components/Logger');
+const Volunteer = require('../components/Volunteer');
 
 const config = new ConfigurationWrapper('mercury', 'mercury.json');
 

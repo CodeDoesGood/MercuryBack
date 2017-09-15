@@ -1,7 +1,7 @@
 const _ = require('lodash');
 const assert = require('assert');
 
-const Project = require('../components/Project/Project');
+const Project = require('../components/Project');
 
 if (!_.isNil(process.env.TRAVIS)) {
   return;
@@ -75,6 +75,30 @@ describe('Project Component', () => {
         .then(() => done(new Error('Content should not update if project id was not passed, or project does not exist')))
         .catch((error) => {
           if (error === (`Project ${project.project_id} does not exist`)) { done(); } else { done(error); }
+        });
+    });
+
+    it('Shouldn\'t attempt to update content if the project "doesExist" is marked as false', (done) => {
+      const project = new Project(1000);
+      project.doesExist = false;
+
+      project.updateContent()
+        .then(() => done(new Error(`Updated content when doesExist is false, doesExist=${project.doesExist}`)))
+        .catch((error) => {
+          assert.equal(error === `Project ${project.project_id} does not exist or has not been checked for existence yet`, true, error);
+          done();
+        });
+    });
+
+    it('Shouldn\'t attempt to update content if the project id is not a valid number', (done) => {
+      const project = new Project('1000');
+      project.doesExist = false;
+
+      project.updateContent()
+        .then(() => done(new Error(`Updated content when project id is not a valid number, project_id=${project.project_id}`)))
+        .catch((error) => {
+          assert.equal(error === `Id "${project.project_id}" passed is not a valid number`, true, error);
+          done();
         });
     });
   });

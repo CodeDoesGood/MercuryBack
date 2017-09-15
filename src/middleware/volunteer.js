@@ -1,7 +1,7 @@
 const _ = require('lodash');
 
-const logger = require('../components/Logger/Logger');
-const Volunteer = require('../components/Volunteer/Volunteer');
+const logger = require('../components/Logger');
+const Volunteer = require('../components/Volunteer');
 
 /**
  * Validates that the user creation details are all there and contain all the correct information
@@ -82,8 +82,13 @@ function validateRequestResetDetails(req, res, next) {
  */
 function createPasswordResetCode(req, res, next) {
   const volunteer = req.volunteer;
-  req.resetPasswordCode = volunteer.createPasswordResetCode();
-  next();
+
+  volunteer.createPasswordResetCode()
+    .then((code) => {
+      req.resetPasswordCode = code;
+      next();
+    })
+    .catch(() => res.status(500).send({ error: 'Password reset code', description: 'Unable to generate password reset code' }));
 }
 
 /**
@@ -185,8 +190,9 @@ function validatePasswordResetCodeAuthenticity(req, res, next) {
       const hashedCode = volunteer.saltAndHash(code, storedSalt);
 
       if (hashedCode.hashedPassword === storedCode) {
-        volunteer.removePasswordResetCode();
-        next();
+        volunteer.removePasswordResetCode()
+          .then(() => next())
+          .catch(error => res.status(400).send({ error: 'Code removing', description: `Failed to remove password reset code: error=${JSON.stringify(error)}` }));
       } else {
         res.status(401).send({ error: 'Invalid Code', description: 'The code passed was not the correct code for verification' });
       }
