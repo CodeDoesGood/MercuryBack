@@ -10,13 +10,13 @@ const router = Router();
  * These routes are for getting and updating single projects by id
  */
 
-router.get('/project/gather/:id', [
+router.get('/project/gather/:project_id', [
   database.validateConnectionStatus.bind(this),
   project.validateProjectId.bind(this),
   project.getProjectById.bind(this),
 ]);
 
-router.post('/project/update/:id', [
+router.post('/project/update/:project_id', [
   authentication.checkAuthenticationToken.bind(this),
   authentication.checkAdminAuthenticationLevel.bind(this),
   project.validateProjectUpdateContent.bind(this),

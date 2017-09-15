@@ -175,7 +175,7 @@ function createNewVolunteer(req, res, next) {
 
   volunteer.create(vol.password, 1)
     .then((details) => {
-      req.volunteer.id = details.id;
+      req.volunteer.volunteer_id = details.id;
       req.verificationCode = details.code;
       next();
     })

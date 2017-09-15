@@ -8,11 +8,11 @@ const logger = require('../Logger/Logger');
  * Interface for everything that is needed for a volunteer
  */
 class Volunteer extends Database {
-  constructor(id = null, username = null) {
+  constructor(VolunteerId = null, username = null) {
     super();
     this.doesExist = false;
 
-    this.id = id;
+    this.volunteer_id = VolunteerId;
     this.username = username;
     this.password = null;
     this.position = null;
@@ -41,17 +41,17 @@ class Volunteer extends Database {
    */
   exists(type = 'volunteer_id') {
     return new Promise((resolve, reject) => {
-      if (_.isNil(this.id)) {
-        reject(`Type must be defined or valid, type=${this.id}`);
+      if (_.isNil(this[type])) {
+        reject(`Type must be defined or valid, type=${this[type]}`);
       }
 
       this.connect()
-        .then(() => this.knex('volunteer').where(type, this.id).select('volunteer_id', 'username', 'email', 'password', 'salt').first())
+        .then(() => this.knex('volunteer').where(type, this[type]).select('volunteer_id', 'username', 'email', 'password', 'salt').first())
         .then((volunteer) => {
           if (_.isNil(volunteer)) {
             reject(false);
           } else {
-            this.id = volunteer.volunteer_id;
+            this.volunteer_id = volunteer.volunteer_id;
             this.username = volunteer.username;
             this.email = volunteer.email;
             this.password = volunteer.password;
@@ -102,7 +102,7 @@ class Volunteer extends Database {
         .then(() => this.knex('volunteer').insert(volunteer))
         .then((id) => {
           const code = this.createVerificationCode(id[0]);
-          this.id = id[0];
+          this.volunteer_id = id[0];
           this.password = hashedPassword.hashedPassword;
           this.salt = hashedPassword.salt;
 
@@ -117,11 +117,11 @@ class Volunteer extends Database {
    */
   verify() {
     return new Promise((resolve, reject) => {
-      if (!_.isNumber(this.id)) {
-        reject(`volunteerId "${this.id}" passed is not a valid number`);
+      if (!_.isNumber(this.volunteer_id)) {
+        reject(`volunteerId "${this.volunteer_id}" passed is not a valid number`);
       }
       this.connect()
-        .then(() => this.knex('volunteer').where('volunteer_id', this.id).update({ verified: true }))
+        .then(() => this.knex('volunteer').where('volunteer_id', this.volunteer_id).update({ verified: true }))
         .then(() => {
           this.verified = true;
           resolve();
@@ -143,17 +143,17 @@ class Volunteer extends Database {
     const hashedNumber = this.saltAndHash(number.toString());
     const date = new Date();
 
-    this.removeVerificationCode(parseInt(this.id, 10));
+    this.removeVerificationCode(parseInt(this.volunteer_id, 10));
 
     this.connect()
       .then(() => this.knex('verification_code').insert({
-        verification_code_id: this.id,
+        verification_code_id: this.volunteer_id,
         code: hashedNumber.hashedPassword,
         salt: hashedNumber.salt,
         created_datetime: date,
       }))
-      .then(() => logger.info(`Created verification Code for user ${this.id}, number=${number}`))
-      .catch(error => logger.error(`Failed to create verification code for user ${this.id} error=${JSON.stringify(error)}`));
+      .then(() => logger.info(`Created verification Code for user ${this.volunteer_id}, number=${number}`))
+      .catch(error => logger.error(`Failed to create verification code for user ${this.volunteer_id} error=${JSON.stringify(error)}`));
 
     return number;
   }
@@ -162,14 +162,14 @@ class Volunteer extends Database {
    * Removes the verification code by id for user
    */
   removeVerificationCode() {
-    if (!_.isNumber(this.id)) {
-      return `volunteerId "${this.id}" passed is not a valid number`;
+    if (!_.isNumber(this.volunteer_id)) {
+      return `volunteerId "${this.volunteer_id}" passed is not a valid number`;
     }
 
     return this.connect()
-      .then(() => this.knex('verification_code').where('verification_code_id', this.id).del())
+      .then(() => this.knex('verification_code').where('verification_code_id', this.volunteer_id).del())
       .then()
-      .catch(error => logger.error(`Failed to remove verification code for user ${this.id} error=${JSON.stringify(error)}`));
+      .catch(error => logger.error(`Failed to remove verification code for user ${this.volunteer_id} error=${JSON.stringify(error)}`));
   }
 
   /**
@@ -177,12 +177,12 @@ class Volunteer extends Database {
    */
   getVerificationCode() {
     return new Promise((resolve, reject) => {
-      if (!_.isNumber(this.id)) {
-        reject(`volunteerId "${this.id}" passed is not a valid number`);
+      if (!_.isNumber(this.volunteer_id)) {
+        reject(`volunteerId "${this.volunteer_id}" passed is not a valid number`);
       }
 
       this.connect()
-        .then(() => this.knex('verification_code').where('verification_code_id', this.id).first())
+        .then(() => this.knex('verification_code').where('verification_code_id', this.volunteer_id).first())
         .then(details => resolve(details))
         .catch(error => reject(error));
     });
@@ -193,12 +193,12 @@ class Volunteer extends Database {
    */
   doesVerificationCodeExist() {
     return new Promise((resolve, reject) => {
-      if (!_.isNumber(this.id)) {
-        reject(`volunteerId "${this.id}" passed is not a valid number`);
+      if (!_.isNumber(this.volunteer_id)) {
+        reject(`volunteerId "${this.volunteer_id}" passed is not a valid number`);
       }
 
       this.connect()
-        .then(() => this.knex('verification_code').select('verification_code_id').where('verification_code_id', this.id).first())
+        .then(() => this.knex('verification_code').select('verification_code_id').where('verification_code_id', this.volunteer_id).first())
         .then((result) => {
           if (_.isNil(result.verification_code_id)) {
             reject(0);
@@ -217,19 +217,19 @@ class Volunteer extends Database {
    */
   updatePassword(password) {
     return new Promise((resolve, reject) => {
-      if (!_.isNumber(this.id) || !_.isString(password)) {
+      if (!_.isNumber(this.volunteer_id) || !_.isString(password)) {
         reject('password or id passed was not a valid number or string');
       }
 
       const salted = this.saltAndHash(password);
 
       this.connect()
-        .then(() => this.knex('volunteer').where('volunteer_id', this.id).update({
+        .then(() => this.knex('volunteer').where('volunteer_id', this.volunteer_id).update({
           password: salted.hashedPassword,
           salt: salted.salt,
         }))
         .then(() => resolve())
-        .catch(error => reject(`Unable to update password for volunteer ${this.id}, error=${JSON.stringify(error)}`));
+        .catch(error => reject(`Unable to update password for volunteer ${this.volunteer_id}, error=${JSON.stringify(error)}`));
     });
   }
 }

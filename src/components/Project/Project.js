@@ -7,13 +7,14 @@ const Database = require('../DatabaseWrapper/DatabaseWrapper');
 
 /**
  * Interface for everything that is needed for a Project
+ * @param projectId can pass project id to be used when checking existence by default
  */
 class Project extends Database {
-  constructor(id = null) {
+  constructor(projectId = null) {
     super();
     this.doesExist = false;
 
-    this.id = id;
+    this.project_id = projectId;
     this.createdDateTime = null;
     this.title = null;
     this.status = null;
@@ -26,19 +27,18 @@ class Project extends Database {
 
   /**
    * Returns the project based on id
-   * @param id
    */
   exists() {
     return new Promise((resolve, reject) => {
-      if (_.isNil(this.id) || !_.isNumber(parseInt(this.id, 10))) {
-        reject(`id '${this.id}' passed is not a valid number`);
+      if (_.isNil(this.project_id) || !_.isNumber(parseInt(this.project_id, 10))) {
+        reject(`id '${this.project_id}' passed is not a valid number`);
       }
 
       this.connect()
-        .then(() => this.knex('project').where('project_id', this.id).first())
+        .then(() => this.knex('project').where('project_id', this.project_id).first())
         .then((project) => {
           if (_.isNil(project)) {
-            reject(`Project ${this.id} does not exist`);
+            reject(`Project ${this.project_id} does not exist`);
           } else {
             this.createdDateTime = project['created_datetime'];
             this.title = project.title;
@@ -61,14 +61,14 @@ class Project extends Database {
    */
   updateContent() {
     return new Promise((resolve, reject) => {
-      if (_.isNil(this.id) || !_.isNumber(this.id)) {
-        reject(`Id "${this.id}" passed is not a valid number`);
+      if (_.isNil(this.project_id) || !_.isNumber(this.project_id)) {
+        reject(`Id "${this.project_id}" passed is not a valid number`);
       } else if (!this.doesExist) {
-        reject(`Project ${this.id} does not exist or has not been checked for existence yet`);
+        reject(`Project ${this.project_id} does not exist or has not been checked for existence yet`);
       }
 
       this.connect()
-        .then(() => this.knex('project').where('project_id', this.id).update({
+        .then(() => this.knex('project').where('project_id', this.project_id).update({
           title: this.title,
           status: this.status,
           project_category: this.projectCategory,
@@ -87,7 +87,7 @@ class Project extends Database {
    */
   getContent() {
     return {
-      id: this.id,
+      project_id: this.project_id,
       createdDateTime: this.createdDateTime,
       title: this.title,
       status: this.status,
