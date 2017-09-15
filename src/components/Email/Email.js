@@ -21,7 +21,7 @@ class Email {
     this.verify()
       .then(() => {
         logger.info(`Email Client is ready, service=${this.service}, email=${this.username}`);
-        this.online = false;
+        this.online = true;
       })
       .catch(error => logger.error(`Error creating email connection, error=${error}`));
   }
