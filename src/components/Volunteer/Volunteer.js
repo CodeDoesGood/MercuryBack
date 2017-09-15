@@ -178,7 +178,7 @@ class Volunteer extends Database {
         salt: hashedNumber.salt,
         created_datetime: date,
       }))
-      .then(() => logger.info(`Created password reset code for user ${this.volunteer_id}, number=${number}`))
+      .then()
       .catch(error => logger.error(`Failed to create verification code for user ${this.volunteer_id} error=${JSON.stringify(error)}`));
 
     return number;

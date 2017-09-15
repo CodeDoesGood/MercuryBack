@@ -25,7 +25,8 @@ function validateConnectionStatus(req, res, next) {
  */
 function sendVerificationEmail(req, res) {
   const volunteer = req.volunteer;
-  const verificationLink = `localhost:3000/${volunteer.username}/${volunteer.verificationCode}`;
+  const code = req.verificationCode;
+  const verificationLink = `http://localhost:3000/verify/${volunteer.username}/${code}`;
 
   // This is currently here because we have no email service
   logger.debug('link for user', volunteer.username, verificationLink);
@@ -43,8 +44,6 @@ function sendVerificationEmail(req, res) {
       logger.error(`Error attempting to send a email. to=${to} from=${from}, error=${error}`);
       res.status(503).send({ error: 'Unavailable Service', description: 'Email service is currently unavailable or down' });
     });
-
-  res.status(503).send({ error: 'Currently unavailable', description: 'This service is currently unavailable' });
 }
 
 /**
@@ -53,8 +52,33 @@ function sendVerificationEmail(req, res) {
  * to reset the users password.
  */
 function sendPasswordResetLinkToRequestingEmail(req, res) {
-  const code = req.resetPasswordCode
-  res.status(503).send({ error: 'Currently unavailable', description: 'This service is currently unavailable' });
+  const volunteer = req.volunteer;
+
+  const code = req.resetPasswordCode;
+  const username = volunteer.username;
+  const email = volunteer.email;
+
+  const link = `http://localhost:3000/reset/${username}/${code}`;
+
+  const content = `A password reset has been requested for the Volunteer: ${username}. If you did not make this request you` +
+    `can safely ignore this email.\\n\\nIf you do actually want to reset your password, visit this link: ${link}`;
+
+
+  logger.info(`Created password reset link for user=${username}, link=${link}`);
+
+  const to = email;
+  const from = config.getKey(['email']).email;
+  const subject = '[CodeDoesGood] Password Reset Email';
+  const text = content;
+
+  emailClient.send(from, to, subject, text, text)
+    .then(() => {
+      res.status(200).send({ message: `Account ${volunteer.username} created, you will soon get a verification email` });
+    })
+    .catch((error) => {
+      logger.error(`Error attempting to send a email. to=${to} from=${from}, error=${error}`);
+      res.status(503).send({ error: 'Unavailable Service', description: 'Email service is currently unavailable or down' });
+    });
 }
 
 /**

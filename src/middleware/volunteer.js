@@ -47,10 +47,27 @@ function validateVolunteerCreationDetails(req, res, next) {
 }
 
 /**
- * TODO: THIS
+ * Validates that the user exists and that the email and username was passed.
  */
 function validateRequestResetDetails(req, res, next) {
-  next();
+  const username = req.body.username;
+  const email = req.body.email;
+
+  if (_.isNil(username)) {
+    res.status(400).send({ error: 'Username validation', description: 'The username parameter was not passed' });
+  } else if (_.isNil(email)) {
+    res.status(400).send({ error: 'Email validation', description: 'The email parameter was not passed' });
+  } else {
+    const volunteer = new Volunteer(null, username);
+
+    volunteer.exists('username')
+      .then(() => {
+        req.volunteer = volunteer;
+        req.email = email;
+        next();
+      })
+      .catch(() => res.status(400).send({ error: 'User existence', message: 'Volunteer does not exist' }));
+  }
 }
 
 /**
@@ -61,19 +78,9 @@ function validateRequestResetDetails(req, res, next) {
  * will allow them to to send a reset request with the code and there new password.
  */
 function createPasswordResetCode(req, res, next) {
-  const username = req.username;
-  const email = req.email;
-
-  const volunteer = new Volunteer(null, username);
-  volunteer.email = email;
-
-  volunteer.exists('username')
-    .then(() => volunteer.createPasswordResetCode())
-    .then((code) => {
-      req.resetPasswordCode = code;
-      next();
-    })
-    .catch(error => res.status(500).send({ error: 'Password Creation', description: `unable to create password reset code, error=${error}` }));
+  const volunteer = req.volunteer;
+  req.resetPasswordCode = volunteer.createPasswordResetCode();
+  next();
 }
 
 /**
