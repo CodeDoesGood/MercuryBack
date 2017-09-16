@@ -9,4 +9,4 @@ notifications:
 
 script:
   - cd backend && npm install && npm run lint && npm test
-  - cd ../frontend && npm install && npm run lint
+  - cd ../frontend && npm install --save-dev && npm run lint
