@@ -8,4 +8,5 @@ notifications:
     on_success: never
 
 script:
-  - cd backend && npm install && npm test
+  - cd backend && npm install && npm run lint && npm test
+  - cd ../frontend && npm install --save-dev && npm run lint
