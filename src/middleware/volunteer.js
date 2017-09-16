@@ -213,8 +213,7 @@ function updateUsersPassword(req, res) {
   volunteer.updatePassword(password)
     .then(() => res.status(200).send({ message: `Volunteer ${username} password now updated` }))
     .catch((error) => {
-      logger.error(`Failed to update password for ${username}, error=${JSON.stringify(error)}`);
-      res.status(500).send({ error: 'Password updating', description: `Failed to update password for ${username}` });
+      res.status(500).send({ error: 'Password updating', description: `Failed to update password for ${username}, error=${error}` });
     });
 }
 
