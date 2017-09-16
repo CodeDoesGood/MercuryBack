@@ -1,0 +1,14 @@
+{
+    "name": "mercury-web-front",
+    "version": "0.0.1",
+    "author": "CodeDoesGood",
+    "description": "Merucry webapp front",
+    "scripts": {
+    },
+    "license": "MIT",
+    "dependencies": {
+    },
+    "devDependencies": {
+    }
+  }
+  
