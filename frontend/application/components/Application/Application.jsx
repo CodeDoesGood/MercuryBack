@@ -30,7 +30,10 @@ export default class Application extends React.Component {
           <Route
             exact
             path="/"
-            render={() => <Home />}
+            render={() => <Home
+              announcements={this.props.announcements}
+              notifications={this.props.notifications}
+            />}
           />
           <Route
             path={this.routePaths.login}
@@ -53,4 +56,6 @@ export default class Application extends React.Component {
 Application.propTypes = {
   authenticating: PropTypes.func.isRequired,
   client: PropTypes.shape().isRequired,
+  notifications: PropTypes.arrayOf(PropTypes.shape()).isRequired,
+  announcements: PropTypes.arrayOf(PropTypes.shape()).isRequired,
 };
