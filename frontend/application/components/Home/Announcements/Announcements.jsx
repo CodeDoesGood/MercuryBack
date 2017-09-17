@@ -26,7 +26,7 @@ export default class Announcements extends React.Component {
         (announcement, index) => (<Announcement key={index} announcement={announcement} />))
       )}</div>);
     }
-    return (<div>No Notifications</div>);
+    return (<div>No Announcements</div>);
   }
 }
 
