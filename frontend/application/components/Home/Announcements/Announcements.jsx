@@ -8,7 +8,11 @@ export default class Announcements extends React.Component {
   constructor(props) {
     super(props);
 
-    // TODO: Create a endpoint and store announcements
+    const volunteer = this.props.volunteer;
+
+    volunteer.getAnnouncements()
+      .then(gainedAnnouncements => this.props.updateAnnouncements(gainedAnnouncements))
+      .catch(() => this.props.updateAnnouncements([]));
 
     this.state = {
       message: '',
@@ -18,13 +22,16 @@ export default class Announcements extends React.Component {
 
   render() {
     if (!_.isNil(this.props.announcements) && !_.isNil(this.props.announcements[0])) {
-      return _.map(this.props.announcements,
-        announcement => <Announcement announcement={announcement} />);
+      return (<div>{(_.map(this.props.announcements,
+        (announcement, index) => (<Announcement key={index} announcement={announcement} />))
+      )}</div>);
     }
     return (<div>No Notifications</div>);
   }
 }
 
 Announcements.propTypes = {
-  announcements: PropTypes.arrayOf(PropTypes.string).isRequired,
+  volunteer: PropTypes.shape().isRequired,
+  updateAnnouncements: PropTypes.func.isRequired,
+  announcements: PropTypes.arrayOf(PropTypes.shape()).isRequired,
 };

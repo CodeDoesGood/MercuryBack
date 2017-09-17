@@ -8,7 +8,11 @@ export default class Notifications extends React.Component {
   constructor(props) {
     super(props);
 
-    // TODO: Create a endpoint and store notifications
+    const volunteer = this.props.volunteer;
+
+    volunteer.getNotifications()
+      .then(notifications => this.props.updateNotifications(notifications))
+      .catch(() => this.props.updateNotifications([]));
 
     this.state = {
       message: '',
@@ -18,13 +22,16 @@ export default class Notifications extends React.Component {
 
   render() {
     if (!_.isNil(this.props.notifications) && !_.isNil(this.props.notifications[0])) {
-      return _.map(this.props.notifications,
-          notification => <Notification notification={notification} />);
+      return (<div>{(_.map(this.props.notifications,
+          (notification, index) => (<Notification key={index} notification={notification} />))
+      )}</div>);
     }
     return (<div>No Notifications</div>);
   }
 }
 
 Notifications.propTypes = {
-  notifications: PropTypes.arrayOf(PropTypes.string).isRequired,
+  volunteer: PropTypes.shape().isRequired,
+  updateNotifications: PropTypes.func.isRequired,
+  notifications: PropTypes.arrayOf(PropTypes.shape()).isRequired,
 };
