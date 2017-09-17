@@ -6,7 +6,6 @@ import React from 'react';
 import * as routePaths from './routePaths';
 
 import Header from '../Layout/Header';
-import Footer from '../Layout/Footer';
 
 import Login from '../Login/Login';
 import Reset from '../Reset/Reset';
@@ -45,7 +44,6 @@ export default class Application extends React.Component {
             path={this.routePaths.verify}
             render={props => <Verify volunteer={client.volunteer} {...props} />}
           />
-          <Footer />
         </div>
       </Router>
     );
