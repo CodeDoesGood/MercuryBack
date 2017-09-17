@@ -2,13 +2,14 @@ const fs = require('fs');
 
 const defaultConfiguration = require('./defaults');
 
-let instance = null;
-
 class ConfigurationWrapper {
   constructor(folder, name) {
-    if (instance) {
-      return instance;
-    }
+    // the folder
+    this.folder = folder;
+
+    // the file name
+    this.file = name;
+
     // Home directory that will be used for storing the file
     this.homeDirectory = null;
 
@@ -16,25 +17,20 @@ class ConfigurationWrapper {
     this.getUserHome();
 
     // The directory to the folder path that will used
-    this.folderDir = `${this.homeDirectory}${folder}`;
-
-    // The file name of the configuration file
-    this.name = name;
+    this.folderDir = `${this.homeDirectory}${this.folder}`;
 
     // The current full configuration path
-    this.path = `${this.homeDirectory}${folder}/${name}`;
+    this.path = `${this.homeDirectory}${this.folder}/${this.file}`;
     // The current default configuration
     this.default = defaultConfiguration;
 
     // The configuration that will be loaded into memory
     this.configuration = this.load();
-
-    instance = this;
   }
 
   /**
    * Loads the configuration file and store it in memory and
-   * if no configuraiton exists, create it.
+   * if no configuration exists, create it.
    */
   load() {
     let configuration = this.getDefault();
