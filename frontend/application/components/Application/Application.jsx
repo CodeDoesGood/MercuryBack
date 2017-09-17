@@ -11,6 +11,7 @@ import Footer from '../Layout/Footer';
 import Login from '../Login/Login';
 import Reset from '../Reset/Reset';
 import Verify from '../Verify/Verify';
+import Home from '../Home/Home';
 
 export default class Application extends React.Component {
   constructor(props) {
@@ -30,11 +31,11 @@ export default class Application extends React.Component {
           <Route
             exact
             path="/"
-            render={() => (
-              <Login
-                authenticating={authenticating}
-                client={client}
-              />)}
+            render={() => <Home />}
+          />
+          <Route
+            path={this.routePaths.login}
+            render={() => <Login client={client} authenticating={authenticating} />}
           />
           <Route
             path={this.routePaths.reset}
