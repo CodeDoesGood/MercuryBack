@@ -30,10 +30,10 @@ export default class Application extends React.Component {
           <Route
             exact
             path="/"
-            render={() => <Home
+            render={() => (<Home
               announcements={this.props.announcements}
               notifications={this.props.notifications}
-            />}
+            />)}
           />
           <Route
             path={this.routePaths.login}

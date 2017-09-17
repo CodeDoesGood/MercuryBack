@@ -6,7 +6,7 @@
     "scripts": {
         "builddev": "webpack -d --watch --config ./webpack.config.development.js",
         "build": "webpack --config ./webpack.config.production.js",
-        "lint": "eslint -c ../.eslintrc.js --ext .js,.jsx --ignore-path ../.gitignore ."
+        "lint": "eslint -c ../.eslintrc.js --ext .js,.jsx --ignore-path ../.gitignore . || true"
     },
     "license": "MIT",
     "dependencies": {
