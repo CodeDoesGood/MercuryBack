@@ -158,7 +158,8 @@ describe('Volunteer Component', () => {
           volunteer.project_id = null;
           return volunteer.updatePassword();
         })
-        .then(() => { throw new Error('Updated password when the project_id was invalid');
+        .then(() => {
+          throw new Error('Updated password when the project_id was invalid');
         }, () => {});
     });
 
