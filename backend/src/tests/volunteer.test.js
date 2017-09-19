@@ -768,7 +768,7 @@ describe('Volunteer Component', () => {
           return volunteer.getActiveNotifications();
         })
         .then((newNotifications) => {
-          assert.equal(totalNotifications, newNotifications.length, `new Notifications should not change when the volunteer_id is not correct`);
+          assert.equal(totalNotifications, newNotifications.length, 'new Notifications should not change when the volunteer_id is not correct');
         }, (error) => {
           throw new Error(error);
         });
