@@ -365,10 +365,15 @@ class Volunteer extends Database {
     return new Promise((resolve, reject) => {
       if (_.isNil(announcementId) || !_.isNumber(announcementId)) {
         reject(`Announcement Id must be passed and also a valid number, announcement id=${announcementId}`);
+      } else if (!_.isNumber(this.volunteer_id)) {
+        reject(`volunteerId "${this.volunteer_id}" passed is not a valid number`);
       }
 
       this.connect()
-        .then(() => this.knex('volunteer_announcement').where('volunteer_announcement_id', announcementId).update({
+        .then(() => this.knex('volunteer_announcement').where({
+          volunteer_announcement_id: announcementId,
+          volunteer_id: this.volunteer_id,
+        }).update({
           read: true,
           read_date: new Date(),
         }))

@@ -203,12 +203,12 @@ function validatePasswordResetCodeAuthenticity(req, res, next) {
  *  Checks to see if the notification id is passed properly and passes it on correctly.
  */
 function validateNotificationId(req, res, next) {
-  const notificationId = parseInt(req.body.notification_id, 10);
+  const notificationId = req.body.notification_id;
 
-  if (_.isNil(notificationId)) {
+  if (_.isNil(notificationId) || !_.isNumber(parseInt(notificationId, 10))) {
     res.status(400).send({ error: 'Invalid Notification Id', description: 'You must pass a notification id to dismiss' });
   } else {
-    req.notificationId = notificationId;
+    req.notificationId = parseInt(notificationId, 10);
     next();
   }
 }
@@ -321,7 +321,7 @@ function gatherActiveNotifications(req, res) {
 
   volunteer.exists()
     .then(() => volunteer.getActiveNotifications())
-    .then(notifications => res.status(200).send({ message: '', content: { notifications } }))
+    .then(notifications => res.status(200).send({ message: 'Gathered Notifications', content: { notifications } }))
     .catch(error => res.status(500).send({ error: 'Notifications error', description: `Failed to gather notifications for user ${volunteer.username}, error=${error}` }));
 }
 
@@ -336,7 +336,7 @@ function markNotificationAsRead(req, res) {
 
   volunteer.exists()
     .then(() => volunteer.dismissNotification(notificationId))
-    .then(() => res.send(200))
+    .then(() => res.sendStatus(200))
     .catch(error => res.status(500).send({ error: 'Notification dismissing', description: `Unable to dismiss notification ${notificationId}, error=${error}` }));
 }
 
