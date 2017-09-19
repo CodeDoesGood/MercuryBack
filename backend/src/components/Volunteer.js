@@ -343,7 +343,12 @@ class Volunteer extends Database {
     return new Promise((resolve, reject) => {
       this.connect()
         .then(() => this.knex('volunteer_announcement').where('volunteer_id', this.volunteer_id).andWhere('read', false).select('announcement'))
-        .then(announcementIds => this.knex('announcement').where('announcement', announcementIds).select())
+        .then((announcementIds) => {
+          if (!_.isNil(announcementIds[0])) {
+            return this.knex('announcement').where('announcement', announcementIds).select();
+          }
+          return resolve([]);
+        })
         .then(announcements => resolve(announcements))
         .catch(error => reject(error));
     });
