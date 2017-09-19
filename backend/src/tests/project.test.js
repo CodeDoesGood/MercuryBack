@@ -9,20 +9,21 @@ if (!_.isNil(process.env.TRAVIS)) {
 
 describe('Project Component', () => {
   describe('#exists', () => {
-    it('Should reject if the project does not exist', (done) => {
+    it('Should reject if the project does not exist', () => {
       const project = new Project(1000000);
 
-      project.exists()
-        .then(() => done(new Error('Resolved when the project did not exist')))
-        .catch((error) => {
-          if (error === (`Project ${project.project_id} does not exist`)) { done(); } else { done(error); }
+      return project.exists()
+        .then(() => {
+          throw new Error('Resolved when the project did not exist');
+        }, (error) => {
+          assert.equal(error, `Project ${project.project_id} does not exist`, error);
         });
     });
 
-    it('Should resolve after binding all database objects to the project', (done) => {
+    it('Should resolve after binding all database objects to the project', () => {
       const project = new Project(1);
 
-      project.exists()
+      return project.exists()
         .then(() => {
           assert.equal(_.isNil(project.project_id), false, 'id should exist after pulling data from the database');
           assert.equal(_.isNil(project.createdDateTime), false, 'dataEntryDate should exist after pulling data from the database');
@@ -30,75 +31,77 @@ describe('Project Component', () => {
           assert.equal(_.isNil(project.status), false, 'status should exist after pulling data from the database');
           assert.equal(_.isNil(project.projectCategory), false, 'projectCategory should exist after pulling data from the database');
           assert.equal(_.isNil(project.hidden), false, 'hidden should exist after pulling data from the database');
-          done();
-        })
-        .catch(error => done(new Error(error)));
+        }, (error) => { throw new Error(error); });
     });
 
-    it('Should reject if no id is passed', (done) => {
+    it('Should reject if no id is passed', () => {
       const project = new Project();
 
-      project.exists()
-        .then(() => done(new Error('Resolved when the project did not exist')))
-        .catch((error) => {
-          if (error === (`id '${project.project_id}' passed is not a valid number`)) { done(); } else { done(error); }
+      return project.exists()
+        .then(() => {
+          throw new Error('Resolved when the project did not exist');
+        }, (error) => {
+          assert.equal(error, `id '${project.project_id}' passed is not a valid number`, error);
         });
     });
   });
 
   describe('#updateContent', () => {
-    it('Should not update content if id is not passed', (done) => {
+    it('Should not update content if id is not passed', () => {
       const project = new Project();
 
-      project.updateContent()
-        .then(() => done(new Error('Content should not update if project id was not passed, or project does not exist')))
-        .catch((error) => {
-          if (error === (`Id "${project.project_id}" passed is not a valid number`)) { done(); } else { done(error); }
+      return project.updateContent()
+        .then(() => {
+          throw new Error('Content should not update if project id was not passed, or project does not exist');
+        }, (error) => {
+          assert.equal(error, `Id "${project.project_id}" passed is not a valid number`, error);
         });
     });
 
-    it('Should not update content if the project existence is not called', (done) => {
+    it('Should not update content if the project existence is not called', () => {
       const project = new Project(1);
 
-      project.updateContent()
-        .then(() => done(new Error('Content should not update if project id was not passed, or project does not exist')))
-        .catch((error) => {
-          if (error === (`Project ${project.project_id} does not exist or has not been checked for existence yet`)) { done(); } else { done(error); }
+      return project.updateContent()
+        .then(() => {
+          throw new Error('Content should not update if project id was not passed, or project does not exist');
+        }, (error) => {
+          assert.equal(error, `Project ${project.project_id} does not exist or has not been checked for existence yet`, error);
         });
     });
 
-    it('Should not update content if the project does not exist', (done) => {
+    it('Should not update content if the project does not exist', () => {
       const project = new Project(1000000);
 
-      project.exists()
+      return project.exists()
         .then(() => project.updateContent())
-        .then(() => done(new Error('Content should not update if project id was not passed, or project does not exist')))
-        .catch((error) => {
-          if (error === (`Project ${project.project_id} does not exist`)) { done(); } else { done(error); }
+        .then(() => {
+          throw new Error('Content should not update if project id was not passed, or project does not exist');
+        }, (error) => {
+          assert.equal(error, `Project ${project.project_id} does not exist`, error);
         });
     });
 
-    it('Shouldn\'t attempt to update content if the project "doesExist" is marked as false', (done) => {
+    it('Shouldn\'t attempt to update content if the project "doesExist" is marked as false', () => {
       const project = new Project(1000);
       project.doesExist = false;
 
-      project.updateContent()
-        .then(() => done(new Error(`Updated content when doesExist is false, doesExist=${project.doesExist}`)))
-        .catch((error) => {
+      return project.updateContent()
+        .then(() => {
+          throw new Error(`Updated content when doesExist is false, doesExist=${project.doesExist}`);
+        }, (error) => {
           assert.equal(error === `Project ${project.project_id} does not exist or has not been checked for existence yet`, true, error);
-          done();
         });
     });
 
-    it('Shouldn\'t attempt to update content if the project id is not a valid number', (done) => {
+    it('Shouldn\'t attempt to update content if the project id is not a valid number', () => {
       const project = new Project('1000');
       project.doesExist = false;
 
-      project.updateContent()
-        .then(() => done(new Error(`Updated content when project id is not a valid number, project_id=${project.project_id}`)))
-        .catch((error) => {
+      return project.updateContent()
+        .then(() => {
+          throw new Error(`Updated content when project id is not a valid number, project_id=${project.project_id}`);
+        }, (error) => {
           assert.equal(error === `Id "${project.project_id}" passed is not a valid number`, true, error);
-          done();
         });
     });
   });
