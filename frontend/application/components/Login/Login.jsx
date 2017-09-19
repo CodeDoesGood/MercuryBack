@@ -34,15 +34,25 @@ export default class Login extends React.Component {
 
   render() {
     return (
-      <div style={{ textAlign: 'center', display: 'inherit' }}>
-        <h1>Login</h1>
-        <form ref={(loginForm) => { this.loginForm = loginForm; }}>
-          <span>username:</span>
-          <input ref={(formUsername) => { this.formUsername = formUsername; }} required="required" /><br />
-          <span>password:</span>
-          <input ref={(formPassword) => { this.formPassword = formPassword; }} type="password" required="required" /><br />
-          <button type="submit" onClick={this.login}><span>Login</span></button>
-        </form>
+      <div>
+        <div>
+          <div>
+            <img src="http://via.placeholder.com/500x200" alt="login background text" />
+            <div>&lt;Code Does Good /&gt;</div>
+          </div>
+          <div>
+            <span>CDG Volunteer Sign In</span>
+            <form ref={(loginForm) => { this.loginForm = loginForm; }}>
+              <input ref={(formUsername) => { this.formUsername = formUsername; }} required="required" />
+              <input ref={(formPassword) => { this.formUsername = formPassword; }} required="required" />
+              <div>
+                <span>Not a CDG Volunteer yet? Sign up here</span>
+                <button type="submit" onClick={this.login}>Sign In</button>
+              </div>
+              <span>forgot my username / password</span>
+            </form>
+          </div>
+        </div>
       </div>
     );
   }

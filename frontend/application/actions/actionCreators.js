@@ -24,3 +24,33 @@ export function removeContactInformation(contact = {}) {
     contact,
   };
 }
+
+// Notifications
+export function updateNotifications(notifications) {
+  return {
+    type: actionTypes.UPDATE_NOTIFICATIONS,
+    notifications,
+  };
+}
+
+// announcements
+export function updateAnnouncements(announcements) {
+  return {
+    type: actionTypes.UPDATE_ANNOUNCEMENTS,
+    announcements,
+  };
+}
+
+export function removeNotification(notification) {
+  return {
+    type: actionTypes.REMOVE_NOTIFICATION,
+    notification,
+  };
+}
+
+export function removeAnnouncements(announcement) {
+  return {
+    type: actionTypes.REMOVE_ANNOUNCEMENT,
+    announcement,
+  };
+}

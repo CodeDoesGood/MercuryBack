@@ -20,6 +20,18 @@ const volunteerEndpoint = endpoint({
     const options = utils.buildOptions(this.apiUrl, `${this.path}/verify`, 'post', { username, code });
     return this.apiCall(options);
   },
+  getNotifications() {
+    const options = utils.buildOptions(this.apiUrl, `${this.apiUrl}/notifications`, 'get', {});
+    return this.apiCall(options);
+  },
+  getAnnouncements() {
+    const options = utils.buildOptions(this.apiUrl, `${this.apiUrl}/announcements`, 'get', {});
+    return this.apiCall(options);
+  },
+  removeNotification(notificationId) {
+    const options = utils.buildOptions(this.apiUrl, `${this.apiUrl}/notification/dismiss`, 'post', { notification_id: notificationId });
+    return this.apiCall(options);
+  },
 });
 
 export default volunteerEndpoint;
