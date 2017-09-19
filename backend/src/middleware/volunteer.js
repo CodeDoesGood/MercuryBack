@@ -197,7 +197,21 @@ function validatePasswordResetCodeAuthenticity(req, res, next) {
         res.status(401).send({ error: 'Invalid Code', description: 'The code passed was not the correct code for verification' });
       }
     })
-    .catch(error => res.status(500).send({ error: 'Verification', descripion: `Failed to get password reset code, error=${JSON.stringify(error)}` }));
+    .catch(error => res.status(500).send({ error: 'Verification', description: `Failed to get password reset code, error=${JSON.stringify(error)}` }));
+}
+
+/**
+ *  Checks to see if the notification id is passed properly and passes it on correctly.
+ */
+function validateNotificationId(req, res, next) {
+  const notificationId = parseInt(req.body.notification_id, 10);
+
+  if (_.isNil(notificationId)) {
+    res.status(400).send({ error: 'Invalid Notification Id', description: 'You must pass a notification id to dismiss' });
+  } else {
+    req.notificationId = notificationId;
+    next();
+  }
 }
 
 /**
@@ -342,6 +356,7 @@ module.exports = {
   validatePasswordResetDetails,
   validateResetCodeExists,
   validatePasswordResetCodeAuthenticity,
+  validateNotificationId,
   gatherActiveNotifications,
   markNotificationAsRead,
 };

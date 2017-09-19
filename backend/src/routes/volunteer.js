@@ -21,6 +21,7 @@ router.get('/volunteer/notifications', [
  */
 router.post('/volunteer/notification/dismiss', [
   authentication.checkAuthenticationToken.bind(this),
+  volunteer.validateNotificationId.bind(this),
   volunteer.markNotificationAsRead.bind(this),
 ]);
 
