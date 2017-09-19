@@ -367,7 +367,10 @@ class Volunteer extends Database {
       }
 
       this.connect()
-        .then(() => this.knex('volunteer_announcement').where('volunteer_announcement_id', announcementId).update('read', true))
+        .then(() => this.knex('volunteer_announcement').where('volunteer_announcement_id', announcementId).update({
+          read: true,
+          read_date: new Date(),
+        }))
         .then(() => resolve())
         .catch(error => reject(error));
     });
