@@ -4,7 +4,7 @@
   "author": "CodeDoesGood",
   "description": "Merucry webapp",
   "scripts": {
-    "test": "node ./node_modules/mocha/bin/mocha ./src/tests/index.test.js || true",
+    "test": "node ./node_modules/mocha/bin/mocha ./src/tests/index.test.js",
     "cover": "nyc ./node_modules/mocha/bin/mocha ./src/tests/index.test.js",
     "coverfull": "nyc --reporter=html ./node_modules/mocha/bin/mocha ./src/tests/index.test.js",
     "inspect": "node --inspect ./src/index.js",

@@ -17,7 +17,6 @@ router.get('/volunteer/notifications', [
 
 /**
  * marks the volunteer id that was passed via the body as read.
- * TODO: Make a middleware to validate that the notification id was passed.
  */
 router.post('/volunteer/notification/dismiss', [
   authentication.checkAuthenticationToken.bind(this),
@@ -40,7 +39,7 @@ router.post('/volunteer/create', [
 ]);
 
 /**
- * Verify is after a volunteer registers with a account, a email woudld be sent to the
+ * Verify is after a volunteer registers with a account, a email would be sent to the
  * volunteer to verify there account
  */
 router.post('/volunteer/verify/:username/:code', [
