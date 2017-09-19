@@ -345,7 +345,8 @@ class Volunteer extends Database {
         .then(() => this.knex('volunteer_announcement').where('volunteer_id', this.volunteer_id).andWhere('read', false).select('announcement'))
         .then((announcementIds) => {
           if (!_.isNil(announcementIds[0])) {
-            return this.knex('announcement').where('announcement', announcementIds).select();
+            const justIds = _.map(announcementIds, announcementId => announcementId.announcement);
+            return this.knex('announcement').whereIn('announcement_id', justIds).select();
           }
           return resolve([]);
         })
