@@ -295,6 +295,9 @@ function createNewVolunteer(req, res, next) {
     .catch(error => res.status(500).send({ error, description: `Failed to create the user ${volunteer.username}` }));
 }
 
+/**
+ * Gets all active notifications for the requesting user, requires authentication token.
+ */
 function gatherActiveNotifications(req, res) {
   const decodedToken = req.decoded;
 
@@ -310,6 +313,20 @@ function gatherActiveNotifications(req, res) {
     .catch(error => res.status(500).send({ error: 'Notifications error', description: `Failed to gather notifications for user ${volunteer.username}, error=${error}` }));
 }
 
+function markNotificationAsRead(req, res) {
+  const decodedToken = req.decoded;
+
+  const notificationId = req.notificationId;
+  const username = decodedToken.username;
+  const volunteerId = decodedToken.id;
+
+  const volunteer = new Volunteer(volunteerId, username);
+
+  volunteer.exists()
+    .then(() => volunteer.dismissNotification(notificationId))
+    .then(() => res.send(200))
+    .catch(error => res.status(500).send({ error: 'Notification dismissing', description: `Unable to dismiss notification ${}, error=${error}` }));
+}
 
 module.exports = {
   validateVolunteerCreationDetails,
@@ -326,4 +343,5 @@ module.exports = {
   validateResetCodeExists,
   validatePasswordResetCodeAuthenticity,
   gatherActiveNotifications,
+  markNotificationAsRead,
 };

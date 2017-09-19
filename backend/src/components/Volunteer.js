@@ -348,6 +348,25 @@ class Volunteer extends Database {
         .catch(error => reject(error));
     });
   }
+
+  /**
+   * Marks the passed volunteer_announcement id as read in the database, this will no
+   * longer be returned once the user requests there notifications again.
+   * @param announcementId The id of the notification to be marked as read.
+   * TODO: this needs to be tried and tests written to cover usages.
+   */
+  dismissNotification(announcementId) {
+    return new Promise((resolve, reject) => {
+      if (_.isNil(announcementId) || !_.isNumber(announcementId)) {
+        reject(`Announcement Id must be passed and also a valid number, announcement id=${announcementId}`);
+      }
+
+      this.connect()
+        .then(() => this.knex('volunteer_announcement').where('volunteer_announcement_id', announcementId).update('read', true))
+        .then(() => resolve())
+        .catch(error => reject(error));
+    });
+  }
 }
 
 module.exports = Volunteer;

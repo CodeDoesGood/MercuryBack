@@ -16,6 +16,15 @@ router.get('/volunteer/notifications', [
 ]);
 
 /**
+ * marks the volunteer id that was passed via the body as read.
+ * TODO: Make a middleware to validate that the notification id was passed.
+ */
+router.post('/volunteer/notification/dismiss', [
+  authentication.checkAuthenticationToken.bind(this),
+  volunteer.markNotificationAsRead.bind(this),
+]);
+
+/**
  * These routes are for getting and updating single projects by id
  */
 
