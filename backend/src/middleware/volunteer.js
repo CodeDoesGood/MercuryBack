@@ -295,6 +295,21 @@ function createNewVolunteer(req, res, next) {
     .catch(error => res.status(500).send({ error, description: `Failed to create the user ${volunteer.username}` }));
 }
 
+function gatherActiveNotifications(req, res) {
+  const decodedToken = req.decoded;
+
+  const username = decodedToken.username;
+  const volunteerId = decodedToken.id;
+
+  const volunteer = new Volunteer(volunteerId, username);
+
+  // TODO: Find out if its worth checking for existence here.
+  volunteer.exists()
+    .then(() => volunteer.getActiveNotifications())
+    .then(notifications => res.status(200).send({ message: '', content: { notifications } }))
+    .catch(error => res.status(500).send({ error: 'Notifications error', description: `Failed to gather notifications for user ${volunteer.username}, error=${error}` }));
+}
+
 
 module.exports = {
   validateVolunteerCreationDetails,
@@ -310,4 +325,5 @@ module.exports = {
   validatePasswordResetDetails,
   validateResetCodeExists,
   validatePasswordResetCodeAuthenticity,
+  gatherActiveNotifications,
 };

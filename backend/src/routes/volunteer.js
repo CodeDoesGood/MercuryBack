@@ -8,6 +8,14 @@ const Router = require('express').Router;
 const router = Router();
 
 /**
+ * routing for gathering volunteers active notifications
+ */
+router.get('/volunteer/notifications', [
+  authentication.checkAuthenticationToken.bind(this),
+  volunteer.gatherActiveNotifications.bind(this),
+]);
+
+/**
  * These routes are for getting and updating single projects by id
  */
 

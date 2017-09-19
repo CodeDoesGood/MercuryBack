@@ -333,6 +333,21 @@ class Volunteer extends Database {
         .catch(error => reject(error));
     });
   }
+
+  /**
+   * Grabs all the volunteer announcement ids from the volunteer_announcement table and then
+   * uses them ids to get all the announcements from the announcement table.
+   * TODO: try this out and then write tests to cover the usages.
+   */
+  getActiveNotifications() {
+    return new Promise((resolve, reject) => {
+      this.connect()
+        .then(() => this.knex('volunteer_announcement').where('volunteer_id', this.volunteer_id).andWhere('read', false).select('announcement'))
+        .then(announcementIds => this.knex('announcement').where('announcement', announcementIds).select())
+        .then(announcements => resolve(announcements))
+        .catch(error => reject(error));
+    });
+  }
 }
 
 module.exports = Volunteer;
