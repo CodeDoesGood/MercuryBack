@@ -94,7 +94,6 @@ function createPasswordResetCode(req, res, next) {
 /**
  * Checks and validates that the password being updated via the update ore reset code meets all
  * requirements otherwise sends 400.
- * TODO: this needs to be renamed to allow for updating password details ot just password details.
  */
 function validatePasswordDetails(req, res, next) {
   const password = req.body.password;
@@ -197,7 +196,21 @@ function validatePasswordResetCodeAuthenticity(req, res, next) {
         res.status(401).send({ error: 'Invalid Code', description: 'The code passed was not the correct code for verification' });
       }
     })
-    .catch(error => res.status(500).send({ error: 'Verification', descripion: `Failed to get password reset code, error=${JSON.stringify(error)}` }));
+    .catch(error => res.status(500).send({ error: 'Verification', description: `Failed to get password reset code, error=${JSON.stringify(error)}` }));
+}
+
+/**
+ *  Checks to see if the notification id is passed properly and passes it on correctly.
+ */
+function validateNotificationId(req, res, next) {
+  const notificationId = req.body.notification_id;
+
+  if (_.isNil(notificationId) || !_.isNumber(parseInt(notificationId, 10))) {
+    res.status(400).send({ error: 'Invalid Notification Id', description: 'You must pass a notification id to dismiss' });
+  } else {
+    req.notificationId = parseInt(notificationId, 10);
+    next();
+  }
 }
 
 /**
@@ -295,6 +308,37 @@ function createNewVolunteer(req, res, next) {
     .catch(error => res.status(500).send({ error, description: `Failed to create the user ${volunteer.username}` }));
 }
 
+/**
+ * Gets all active notifications for the requesting user, requires authentication token.
+ */
+function gatherActiveNotifications(req, res) {
+  const decodedToken = req.decoded;
+
+  const username = decodedToken.username;
+  const volunteerId = decodedToken.id;
+
+  const volunteer = new Volunteer(volunteerId, username);
+
+  volunteer.exists()
+    .then(() => volunteer.getActiveNotifications())
+    .then(notifications => res.status(200).send({ message: 'Gathered Notifications', content: { notifications } }))
+    .catch(error => res.status(500).send({ error: 'Notifications error', description: `Failed to gather notifications for user ${volunteer.username}, error=${error}` }));
+}
+
+function markNotificationAsRead(req, res) {
+  const decodedToken = req.decoded;
+
+  const notificationId = req.notificationId;
+  const username = decodedToken.username;
+  const volunteerId = decodedToken.id;
+
+  const volunteer = new Volunteer(volunteerId, username);
+
+  volunteer.exists()
+    .then(() => volunteer.dismissNotification(notificationId))
+    .then(() => res.sendStatus(200))
+    .catch(error => res.status(500).send({ error: 'Notification dismissing', description: `Unable to dismiss notification ${notificationId}, error=${error}` }));
+}
 
 module.exports = {
   validateVolunteerCreationDetails,
@@ -310,4 +354,7 @@ module.exports = {
   validatePasswordResetDetails,
   validateResetCodeExists,
   validatePasswordResetCodeAuthenticity,
+  validateNotificationId,
+  gatherActiveNotifications,
+  markNotificationAsRead,
 };

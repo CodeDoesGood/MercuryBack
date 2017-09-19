@@ -8,6 +8,23 @@ const Router = require('express').Router;
 const router = Router();
 
 /**
+ * routing for gathering volunteers active notifications
+ */
+router.get('/volunteer/notifications', [
+  authentication.checkAuthenticationToken.bind(this),
+  volunteer.gatherActiveNotifications.bind(this),
+]);
+
+/**
+ * marks the volunteer id that was passed via the body as read.
+ */
+router.post('/volunteer/notification/dismiss', [
+  authentication.checkAuthenticationToken.bind(this),
+  volunteer.validateNotificationId.bind(this),
+  volunteer.markNotificationAsRead.bind(this),
+]);
+
+/**
  * These routes are for getting and updating single projects by id
  */
 
@@ -22,7 +39,7 @@ router.post('/volunteer/create', [
 ]);
 
 /**
- * Verify is after a volunteer registers with a account, a email woudld be sent to the
+ * Verify is after a volunteer registers with a account, a email would be sent to the
  * volunteer to verify there account
  */
 router.post('/volunteer/verify/:username/:code', [

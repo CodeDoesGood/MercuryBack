@@ -333,6 +333,54 @@ class Volunteer extends Database {
         .catch(error => reject(error));
     });
   }
+
+  /**
+   * Grabs all the volunteer announcement ids from the volunteer_announcement table and then
+   * uses them ids to get all the announcements from the announcement table.
+   * TODO: try this out and then write tests to cover the usages.
+   */
+  getActiveNotifications() {
+    return new Promise((resolve, reject) => {
+      this.connect()
+        .then(() => this.knex('volunteer_announcement').where('volunteer_id', this.volunteer_id).andWhere('read', false).select('announcement'))
+        .then((announcementIds) => {
+          if (!_.isNil(announcementIds[0])) {
+            const justIds = _.map(announcementIds, announcementId => announcementId.announcement);
+            return this.knex('announcement').whereIn('announcement_id', justIds).select();
+          }
+          return resolve([]);
+        })
+        .then(announcements => resolve(announcements))
+        .catch(error => reject(error));
+    });
+  }
+
+  /**
+   * Marks the passed volunteer_announcement id as read in the database, this will no
+   * longer be returned once the user requests there notifications again.
+   * @param announcementId The id of the notification to be marked as read.
+   * TODO: this needs to be tried and tests written to cover usages.
+   */
+  dismissNotification(announcementId) {
+    return new Promise((resolve, reject) => {
+      if (_.isNil(announcementId) || !_.isNumber(announcementId)) {
+        reject(`Announcement Id must be passed and also a valid number, announcement id=${announcementId}`);
+      } else if (!_.isNumber(this.volunteer_id)) {
+        reject(`volunteerId "${this.volunteer_id}" passed is not a valid number`);
+      }
+
+      this.connect()
+        .then(() => this.knex('volunteer_announcement').where({
+          volunteer_announcement_id: announcementId,
+          volunteer_id: this.volunteer_id,
+        }).update({
+          read: true,
+          read_date: new Date(),
+        }))
+        .then(() => resolve())
+        .catch(error => reject(error));
+    });
+  }
 }
 
 module.exports = Volunteer;

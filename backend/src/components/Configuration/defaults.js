@@ -14,6 +14,7 @@ const defaultConfig = {
       password: '',
       database: 'mercury',
     },
+    pool: { min: 0, max: 100 },
   },
 
   // Secret used to authenticate tokens, this should be updated on the server to the real secret.

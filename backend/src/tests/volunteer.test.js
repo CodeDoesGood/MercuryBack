@@ -661,12 +661,143 @@ describe('Volunteer Component', () => {
       volunteer.info.connection.user = 'wrongusername';
       volunteer.volunteer_id = 1;
 
-      return volunteer.doesVerificationCodeExist().then((content) => {
-        throw new Error(`doesVerificationCodeExist Shouldn't of resolved when the connection details are wrong, ${content}`);
-      }, (error) => {
-        volunteer.info.connection.user = username;
-        assert.equal(error.message.indexOf('ER_ACCESS_DENIED_ERROR') >= 0, true, error);
-      });
+      return volunteer.doesVerificationCodeExist()
+        .then((content) => {
+          throw new Error(`doesVerificationCodeExist Shouldn't of resolved when the connection details are wrong, ${content}`);
+        }, (error) => {
+          volunteer.info.connection.user = username;
+          assert.equal(error.message.indexOf('ER_ACCESS_DENIED_ERROR') >= 0, true, error);
+        });
+    });
+  });
+
+  describe('#getActiveNotifications', () => {
+    it('Should return all active notifications if notifications exist for the user', () => {
+      const volunteer = new Volunter(null, 'user1');
+
+      return volunteer.exists('username')
+        .then(() => volunteer.getActiveNotifications())
+        .then((notifications) => {
+          assert.equal(!_.isNil(notifications[0]), true, `Notificaitons should be returned instead of a empty array, ${notifications}`);
+
+          _.forEach(notifications, (notification) => {
+            assert.equal(!_.isNil(notification.announcement_id), true, 'Announcement_id should not be undefined or null');
+            assert.equal(!_.isNil(notification.data_entry_user_id), true, 'data_entry_user_id should not be undefined or null');
+            assert.equal(!_.isNil(notification.title), true, 'title should not be undefined or null');
+            assert.equal(!_.isNil(notification.body), true, 'body should not be undefined or null');
+            assert.equal(!_.isNil(notification.announcement_type), true, 'announcement_type should not be undefined or null');
+            assert.equal(!_.isNil(notification.created_datetime), true, 'created_datetime should not be undefined or null');
+            assert.equal(!_.isNil(notification.modified_datetime), true, 'modified_datetime should not be undefined or null');
+          });
+        }, (error) => {
+          throw new Error(error);
+        });
+    });
+
+    it('Should return a empty array if no notifications exist', () => {
+      const volunteer = new Volunter(null, 'user2');
+
+      return volunteer.exists('username')
+        .then(() => volunteer.getActiveNotifications())
+        .then((notifications) => {
+          assert.equal(_.isNil(notifications[0]), true, `Should of returned null if there is no notifications for that user, notifications=${notifications}`);
+        }, (error) => {
+          throw new Error(error);
+        });
+    });
+
+    it('Should reject if the connection details are wrong', () => {
+      const volunteer = new Volunter(null, 'user1');
+      const username = volunteer.info.connection.user;
+      volunteer.info.connection.user = 'wrongusername';
+      volunteer.volunteer_id = 1;
+
+      return volunteer.getActiveNotifications()
+        .then((content) => {
+          throw new Error(`getActiveNotifications Shouldn't of resolved when the connection details are wrong, ${content}`);
+        }, (error) => {
+          volunteer.info.connection.user = username;
+          assert.equal(error.message.indexOf('ER_ACCESS_DENIED_ERROR') >= 0, true, error);
+        });
+    });
+  });
+
+  describe('#dismissNotification', () => {
+    it('Should return 200 if its marked it as read', () => {
+      const volunteer = new Volunter(null, 'user1');
+
+      return volunteer.exists('username')
+        .then(() => volunteer.dismissNotification(1))
+        .then(() => {
+        }, (error) => {
+          throw new Error(error);
+        }).finally(() => volunteer.knex('volunteer_announcement').where({
+          volunteer_announcement_id: 1,
+        }).update({
+          read: false,
+          read_date: null,
+        }));
+    });
+
+    it('Should reject if the volunteer id does not exist', () => {
+      const volunteer = new Volunter(null, 'user1');
+
+      return volunteer.dismissNotification(1)
+        .then(() => {
+          throw new Error('Dismiss should reject if the volunteer id does not exist');
+        }, (error) => {
+          assert.equal(error, `volunteerId "${volunteer.volunteer_id}" passed is not a valid number`, error);
+        });
+    });
+
+    it('should not mark it as read if its not the correct voluteer_id', () => {
+      const volunteer = new Volunter(null, 'user1');
+      let totalNotifications = 0;
+      let oldVolunteerId = 0;
+
+      return volunteer.exists('username')
+        .then(() => volunteer.getActiveNotifications())
+        .then((notifications) => {
+          totalNotifications = notifications.length;
+          oldVolunteerId = volunteer.volunteer_id;
+          volunteer.volunteer_id = 99;
+          return volunteer.dismissNotification(1);
+        })
+        .then(() => {
+          volunteer.volunteer_id = oldVolunteerId;
+          return volunteer.getActiveNotifications();
+        })
+        .then((newNotifications) => {
+          assert.equal(totalNotifications, newNotifications.length, 'new Notifications should not change when the volunteer_id is not correct');
+        }, (error) => {
+          throw new Error(error);
+        });
+    });
+
+    it('Should reject if the announcement id is not passed', () => {
+      const volunteer = new Volunter(null, 'user1');
+
+      return volunteer.dismissNotification()
+        .then(() => {
+          throw new Error('Dismiss should reject if the announcement id is not passed');
+        }, (error) => {
+          assert.equal(error, 'Announcement Id must be passed and also a valid number, announcement id=undefined', error);
+        });
+    });
+
+    it('Should reject if the connection details are wrong', () => {
+      const volunteer = new Volunter(null, 'user1');
+      const username = volunteer.info.connection.user;
+      volunteer.info.connection.user = 'wrongusername';
+      volunteer.volunteer_id = 1;
+
+      return volunteer.dismissNotification(1)
+        .then((content) => {
+          throw new Error(`dismissNotification Shouldn't of resolved when the connection details are wrong, ${content}`);
+        }, (error) => {
+          volunteer.info.connection.user = username;
+          assert.equal(error.message.indexOf('ER_ACCESS_DENIED_ERROR') >= 0, true, error);
+        });
     });
   });
 });
