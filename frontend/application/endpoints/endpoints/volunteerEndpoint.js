@@ -29,7 +29,7 @@ const volunteerEndpoint = endpoint({
     return this.apiCall(options);
   },
   removeNotification(notificationId) {
-    const options = utils.buildOptions(this.apiUrl, `${this.apiUrl}/notifications/remove`, 'post', { notification_id: notificationId });
+    const options = utils.buildOptions(this.apiUrl, `${this.apiUrl}/notification/dismiss`, 'post', { notification_id: notificationId });
     return this.apiCall(options);
   },
 });
