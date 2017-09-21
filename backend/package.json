@@ -2,7 +2,7 @@
   "name": "mercury-web",
   "version": "0.0.1",
   "author": "CodeDoesGood",
-  "description": "Merucry webapp",
+  "description": "Mercury webapp",
   "scripts": {
     "test": "node ./node_modules/mocha/bin/mocha ./src/tests/index.test.js",
     "cover": "nyc ./node_modules/mocha/bin/mocha ./src/tests/index.test.js",

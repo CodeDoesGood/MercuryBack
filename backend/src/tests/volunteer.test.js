@@ -223,7 +223,7 @@ describe('Volunteer Component', () => {
 
       return volunteer.getVerificationCode()
         .then((content) => {
-          throw new Error(`getVerificationCode Shouldn't of resolved when the connection details are wrong, ${content}`);
+          throw new Error(`getVerificationCode Shouldn't have resolved when the connection details are wrong, ${content}`);
         }, (error) => {
           volunteer.info.connection.user = username;
           assert.equal(error.message.indexOf('ER_ACCESS_DENIED_ERROR') >= 0, true, error);
@@ -267,7 +267,7 @@ describe('Volunteer Component', () => {
 
       return volunteer.removeVerificationCode()
         .then((content) => {
-          throw new Error(`removeVerificationCode Shouldn't of resolved when the connection details are wrong, ${content}`);
+          throw new Error(`removeVerificationCode Shouldn't have resolved when the connection details are wrong, ${content}`);
         }, (error) => {
           volunteer.info.connection.user = username;
           assert.equal(error.message.indexOf('ER_ACCESS_DENIED_ERROR') >= 0, true, error);
@@ -296,7 +296,7 @@ describe('Volunteer Component', () => {
 
       return volunteer.createVerificationCode()
         .then((content) => {
-          throw new Error(`createVerificationCode Shouldn't of resolved when the connection details are wrong, ${content}`);
+          throw new Error(`createVerificationCode Shouldn't have resolved when the connection details are wrong, ${content}`);
         }, (error) => {
           volunteer.info.connection.user = username;
           assert.equal(error.message.indexOf('ER_ACCESS_DENIED_ERROR') >= 0, true, error);
@@ -325,7 +325,7 @@ describe('Volunteer Component', () => {
 
       return volunteer.createPasswordResetCode()
         .then((content) => {
-          throw new Error(`createPasswordResetCode Shouldn't of resolved when the connection details are wrong, ${content}`);
+          throw new Error(`createPasswordResetCode Shouldn't have resolved when the connection details are wrong, ${content}`);
         }, (error) => {
           volunteer.info.connection.user = username;
           assert.equal(error.message.indexOf('ER_ACCESS_DENIED_ERROR') >= 0, true, error);
