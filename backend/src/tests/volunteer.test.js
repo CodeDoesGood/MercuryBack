@@ -171,7 +171,7 @@ describe('Volunteer Component', () => {
 
       return volunteer.updatePassword('username')
         .then((content) => {
-          throw new Error(`exists Shouldn't have resolved when the connection details are wrong, ${content}`);
+          throw new Error(`exists shouldn't have resolved when the connection details are wrong, ${content}`);
         }, (error) => {
           volunteer.info.connection.user = username;
           assert.equal(error.message.indexOf('ER_ACCESS_DENIED_ERROR') >= 0, true, error);
