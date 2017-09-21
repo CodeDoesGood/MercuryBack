@@ -70,72 +70,52 @@ describe('Database Wrapper', () => {
   }
 
   describe('#connect', () => {
-    it('Should resolve if the connection details are correct', (done) => {
-      databaseWrapper.connect()
-        .then(() => done())
-        .catch(error => done(new Error(`Shouldn't reject if the connection details are correct, error=${error}`)));
-    });
+    it('Should resolve if the connection details are correct', () => databaseWrapper.connect('username')
+      .then(() => {
+      }, (error) => { throw new Error(error); }));
 
-    it('Should reject if the connection details are correct', (done) => {
+
+    it('Should reject if the connection details are correct', () => {
       const databaseNull = new DatabaseWrapper(config.getKey('database'));
       databaseNull.info.connection.password = 'wrong';
 
-      databaseNull.connect()
-        .then(() => done(new Error('Shouldn\'t resolve if the connection details are wrong')))
-        .catch(() => done());
-
-      databaseNull.info.connection.password = 'password';
+      return databaseNull.connect()
+        .then(() => {
+          throw new Error('Shouldn\'t resolve if the connection details are wrong');
+        }, () => {})
+        .finally(() => {
+          databaseNull.info.connection.password = 'password';
+        });
     });
   });
 
   describe('#doesEmailExist', () => {
-    it('Should reject if the email does not exist', (done) => {
-      databaseWrapper.doesEmailExist('Emaildoesnotexist@exist.com')
-        .then(() => done(new Error('Shouldn\'t resolve if the email does not exist')))
-        .catch(() => done());
-    });
-    it('Shoudld resolve if the email does nexist', (done) => {
-      databaseWrapper.doesEmailExist('Alys.DURHA2665@gmail.com')
-        .then(() => done())
-        .catch(error => done(new Error(error)));
-    });
+    it('Should reject if the email does not exist', () => databaseWrapper.doesEmailExist('Emaildoesnotexist@exist.com')
+      .then(() => {
+        throw new Error('Shouldn\'t resolve if the email does not exist');
+      }, () => {}));
 
-    it('Should reject if no email is passed at all', (done) => {
-      databaseWrapper.doesEmailExist(null)
-        .then(() => done(new Error('Shouldn\'t resolve if no email is passed')))
-        .catch(() => done());
-    });
+    it('Should resolve if the email does exist', () => databaseWrapper.doesEmailExist('Alys.DURHA2665@gmail.com')
+      .then(() => {}, (error) => { throw new Error(error); }));
 
-    it('Should reject if there is no user stored with that email', (done) => {
-      databaseWrapper.doesUsernameExist('randomusername')
-        .then(() => done(new Error('Shouldn\'t resolve if no username is passed')))
-        .catch(() => done());
-    });
+    it('Should reject if no email is passed at all', () => databaseWrapper.doesEmailExist(null)
+      .then(() => {
+        throw new Error('Shouldn\'t resolve if the email is not passed');
+      }, () => {}));
   });
 
   describe('#doesUsernameExist', () => {
-    it('Should reject if the username does not exist', (done) => {
-      databaseWrapper.doesUsernameExist('user11')
-        .then(() => done(new Error('Shouldn\'t resolve if the email does not exist')))
-        .catch(() => done());
-    });
+    it('Should reject if the username does not exist', () => databaseWrapper.doesUsernameExist('')
+      .then(() => {
+        throw new Error('Shouldn\'t resolve if the email does not exist');
+      }, () => {}));
 
-    it('Shoudld resolve if the email does nexist', (done) => {
-      databaseWrapper.doesUsernameExist('user1')
-        .then(() => done())
-        .catch(error => done(new Error(error)));
-    });
+    it('Should resolve if the username does exist', () => databaseWrapper.doesUsernameExist('user1')
+      .then(() => {}, (error) => { throw new Error(error); }));
 
-    it('Should reject if no username is passed at all', (done) => {
-      databaseWrapper.doesUsernameExist(null)
-        .then(() => done(new Error('Shouldn\'t resolve if no username is passed')))
-        .catch(() => done());
-    });
-
-    it('Should reject if there is no user stored with that username', (done) => {
-      databaseWrapper.doesUsernameExist('randomusername')
-        .then(() => done(new Error('Shouldn\'t resolve if no username is passed')))
-        .catch(() => done());
-    });
+    it('Should reject if no username is passed at all', () => databaseWrapper.doesUsernameExist(null)
+      .then(() => {
+        throw new Error('Shouldn\'t resolve if no username is passed');
+      }, () => {}));
   });
 });

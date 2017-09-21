@@ -81,7 +81,7 @@ class Database {
   doesEmailExist(email) {
     return new Promise((resolve, reject) => {
       if (!_.isString(email)) {
-        reject(`volunteerId "${email}" passed is not a valid string`);
+        reject(`email "${email}" passed is not a valid string`);
       }
 
       this.connect()
