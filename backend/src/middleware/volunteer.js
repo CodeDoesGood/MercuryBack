@@ -300,12 +300,11 @@ function createNewVolunteer(req, res, next) {
   volunteer.email = vol.email;
 
   volunteer.create(vol.password, 1)
-    .then((details) => {
-      req.volunteer.volunteer_id = details.id;
-      req.verificationCode = details.code;
+    .then((code) => {
+      req.verificationCode = code;
       next();
     })
-    .catch(error => res.status(500).send({ error, description: `Failed to create the user ${volunteer.username}` }));
+    .catch(error => res.status(500).send({ error, description: `Failed to create the user ${volunteer.username}, error=${error}` }));
 }
 
 /**

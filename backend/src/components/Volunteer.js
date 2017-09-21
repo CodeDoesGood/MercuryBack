@@ -80,40 +80,37 @@ class Volunteer extends Database {
    * @param dataEntryUserId
    */
   create(password, dataEntryUserId = 1) {
-    // TODO: turn this into a transaction with knex js instead.
-    return new Promise((resolve, reject) => {
-      if (_.isNil(this.name) || _.isNil(this.username) || _.isNil(this.email)) {
-        reject(`name, username, email and password are required, name=${this.name}, username=${this.username}, email=${this.email}`);
-      } else if (_.isNil(password)) {
-        reject(`You must provide a password to create the volunteer=${this.username}`);
-      }
+    if (_.isNil(this.name) || _.isNil(this.username) || _.isNil(this.email)) {
+      return Promise.reject(`name, username, email and password are required, name=${this.name}, username=${this.username}, email=${this.email}`);
+    } else if (_.isNil(password)) {
+      return Promise.reject(`You must provide a password to create the volunteer=${this.username}`);
+    }
 
-      const hashedPassword = this.saltAndHash(password);
-      const date = new Date();
+    const hashedPassword = this.saltAndHash(password);
+    const date = new Date();
 
-      const volunteer = Object.assign({
-        name: this.name,
-        username: this.username,
-        email: this.email,
-        data_entry_user_id: dataEntryUserId },
-        {
-          created_datetime: `${date.getFullYear()}-${date.getMonth()}-${date.getDay()}`,
-          password: hashedPassword.hashedPassword,
-          salt: hashedPassword.salt,
-        });
+    const volunteer = Object.assign({
+      name: this.name,
+      username: this.username,
+      email: this.email,
+      data_entry_user_id: dataEntryUserId },
+      {
+        created_datetime: `${date.getFullYear()}-${date.getMonth()}-${date.getDay()}`,
+        password: hashedPassword.hashedPassword,
+        salt: hashedPassword.salt,
+      });
 
-      this.connect()
-        .then(() => this.knex('volunteer').insert(volunteer))
-        .then((id) => {
-          const code = this.createVerificationCode(id[0]);
-          this.volunteer_id = id[0];
-          this.password = hashedPassword.hashedPassword;
-          this.salt = hashedPassword.salt;
+    return this.connect()
+      .then(() => this.knex('volunteer').insert(volunteer))
+      .then((id) => {
+        this.volunteer_id = id[0];
+        const code = this.createVerificationCode();
+        this.password = hashedPassword.hashedPassword;
+        this.salt = hashedPassword.salt;
 
-          resolve({ id: id[0], code });
-        })
-        .catch(error => reject(error));
-    });
+        return Promise.resolve(code);
+      })
+      .catch(error => Promise.reject(error));
   }
 
   /**

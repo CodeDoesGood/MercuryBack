@@ -45,11 +45,14 @@ class Email {
    * Verifies the connection the service.
    */
   verify() {
-    this.transporter.verify((error, result) => {
-      if (error) {
-        return Promise.reject(error);
-      }
-      return Promise.resolve(result);
+    return new Promise((resolve, reject) => {
+      this.transporter.verify((error, result) => {
+        if (error) {
+          reject(error);
+        } else {
+          resolve(result);
+        }
+      });
     });
   }
 
@@ -75,13 +78,16 @@ class Email {
    * @param {string} text  The content text for the email.
    * @param {string} html The html to be used instead of the text (defaults to the text)
    */
-  send(from, to, subject, text, html = null) {
-    const message = this.buildMessage({ from, to, subject, text, html });
-    this.transporter.sendMail(message, (error, info) => {
-      if (error) {
-        return Promise.reject(error);
-      }
-      return Promise.resolve(info);
+  send(from, to, subject, text, html = undefined) {
+    return new Promise((resolve, reject) => {
+      const message = this.buildMessage({ from, to, subject, text, html });
+      this.transporter.sendMail(message, (error, info) => {
+        if (error) {
+          reject(error);
+        } else {
+          resolve(info);
+        }
+      });
     });
   }
 
