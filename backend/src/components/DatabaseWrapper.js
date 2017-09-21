@@ -13,30 +13,25 @@ class Database {
    * Makes a connection to the database
    */
   connect() {
-    return new Promise((resolve, reject) => {
-      if (this.online) {
-        resolve();
-      } else {
-        this.knex = knex(this.info);
+    if (this.online) {
+      return Promise.resolve();
+    }
+    this.knex = knex(this.info);
 
-        this.knex.raw('select 1+1 AS answer')
-          .then(() => {
-            this.online = true;
-            resolve();
-          })
-          .catch((error) => {
-            reject(error);
-          });
-      }
-    });
+    return this.knex.raw('select 1+1 AS answer')
+      .then(() => {
+        this.online = true;
+        return Promise.resolve();
+      })
+      .catch(error => Promise.reject(error));
   }
 
   /**
    * Salts then hashes the password 28000 times
-   * @param password The password being salted and hashed.
+   * @param passedPassword The password being salted and hashed.
    * @param passedSalt can override generate salt for authentication checking
-   * @return {{salt, hashedPassword}} A object containg the salt and salted / hashed password to be
-   * stored.
+   * @return {{salt, hashedPassword}} A object containing the salt and salted / hashed password
+   * to be stored.
    */
   saltAndHash(passedPassword, passedSalt = null) {
     let salt = passedSalt;
@@ -58,20 +53,14 @@ class Database {
    * @param username The username being checked
    */
   doesUsernameExist(username) {
-    return new Promise((resolve, reject) => {
-      if (!_.isString(username)) {
-        reject(`volunteerId "${username}" passed is not a valid string`);
-      }
+    if (!_.isString(username)) {
+      return Promise.reject(`volunteerId "${username}" passed is not a valid string`);
+    }
 
-      this.connect()
-        .then(() => this.knex('volunteer').select('volunteer_id').where('username', username).first())
-        .then((result) => {
-          resolve(result.volunteer_id);
-        })
-        .catch((error) => {
-          reject(error);
-        });
-    });
+    return this.connect()
+      .then(() => this.knex('volunteer').select('volunteer_id').where('username', username).first())
+      .then(result => Promise.resolve(result.volunteer_id))
+      .catch(error => Promise.reject(error));
   }
 
   /**
@@ -79,18 +68,14 @@ class Database {
    * @param email The email being checked
    */
   doesEmailExist(email) {
-    return new Promise((resolve, reject) => {
-      if (!_.isString(email)) {
-        reject(`email "${email}" passed is not a valid string`);
-      }
+    if (!_.isString(email)) {
+      return Promise.reject(`email "${email}" passed is not a valid string`);
+    }
 
-      this.connect()
-        .then(() => this.knex('volunteer').select('volunteer_id').where('email', email).first())
-        .then((result) => {
-          resolve(result.volunteer_id);
-        })
-        .catch(() => reject(0));
-    });
+    return this.connect()
+      .then(() => this.knex('volunteer').select('volunteer_id').where('email', email).first())
+      .then(result => Promise.resolve(result.volunteer_id))
+      .catch(() => Promise.reject(0));
   }
 
   /**

@@ -17,24 +17,20 @@ class Projects extends Database {
    * Returns all projects
    */
   getAllProjects() {
-    return new Promise((resolve, reject) => {
-      this.connect()
-        .then(() => this.knex.select().from('project'))
-        .then(projects => resolve(projects))
-        .catch(error => reject(error));
-    });
+    return this.connect()
+      .then(() => this.knex.select().from('project'))
+      .then(projects => Promise.resolve(projects))
+      .catch(error => Promise.reject(error));
   }
 
   /**
    * Returns all active projects
    */
   getAllActiveProjects() {
-    return new Promise((resolve, reject) => {
-      this.connect()
-        .then(() => this.knex('project').where('status', 1).andWhere('hidden', false))
-        .then(projects => resolve(projects))
-        .catch(error => reject(error));
-    });
+    return this.connect()
+      .then(() => this.knex('project').where('status', 1).andWhere('hidden', false))
+      .then(projects => Promise.resolve(projects))
+      .catch(error => Promise.reject(error));
   }
 
   /**
@@ -42,16 +38,14 @@ class Projects extends Database {
    * @param status
    */
   getAllProjectsByStatus(status) {
-    return new Promise((resolve, reject) => {
-      if (!_.isString(status) && !_.isNumber(status)) {
-        reject(`volunteerId "${status}" passed is not a valid string or number`);
-      }
+    if (!_.isString(status) && !_.isNumber(status)) {
+      return Promise.reject(`volunteerId "${status}" passed is not a valid string or number`);
+    }
 
-      this.connect()
-        .then(() => this.knex('project').where('status', status))
-        .then(projects => resolve(projects))
-        .catch(error => reject(error));
-    });
+    return this.connect()
+      .then(() => this.knex('project').where('status', status))
+      .then(projects => Promise.resolve(projects))
+      .catch(error => Promise.reject(error));
   }
 
   /**
@@ -59,28 +53,24 @@ class Projects extends Database {
    * @param category
    */
   getAllProjectsByCategory(category) {
-    return new Promise((resolve, reject) => {
-      if (!_.isString(category) && !_.isNumber(category)) {
-        reject(`volunteerId "${status}" passed is not a valid string or number`);
-      }
+    if (!_.isString(category) && !_.isNumber(category)) {
+      return Promise.reject(`volunteerId "${status}" passed is not a valid string or number`);
+    }
 
-      this.connect()
-        .then(() => this.knex('project').where('project_category', category))
-        .then(projects => resolve(projects))
-        .catch(error => reject(error));
-    });
+    return this.connect()
+      .then(() => this.knex('project').where('project_category', category))
+      .then(projects => Promise.resolve(projects))
+      .catch(error => Promise.reject(error));
   }
 
   /**
    * Returns all projects marked as hidden
    */
   getAllHiddenProjects() {
-    return new Promise((resolve, reject) => {
-      this.connect()
-        .then(() => this.knex('project').where('hidden', true))
-        .then(projects => resolve(projects))
-        .catch(error => reject(error));
-    });
+    return this.connect()
+      .then(() => this.knex('project').where('hidden', true))
+      .then(projects => Promise.resolve(projects))
+      .catch(error => Promise.reject(error));
   }
 }
 

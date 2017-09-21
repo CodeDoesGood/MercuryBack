@@ -32,56 +32,51 @@ class Project extends Database {
    * Returns the project based on id
    */
   exists() {
-    return new Promise((resolve, reject) => {
-      if (_.isNil(this.project_id) || !_.isNumber(parseInt(this.project_id, 10))) {
-        reject(`id '${this.project_id}' passed is not a valid number`);
-      }
+    if (_.isNil(this.project_id) || !_.isNumber(parseInt(this.project_id, 10))) {
+      return Promise.reject(`id '${this.project_id}' passed is not a valid number`);
+    }
 
-      this.connect()
-        .then(() => this.knex('project').where('project_id', this.project_id).first())
-        .then((project) => {
-          if (_.isNil(project)) {
-            reject(`Project ${this.project_id} does not exist`);
-          } else {
-            this.createdDateTime = project['created_datetime'];
-            this.title = project.title;
-            this.status = project.status;
-            this.projectCategory = project['project_category'];
-            this.hidden = project.hidden;
-            this.imageDirectory = project['image_directory'];
-            this.summary = project.summary;
-            this.description = project.description;
-            this.doesExist = true;
-            resolve();
-          }
-        });
-    });
+    return this.connect()
+      .then(() => this.knex('project').where('project_id', this.project_id).first())
+      .then((project) => {
+        if (_.isNil(project)) {
+          return Promise.reject(`Project ${this.project_id} does not exist`);
+        }
+        this.createdDateTime = project['created_datetime'];
+        this.title = project.title;
+        this.status = project.status;
+        this.projectCategory = project['project_category'];
+        this.hidden = project.hidden;
+        this.imageDirectory = project['image_directory'];
+        this.summary = project.summary;
+        this.description = project.description;
+        this.doesExist = true;
+        return Promise.resolve();
+      });
   }
 
   /**
    * Updates a project by id with the provided content
    */
   updateContent() {
-    return new Promise((resolve, reject) => {
-      if (_.isNil(this.project_id) || !_.isNumber(this.project_id)) {
-        reject(`Id "${this.project_id}" passed is not a valid number`);
-      } else if (!this.doesExist) {
-        reject(`Project ${this.project_id} does not exist or has not been checked for existence yet`);
-      }
+    if (_.isNil(this.project_id) || !_.isNumber(this.project_id)) {
+      return Promise.reject(`Id "${this.project_id}" passed is not a valid number`);
+    } else if (!this.doesExist) {
+      return Promise.reject(`Project ${this.project_id} does not exist or has not been checked for existence yet`);
+    }
 
-      this.connect()
-        .then(() => this.knex('project').where('project_id', this.project_id).update({
-          title: this.title,
-          status: this.status,
-          project_category: this.projectCategory,
-          hidden: this.hidden,
-          image_directory: this.imageDirectory,
-          summary: this.summary,
-          description: this.description,
-        }))
-        .then(() => resolve())
-        .catch(error => reject(error));
-    });
+    return this.connect()
+      .then(() => this.knex('project').where('project_id', this.project_id).update({
+        title: this.title,
+        status: this.status,
+        project_category: this.projectCategory,
+        hidden: this.hidden,
+        image_directory: this.imageDirectory,
+        summary: this.summary,
+        description: this.description,
+      }))
+      .then(() => Promise.resolve())
+      .catch(error => Promise.reject(error));
   }
 
   /**
