@@ -42,30 +42,25 @@ class Volunteer extends Database {
    * and salt that is being used in the class.
    */
   exists(type = 'volunteer_id') {
-    return new Promise((resolve, reject) => {
-      if (_.isNil(this[type])) {
-        reject(`Type must be defined or valid, type=${this[type]}`);
-      }
+    if (_.isNil(this[type])) {
+      return Promise.reject(`Type must be defined or valid, type=${this[type]}`);
+    }
 
-      this.connect()
-        .then(() => this.knex('volunteer').where(type, this[type]).select('volunteer_id', 'username', 'email', 'password', 'salt').first())
-        .then((volunteer) => {
-          if (_.isNil(volunteer)) {
-            reject(`Volunteer does not exist by type=${type}`);
-          } else {
-            this.volunteer_id = volunteer.volunteer_id;
-            this.username = volunteer.username;
-            this.email = volunteer.email;
-            this.password = volunteer.password;
-            this.salt = volunteer.salt;
-            this.doesExist = true;
-            resolve(true);
-          }
-        })
-        .catch((error) => {
-          reject(error);
-        });
-    });
+    return this.connect()
+      .then(() => this.knex('volunteer').where(type, this[type]).select('volunteer_id', 'username', 'email', 'password', 'salt').first())
+      .then((volunteer) => {
+        if (_.isNil(volunteer)) {
+          return Promise.reject(`Volunteer does not exist by type=${type}`);
+        }
+        this.volunteer_id = volunteer.volunteer_id;
+        this.username = volunteer.username;
+        this.email = volunteer.email;
+        this.password = volunteer.password;
+        this.salt = volunteer.salt;
+        this.doesExist = true;
+        return Promise.resolve(true);
+      })
+      .catch(error => Promise.reject(error));
   }
 
   /**
@@ -85,6 +80,7 @@ class Volunteer extends Database {
    * @param dataEntryUserId
    */
   create(password, dataEntryUserId = 1) {
+    // TODO: turn this into a transaction with knex js instead.
     return new Promise((resolve, reject) => {
       if (_.isNil(this.name) || _.isNil(this.username) || _.isNil(this.email)) {
         reject(`name, username, email and password are required, name=${this.name}, username=${this.username}, email=${this.email}`);
@@ -124,18 +120,17 @@ class Volunteer extends Database {
    * Marks the provided usersId as verified in the database
    */
   verify() {
-    return new Promise((resolve, reject) => {
-      if (!_.isNumber(this.volunteer_id)) {
-        reject(`volunteerId "${this.volunteer_id}" passed is not a valid number`);
-      }
-      this.connect()
-        .then(() => this.knex('volunteer').where('volunteer_id', this.volunteer_id).update({ verified: true }))
-        .then(() => {
-          this.verified = true;
-          resolve();
-        })
-        .catch(error => reject(error));
-    });
+    if (!_.isNumber(this.volunteer_id)) {
+      return Promise.reject(`volunteerId "${this.volunteer_id}" passed is not a valid number`);
+    }
+
+    return this.connect()
+      .then(() => this.knex('volunteer').where('volunteer_id', this.volunteer_id).update({ verified: true }))
+      .then(() => {
+        this.verified = true;
+        return Promise.resolve();
+      })
+      .catch(error => Promise.reject(error));
   }
 
   /**
@@ -147,123 +142,107 @@ class Volunteer extends Database {
    * the stored already salted code, if they match we then mark the account as verified.
    */
   createVerificationCode() {
-    return new Promise((resolve, reject) => {
-      const maxNumber = 9999999999999;
-      const minNumber = 1000000000000;
+    const maxNumber = 9999999999999;
+    const minNumber = 1000000000000;
 
-      const number = Math.floor((Math.random() * ((maxNumber - minNumber) + 1000000000000)));
-      const hashedNumber = this.saltAndHash(number.toString());
-      const date = new Date();
+    const number = Math.floor((Math.random() * ((maxNumber - minNumber) + 1000000000000)));
+    const hashedNumber = this.saltAndHash(number.toString());
+    const date = new Date();
 
 
-      this.connect()
-        .then(() => this.removePasswordResetCode())
-        .then(() => this.knex('verification_code').insert({
-          verification_code_id: this.volunteer_id,
-          code: hashedNumber.hashedPassword,
-          salt: hashedNumber.salt,
-          created_datetime: date,
-        }))
-        .then(() => resolve(number))
-        .catch((error) => {
-          reject(error);
-        });
-    });
+    return this.connect()
+      .then(() => this.removePasswordResetCode())
+      .then(() => this.knex('verification_code').insert({
+        verification_code_id: this.volunteer_id,
+        code: hashedNumber.hashedPassword,
+        salt: hashedNumber.salt,
+        created_datetime: date,
+      }))
+      .then(() => Promise.resolve(number))
+      .catch(error => Promise.reject(error));
   }
 
   /**
-   * Generates a password reset code that will be used in a clickable link to allow the user
+   * Generates a password reset code that will be used in a click-able link to allow the user
    * to reset there password, the username, email, password and code will be passed down. If
    * the code matches the code in the database with the username nad email, then the new
    * password will be set (code is hashed and salted)
    */
   createPasswordResetCode() {
-    return new Promise((resolve, reject) => {
-      const maxNumber = 9999999999999;
-      const minNumber = 1000000000000;
+    const maxNumber = 9999999999999;
+    const minNumber = 1000000000000;
 
-      const number = Math.floor((Math.random() * ((maxNumber - minNumber) + 1000000000000)));
-      const hashedNumber = this.saltAndHash(number.toString());
-      const date = new Date();
+    const number = Math.floor((Math.random() * ((maxNumber - minNumber) + 1000000000000)));
+    const hashedNumber = this.saltAndHash(number.toString());
+    const date = new Date();
 
 
-      this.connect()
-        .then(() => this.removePasswordResetCode())
-        .then(() => this.knex('password_reset_code').insert({
-          password_reset_code_id: this.volunteer_id,
-          code: hashedNumber.hashedPassword,
-          salt: hashedNumber.salt,
-          created_datetime: date,
-        }))
-        .then(() => resolve(number))
-        .catch((error) => {
-          reject(error);
-        });
-    });
+    return this.connect()
+      .then(() => this.removePasswordResetCode())
+      .then(() => this.knex('password_reset_code').insert({
+        password_reset_code_id: this.volunteer_id,
+        code: hashedNumber.hashedPassword,
+        salt: hashedNumber.salt,
+        created_datetime: date,
+      }))
+      .then(() => Promise.resolve(number))
+      .catch(error => Promise.reject(error));
   }
 
   /**
    * Removes the verification code by id for user
    */
   removeVerificationCode() {
-    return new Promise((resolve, reject) => {
-      if (!_.isNumber(this.volunteer_id)) {
-        reject(`volunteerId "${this.volunteer_id}" passed is not a valid number`);
-      }
+    if (!_.isNumber(this.volunteer_id)) {
+      return Promise.reject(`volunteerId "${this.volunteer_id}" passed is not a valid number`);
+    }
 
-      this.connect()
+    return this.connect()
       .then(() => this.knex('verification_code').where('verification_code_id', this.volunteer_id).del())
-      .then(() => resolve())
-      .catch(error => reject(error));
-    });
+      .then(() => Promise.resolve())
+      .catch(error => Promise.reject(error));
   }
 
   /**
    * removes the existing (if any) password reset codes for the user)
    */
   removePasswordResetCode() {
-    return new Promise((resolve, reject) => {
-      if (!_.isNumber(this.volunteer_id)) {
-        reject(`volunteerId "${this.volunteer_id}" passed is not a valid number`);
-      }
+    if (!_.isNumber(this.volunteer_id)) {
+      return Promise.reject(`volunteerId "${this.volunteer_id}" passed is not a valid number`);
+    }
 
-      this.connect()
-        .then(() => this.knex('password_reset_code').where('password_reset_code_id', this.volunteer_id).del())
-        .then(() => resolve())
-        .catch(error => reject(error));
-    });
+    return this.connect()
+      .then(() => this.knex('password_reset_code').where('password_reset_code_id', this.volunteer_id).del())
+      .then(() => Promise.resolve())
+      .catch(error => Promise.reject(error));
   }
 
   /**
    * Gets and returns all details for the volunteer in the verification codes table.
    */
   getVerificationCode() {
-    return new Promise((resolve, reject) => {
-      if (!_.isNumber(this.volunteer_id)) {
-        reject(`volunteerId "${this.volunteer_id}" passed is not a valid number`);
-      }
+    if (!_.isNumber(this.volunteer_id)) {
+      return Promise.reject(`volunteerId "${this.volunteer_id}" passed is not a valid number`);
+    }
 
-      this.connect()
-        .then(() => this.knex('verification_code').where('verification_code_id', this.volunteer_id).first())
-        .then(details => resolve(details))
-        .catch(error => reject(error));
-    });
+    return this.connect()
+      .then(() => this.knex('verification_code').where('verification_code_id', this.volunteer_id).first())
+      .then(details => Promise.resolve(details))
+      .catch(error => Promise.reject(error));
   }
 
   /**
    * Gets the password reset code from the password_reset_code table if it exists
    */
   getPasswordResetCode() {
-    return new Promise((resolve, reject) => {
-      if (!_.isNumber(this.volunteer_id)) {
-        reject(`volunteerId "${this.volunteer_id}" passed is not a valid number`);
-      }
+    if (!_.isNumber(this.volunteer_id)) {
+      return Promise.reject(`volunteerId "${this.volunteer_id}" passed is not a valid number`);
+    }
 
-      this.connect()
-        .then(() => this.knex('password_reset_code').where('password_reset_code_id', this.volunteer_id).first())
-        .then(details => resolve(details))
-        .catch(error => reject(error));
-    });
+    return this.connect()
+      .then(() => this.knex('password_reset_code').where('password_reset_code_id', this.volunteer_id).first())
+      .then(details => Promise.resolve(details))
+      .catch(error => Promise.reject(error));
   }
 
 
@@ -271,44 +250,38 @@ class Volunteer extends Database {
    * Resolves the volunteers id if the verification code exists exists otherwise rejects.
    */
   doesVerificationCodeExist() {
-    return new Promise((resolve, reject) => {
-      if (!_.isNumber(this.volunteer_id)) {
-        reject(`volunteerId "${this.volunteer_id}" passed is not a valid number`);
-      }
+    if (!_.isNumber(this.volunteer_id)) {
+      return Promise.reject(`volunteerId "${this.volunteer_id}" passed is not a valid number`);
+    }
 
-      this.connect()
-        .then(() => this.knex('verification_code').select('verification_code_id').where('verification_code_id', this.volunteer_id).first())
-        .then((result) => {
-          if (_.isNil(result) || _.isNil(result.verification_code_id)) {
-            reject(`No verification code exists for user ${this.volunteer_id}`);
-          } else {
-            resolve(result.verification_code_id);
-          }
-        })
-        .catch(error => reject(error));
-    });
+    return this.connect()
+      .then(() => this.knex('verification_code').select('verification_code_id').where('verification_code_id', this.volunteer_id).first())
+      .then((result) => {
+        if (_.isNil(result) || _.isNil(result.verification_code_id)) {
+          return Promise.reject(`No verification code exists for user ${this.volunteer_id}`);
+        }
+        return Promise.resolve(result.verification_code_id);
+      })
+      .catch(error => Promise.reject(error));
   }
 
   /**
    * Resolves the volunteers id if the password code exists exists otherwise rejects.
    */
   doesPasswordResetCodeExist() {
-    return new Promise((resolve, reject) => {
-      if (!_.isNumber(this.volunteer_id)) {
-        reject(`volunteerId "${this.volunteer_id}" passed is not a valid number`);
-      }
+    if (!_.isNumber(this.volunteer_id)) {
+      return Promise.reject(`volunteerId "${this.volunteer_id}" passed is not a valid number`);
+    }
 
-      this.connect()
-        .then(() => this.knex('password_reset_code').select('password_reset_code_id').where('password_reset_code_id', this.volunteer_id).first())
-        .then((result) => {
-          if (_.isNil(result) || _.isNil(result.password_reset_code_id)) {
-            reject(`No password reset code exists for user ${this.volunteer_id}`);
-          } else {
-            resolve(result.password_reset_code_id);
-          }
-        })
-        .catch(error => reject(error));
-    });
+    return this.connect()
+      .then(() => this.knex('password_reset_code').select('password_reset_code_id').where('password_reset_code_id', this.volunteer_id).first())
+      .then((result) => {
+        if (_.isNil(result) || _.isNil(result.password_reset_code_id)) {
+          return Promise.reject(`No password reset code exists for user ${this.volunteer_id}`);
+        }
+        return Promise.resolve(result.password_reset_code_id);
+      })
+      .catch(error => Promise.reject(error));
   }
 
   /**
@@ -317,21 +290,19 @@ class Volunteer extends Database {
    * @param password
    */
   updatePassword(password) {
-    return new Promise((resolve, reject) => {
-      if (!_.isNumber(this.volunteer_id) || !_.isString(password)) {
-        reject('password or id passed was not a valid number or string');
-      }
+    if (!_.isNumber(this.volunteer_id) || !_.isString(password)) {
+      return Promise.reject('password or id passed was not a valid number or string');
+    }
 
-      const salted = this.saltAndHash(password);
+    const salted = this.saltAndHash(password);
 
-      this.connect()
-        .then(() => this.knex('volunteer').where('volunteer_id', this.volunteer_id).update({
-          password: salted.hashedPassword,
-          salt: salted.salt,
-        }))
-        .then(() => resolve())
-        .catch(error => reject(error));
-    });
+    return this.connect()
+      .then(() => this.knex('volunteer').where('volunteer_id', this.volunteer_id).update({
+        password: salted.hashedPassword,
+        salt: salted.salt,
+      }))
+      .then(() => Promise.resolve())
+      .catch(error => Promise.reject(error));
   }
 
   /**
@@ -340,19 +311,17 @@ class Volunteer extends Database {
    * TODO: try this out and then write tests to cover the usages.
    */
   getActiveNotifications() {
-    return new Promise((resolve, reject) => {
-      this.connect()
-        .then(() => this.knex('volunteer_announcement').where('volunteer_id', this.volunteer_id).andWhere('read', false).select('announcement'))
-        .then((announcementIds) => {
-          if (!_.isNil(announcementIds[0])) {
-            const justIds = _.map(announcementIds, announcementId => announcementId.announcement);
-            return this.knex('announcement').whereIn('announcement_id', justIds).select();
-          }
-          return resolve([]);
-        })
-        .then(announcements => resolve(announcements))
-        .catch(error => reject(error));
-    });
+    return this.connect()
+      .then(() => this.knex('volunteer_announcement').where('volunteer_id', this.volunteer_id).andWhere('read', false).select('announcement'))
+      .then((announcementIds) => {
+        if (!_.isNil(announcementIds[0])) {
+          const justIds = _.map(announcementIds, announcementId => announcementId.announcement);
+          return this.knex('announcement').whereIn('announcement_id', justIds).select();
+        }
+        return Promise.resolve([]);
+      })
+      .then(announcements => Promise.resolve(announcements))
+      .catch(error => Promise.reject(error));
   }
 
   /**
@@ -362,24 +331,22 @@ class Volunteer extends Database {
    * TODO: this needs to be tried and tests written to cover usages.
    */
   dismissNotification(announcementId) {
-    return new Promise((resolve, reject) => {
-      if (_.isNil(announcementId) || !_.isNumber(announcementId)) {
-        reject(`Announcement Id must be passed and also a valid number, announcement id=${announcementId}`);
-      } else if (!_.isNumber(this.volunteer_id)) {
-        reject(`volunteerId "${this.volunteer_id}" passed is not a valid number`);
-      }
+    if (_.isNil(announcementId) || !_.isNumber(announcementId)) {
+      return Promise.reject(`Announcement Id must be passed and also a valid number, announcement id=${announcementId}`);
+    } else if (!_.isNumber(this.volunteer_id)) {
+      return Promise.reject(`volunteerId "${this.volunteer_id}" passed is not a valid number`);
+    }
 
-      this.connect()
-        .then(() => this.knex('volunteer_announcement').where({
-          volunteer_announcement_id: announcementId,
-          volunteer_id: this.volunteer_id,
-        }).update({
-          read: true,
-          read_date: new Date(),
-        }))
-        .then(() => resolve())
-        .catch(error => reject(error));
-    });
+    return this.connect()
+      .then(() => this.knex('volunteer_announcement').where({
+        volunteer_announcement_id: announcementId,
+        volunteer_id: this.volunteer_id,
+      }).update({
+        read: true,
+        read_date: new Date(),
+      }))
+      .then(() => Promise.resolve())
+      .catch(error => Promise.reject(error));
   }
 }
 
