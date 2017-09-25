@@ -1,8 +1,8 @@
 const _ = require('lodash');
 const jwt = require('jsonwebtoken');
 
-const constants = require('../components/constants');
 const ConfigurationWrapper = require('../components/Configuration/ConfigurationWrapper');
+const constants = require('../components/constants');
 const logger = require('../components/Logger');
 const Volunteer = require('../components/Volunteer');
 

@@ -1,7 +1,7 @@
 const _ = require('lodash');
 
-const constants = require('../components/constants');
 const ConfigurationWrapper = require('../components/Configuration/ConfigurationWrapper');
+const constants = require('../components/constants');
 const DatabaseWrapper = require('../components/DatabaseWrapper');
 
 const config = new ConfigurationWrapper('mercury', 'mercury.json');
