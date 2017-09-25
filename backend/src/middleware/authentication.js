@@ -1,6 +1,7 @@
 const _ = require('lodash');
 const jwt = require('jsonwebtoken');
 
+const constants = require('../components/constants');
 const ConfigurationWrapper = require('../components/Configuration/ConfigurationWrapper');
 const logger = require('../components/Logger');
 const Volunteer = require('../components/Volunteer');
@@ -16,15 +17,15 @@ function validateAuthenticationDetails(req, res, next) {
   const password = req.body.password;
 
   if (_.isNil(username)) {
-    res.status(401).send({ error: 'Authentication', description: 'The username is required' });
+    res.status(401).send({ error: 'Authentication', description: constants.USERNAME_REQUIRED });
   } else if (_.isNil(password)) {
-    res.status(401).send({ error: 'Authentication', description: 'The password is required' });
-  } else if (username < 4) {
-    res.status(401).send({ error: 'Invalid Credentials', description: 'Username can not be less than 4 characters' });
-  } else if (username > 16) {
-    res.status(401).send({ error: 'Invalid Credentials', description: 'Username can not be greater than 16 characters' });
-  } else if (password < 6) {
-    res.status(401).send({ error: 'Invalid Credentials', description: 'Password can not be less than 6 characters' });
+    res.status(401).send({ error: 'Authentication', description: constants.PASSWORD_REQUIRED });
+  } else if (username < constants.USERNAME_MIN_LENGTH) {
+    res.status(401).send({ error: 'Invalid Credentials', description: constants.INVALID_USERNAME_CREDENTIALS_LENGTH });
+  } else if (username > constants.USERNAME_MAX_LENGTH) {
+    res.status(401).send({ error: 'Invalid Credentials', description: constants.INVALID_USERNAME_CREDENTIALS_LENGTH });
+  } else if (password < constants.PASSWORD_MAX_LENGTH) {
+    res.status(401).send({ error: 'Invalid Credentials', description: constants.INVALID_PASSWORD_CREDENTIALS_LENGTH });
   } else {
     req.username = username;
     req.password = password;
