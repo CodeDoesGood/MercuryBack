@@ -1,5 +1,6 @@
 const _ = require('lodash');
 
+const constants = require('../components/constants');
 const Projects = require('../components/Projects');
 
 const projectsWrapper = new Projects();
@@ -12,7 +13,7 @@ const projectsWrapper = new Projects();
 function getAllProjects(req, res) {
   projectsWrapper.getAllProjects()
     .then(projects => res.status(200).send({ message: 'All Projects', content: { projects } }))
-    .catch(() => res.send(500).send({ error: 'Project Gathering', description: 'Unable to gather all projects' }));
+    .catch(() => res.send(500).send({ error: 'Project Gathering', description: constants.UNABLE_TO_GATHER_PROJECTS }));
 }
 
 /**
@@ -23,7 +24,7 @@ function getAllProjects(req, res) {
 function getAllActiveProjects(req, res) {
   projectsWrapper.getAllActiveProjects()
     .then(projects => res.status(200).send({ message: 'All Active Projects', content: { projects } }))
-    .catch(error => res.status(500).send({ error: `${JSON.stringify(error)}`, description: 'Unable to gather all active projects' }));
+    .catch(error => res.status(500).send({ error: `${JSON.stringify(error)}`, description: constants.UNABLE_TO_GATHER_ACTIVE_PROJECTS }));
 }
 
 /**
@@ -38,7 +39,7 @@ function validateProjectStatus(req, res, next) {
   const status = req.params.status;
 
   if (_.isNil(status) || !_.isString(status)) {
-    res.status(500).send({ error: 'Status Validation', description: `Status '${status}' is in a invalid format or not provided` });
+    res.status(500).send({ error: 'Status Validation', description: constants.INVALID_STATUS_FORMAT });
   } else {
     req.status = status;
     next();
@@ -52,7 +53,7 @@ function validateProjectCategory(req, res, next) {
   const category = req.params.category;
 
   if (_.isNil(category) || !_.isString(category)) {
-    res.status(500).send({ error: 'Category validation', description: `Category '${category}' is in a invalid format or not provided` });
+    res.status(500).send({ error: 'Category validation', description: constants.INVALID_CATEGORY_FORMAT});
   } else {
     req.category = category;
     next();
@@ -69,7 +70,7 @@ function getAllProjectsByStatus(req, res) {
 
   projectsWrapper.getAllProjectsByStatus(status)
     .then(projects => res.status(200).send({ message: 'All projects by status', content: { projects } }))
-    .catch(error => res.status(500).send({ error: `${JSON.stringify(error)}`, description: `Unable to gather all projects by status '${status}'` }));
+    .catch(error => res.status(500).send({ error: `${JSON.stringify(error)}`, description: constants.UNABLE_TO_GATHER_BY_STATUS(status) }));
 }
 
 /**
@@ -82,7 +83,7 @@ function getAllProjectsByCategory(req, res) {
 
   projectsWrapper.getAllProjectsByCategory(category)
     .then(projects => res.status(200).send({ message: 'All projects by category', content: { projects } }))
-    .catch(error => res.status(500).send({ error: `${JSON.stringify(error)}`, description: `Unable to gather all projects by category '${category}'` }));
+    .catch(error => res.status(500).send({ error: `${JSON.stringify(error)}`, description: constants.UNABLE_TO_GATHER_BY_CATEGORY(category) }));
 }
 
 /**
@@ -92,7 +93,7 @@ function getAllProjectsByCategory(req, res) {
 function getAllHiddenProjects(req, res) {
   projectsWrapper.getAllHiddenProjects()
     .then(projects => res.status(200).send({ message: 'All hidden projects', content: { projects } }))
-    .catch(error => res.status(500).send({ error: `${JSON.stringify(error)}`, description: 'Unable to gather all hidden projects' }));
+    .catch(error => res.status(500).send({ error: `${JSON.stringify(error)}`, description: constants.UNABLE_TO_GATHER_ALL_HIDDEN }));
 }
 
 module.exports = {

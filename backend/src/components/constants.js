@@ -54,3 +54,13 @@ export const PROJECT_TYPE_DESCRIPTION_INVALID = 'description type is invalid, mu
 
 export const UNABLE_TO_UPDATE_PROJECT = projectId => `Unable to update project by id ${projectId}`;
 export const UNABLE_TO_GATHER_PROJECT = projectId => `Unable to gather project by id ${projectId}`;
+
+export const UNABLE_TO_GATHER_PROJECTS = 'Unable to gather the projects';
+export const UNABLE_TO_GATHER_ACTIVE_PROJECTS = 'Unable to gather all active projects';
+
+export const INVALID_STATUS_FORMAT = status => `Status '${status}' is in a invalid format or not provided`;
+export const INVALID_CATEGORY_FORMAT = category => `Category '${category}' is in a invalid format or not provided`;
+
+export const UNABLE_TO_GATHER_BY_STATUS = status => `Unable to gather all projects by status '${status}'`;
+export const UNABLE_TO_GATHER_BY_CATEGORY = category => `Unable to gather all projects by category '${category}'`;
+export const UNABLE_TO_GATHER_ALL_HIDDEN = 'Unable to gather all hidden projects';
