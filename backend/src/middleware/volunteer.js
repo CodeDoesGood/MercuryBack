@@ -1,5 +1,6 @@
 const _ = require('lodash');
 
+const constants = require('../components/constants');
 const logger = require('../components/Logger');
 const Volunteer = require('../components/Volunteer');
 
@@ -12,16 +13,16 @@ function validateVolunteerCreationDetails(req, res, next) {
   const volunteer = _.pick(req.body.volunteer, volunteerRequirements);
 
   if (_.isNil(volunteer) || !_.isObject(volunteer)) {
-    return res.status(400).send({ error: 'volunteer Validation', description: 'volunteer provided is not in a valid format' });
+    return res.status(400).send({ error: 'volunteer Validation', description: constants.INVALID_VOLUNTEER_FORMAT });
   }
 
   _.forEach(volunteerRequirements, (requirement) => {
     if (!volunteer[requirement] && !res.headersSent) {
-      return res.status(400).send({ error: 'Invalid Credentials', description: `Volunteer must contain ${requirement}` });
+      return res.status(400).send({ error: 'Invalid Credentials', description: constants.VOLUNTEER_REQUIREMENT_NEEDED(requirement) });
     } else if (requirement !== 'data_entry_user_id' && !_.isString(volunteer[requirement]) && !res.headersSent) {
       return res.status(400).send({
         error: 'Invalid Credentials Formatting',
-        description: `Volunteer ${requirement} must be a string`,
+        description: constants.VOLUNTEER_REQUIREMENT_STRING(requirement),
       });
     }
     return 1;
@@ -33,11 +34,11 @@ function validateVolunteerCreationDetails(req, res, next) {
    */
   if (!res.headersSent) {
     if (volunteer.username < 4) {
-      return res.status(400).send({ error: 'Invalid Credentials', description: 'Username can not be less than 4 characters' });
+      return res.status(400).send({ error: 'Invalid Credentials', description: constants.INVALID_USERNAME_CREDENTIALS_LENGTH });
     } else if (volunteer.username > 16) {
-      return res.status(400).send({ error: 'Invalid Credentials', description: 'Username can not be greater than 16 characters' });
+      return res.status(400).send({ error: 'Invalid Credentials', description: constants.INVALID_USERNAME_CREDENTIALS_LENGTH });
     } else if (volunteer.password < 6) {
-      return res.status(400).send({ error: 'Invalid Credentials', description: 'Password can not be less than 6 characters' });
+      return res.status(400).send({ error: 'Invalid Credentials', description: constants.INVALID_PASSWORD_CREDENTIALS_LENGTH });
     }
     volunteer.email = volunteer.email.toLowerCase();
     req.volunteer = volunteer;
@@ -54,9 +55,9 @@ function validateRequestResetDetails(req, res, next) {
   const email = req.body.email;
 
   if (_.isNil(username)) {
-    res.status(400).send({ error: 'Username validation', description: 'The username parameter was not passed' });
+    res.status(400).send({ error: 'Username validation', description: constants.USERNAME_REQUIRED });
   } else if (_.isNil(email)) {
-    res.status(400).send({ error: 'Email validation', description: 'The email parameter was not passed' });
+    res.status(400).send({ error: 'Email validation', description: constants.EMAIL_REQUIRED });
   } else {
     const volunteer = new Volunteer(null, username);
 

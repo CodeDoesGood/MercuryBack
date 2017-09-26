@@ -64,3 +64,8 @@ export const INVALID_CATEGORY_FORMAT = category => `Category '${category}' is in
 export const UNABLE_TO_GATHER_BY_STATUS = status => `Unable to gather all projects by status '${status}'`;
 export const UNABLE_TO_GATHER_BY_CATEGORY = category => `Unable to gather all projects by category '${category}'`;
 export const UNABLE_TO_GATHER_ALL_HIDDEN = 'Unable to gather all hidden projects';
+
+export const INVALID_VOLUNTEER_FORMAT = 'volunteer provided is not in a valid format';
+
+export const VOLUNTEER_REQUIREMENT_NEEDED = requirement => `Volunteer must contain ${requirement}`;
+export const VOLUNTEER_REQUIREMENT_STRING = requirement => `Volunteer ${requirement} must be a string`;
