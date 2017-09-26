@@ -296,7 +296,7 @@ function createNewVolunteer(req, res, next) {
 
   const volunteer = new Volunteer(null, vol.username);
 
-  volunteer.name =s vol.name;
+  volunteer.name = vol.name;
   volunteer.email = vol.email;
 
   volunteer.create(vol.password, 1)

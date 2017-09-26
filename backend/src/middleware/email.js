@@ -98,9 +98,12 @@ function validateContactUsRequestInformation(req, res, next) {
 
   if (!valid) {
     return res.status(400).send({ error: 'Invalid fields', description: constants.EMAIL_FIELDS_REQUIRED });
-  } else if (sender.name.length > constants.EMAIL_MAX_LENGTH || sender.email.length > constants.EMAIL_MAX_LENGTH || sender.subject.length > constants.EMAIL_MAX_LENGTH) {
+  } else if (sender.name.length > constants.EMAIL_MAX_LENGTH ||
+    sender.email.length > constants.EMAIL_MAX_LENGTH ||
+    sender.subject.length > constants.EMAIL_MAX_LENGTH) {
     return res.status(400).send({ error: 'Invalid length', description: constants.EMAIL_AND_NAME_LENGTH });
-  } else if (sender.text.length > constants.EMAIL_BODY_MAX_LENGTH || sender.text.length < constants.EMAIL_BODY_MIN_LENGTH) {
+  } else if (sender.text.length > constants.EMAIL_BODY_MAX_LENGTH ||
+    sender.text.length < constants.EMAIL_BODY_MIN_LENGTH) {
     return res.status(400).send({ error: 'Invalid length', description: constants.EMAIL_BODY_LENGTH });
   }
 

@@ -53,7 +53,7 @@ function validateProjectCategory(req, res, next) {
   const category = req.params.category;
 
   if (_.isNil(category) || !_.isString(category)) {
-    res.status(500).send({ error: 'Category validation', description: constants.INVALID_CATEGORY_FORMAT});
+    res.status(500).send({ error: 'Category validation', description: constants.INVALID_CATEGORY_FORMAT });
   } else {
     req.category = category;
     next();
