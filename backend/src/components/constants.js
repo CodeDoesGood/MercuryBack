@@ -33,3 +33,24 @@ export const EMAIL_ALREADY_EXISTS = email => `The email ${email} already exists`
 
 export const USERNAME_DOES_NOT_EXIST = username => `The username ${username} does not exist`;
 export const EMAIL_DOES_NOT_EXIST = email => `The email ${email} does not exist`;
+
+export const INVALID_PROJECT_ID_FORMAT = projectId => `Id '${projectId}' is in a invalid format or not provided`;
+export const PROJECT_MUST_CONTAIN = contain => `The projet must contain ${contain} value`;
+
+export const PROJECT_MUST_CONTAIN_HIDDEN = 'The project must contain the hidden value';
+export const INVALID_PROJECT_FORMAT = 'The provided project is not a valid format';
+
+
+export const PROJECT_TYPE_ID_INVALID = 'id type is invalid, must be a int';
+export const PROJECT_TYPE_CREATED_DATETIME_INVALID = 'created_datetime type is invalid, must be a string';
+export const PROJECT_TYPE_DATA_ENTRY_USER_ID_INVALID = 'data_entry_user_id type is invalid, must be a int';
+export const PROJECT_TYPE_TITLE_INVALID = 'title type is invalid, must be a string';
+export const PROJECT_TYPE_STATUS_INVALID = 'status type is invalid, must be a string';
+export const PROJECT_TYPE_PROJECT_CATEGORY_INVALID = 'project_category type is invalid, must be a int';
+export const PROJECT_TYPE_HIDDEN_INVALID = 'hidden type is invalid, must be a bool';
+export const PROJECT_TYPE_IMAGE_DIRECTORY_INVALID = 'image_directory type is invalid, must be a string';
+export const PROJECT_TYPE_SUMMARY_INVALID = 'summary type is invalid, must be a string';
+export const PROJECT_TYPE_DESCRIPTION_INVALID = 'description type is invalid, must be a string';
+
+export const UNABLE_TO_UPDATE_PROJECT = projectId => `Unable to update project by id ${projectId}`;
+export const UNABLE_TO_GATHER_PROJECT = projectId => `Unable to gather project by id ${projectId}`;
