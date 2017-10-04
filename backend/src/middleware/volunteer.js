@@ -67,10 +67,10 @@ function validateRequestResetDetails(req, res, next) {
           req.volunteer = volunteer;
           next();
         } else {
-          res.status(400).send({ error: 'Email validation', description: 'The email passed does not match the volunteer email' });
+          res.status(400).send({ error: 'Email validation', description: constants.VOLUNTEER_EMAIL_MATCH });
         }
       })
-      .catch(() => res.status(400).send({ error: 'User existence', message: 'Volunteer does not exist' }));
+      .catch(() => res.status(400).send({ error: 'User existence', message: constants.VOLUNTEER_EXISTS }));
   }
 }
 
@@ -89,7 +89,7 @@ function createPasswordResetCode(req, res, next) {
       req.resetPasswordCode = code;
       next();
     })
-    .catch(() => res.status(500).send({ error: 'Password reset code', description: 'Unable to generate password reset code' }));
+    .catch(() => res.status(500).send({ error: 'Password reset code', description: constants.VOLUNTEER_RESET_CODE_FAIL }));
 }
 
 /**
@@ -101,9 +101,9 @@ function validatePasswordDetails(req, res, next) {
   const oldPassword = req.body.oldPassword;
 
   if (_.isNil(password) || _.isNil(oldPassword)) {
-    res.status(400).send({ error: 'Param not provided', description: 'Both oldPassword and password need to be provided' });
+    res.status(400).send({ error: 'Param not provided', description: constants.VOLUNTEER_UPDATE_PASSWORD_REQUIRE });
   } else if (password.length < 6 || oldPassword.length < 6) {
-    res.status(400).send({ error: 'Invalid Credentials', description: 'Password can not be less than 6 characters' });
+    res.status(400).send({ error: 'Invalid Credentials', description: constants.PASSWORD_MAX_LENGTH });
   } else {
     req.password = password;
     req.oldPassword = oldPassword;
@@ -118,9 +118,9 @@ function validatePasswordDetail(req, res, next) {
   const password = req.password;
 
   if (_.isNil(password)) {
-    res.status(400).send({ error: 'Param not provided', description: 'password need to be provided' });
+    res.status(400).send({ error: 'Param not provided', description: constants.PASSWORD_REQUIRED });
   } else if (password.length < 6) {
-    res.status(400).send({ error: 'Invalid Credentials', description: 'Password can not be less than 6 characters' });
+    res.status(400).send({ error: 'Invalid Credentials', description: constants.PASSWORD_MAX_LENGTH });
   } else {
     next();
   }
@@ -135,11 +135,11 @@ function validatePasswordResetDetails(req, res, next) {
   const password = req.body.password;
 
   if (_.isNil(resetCode)) {
-    res.status(400).send({ error: 'Param not provided', description: 'reset_code must be provided' });
+    res.status(400).send({ error: 'Param not provided', description: constants.RESET_CODE_REQUIRED });
   } else if (_.isNil(username)) {
-    res.status(400).send({ error: 'Param not provided', description: 'username must be provided' });
+    res.status(400).send({ error: 'Param not provided', description: constants.USERNAME_REQUIRED });
   } else if (_.isNil(password)) {
-    res.status(400).send({ error: 'Param not provided', description: 'password must be provided' });
+    res.status(400).send({ error: 'Param not provided', description: constants.PASSWORD_REQUIRED });
   } else {
     req.resetCode = resetCode;
     req.username = username;
@@ -168,10 +168,10 @@ function validateVerifyCodeAuthenticity(req, res, next) {
       if (hashedCode.hashedPassword === storedCode) {
         next();
       } else {
-        res.status(401).send({ error: 'Invalid Code', description: 'The code passed was not the correct code for verification' });
+        res.status(401).send({ error: 'Invalid Code', description: constants.VOLUNTEER_INVALID_VERIFICATION_CODE });
       }
     })
-    .catch(error => res.status(500).send({ error: 'Verification', descripion: `Failed to get verification code, error=${JSON.stringify(error)}` }));
+    .catch(error => res.status(500).send({ error: 'Verification', description: `Failed to get verification code, error=${JSON.stringify(error)}` }));
 }
 
 /**
@@ -194,7 +194,7 @@ function validatePasswordResetCodeAuthenticity(req, res, next) {
           .then(() => next())
           .catch(error => res.status(400).send({ error: 'Code removing', description: `Failed to remove password reset code: error=${JSON.stringify(error)}` }));
       } else {
-        res.status(401).send({ error: 'Invalid Code', description: 'The code passed was not the correct code for verification' });
+        res.status(401).send({ error: 'Invalid Code', description: constants.VOLUNTEER_INVALID_VERIFICATION_CODE });
       }
     })
     .catch(error => res.status(500).send({ error: 'Verification', description: `Failed to get password reset code, error=${JSON.stringify(error)}` }));
@@ -207,7 +207,7 @@ function validateNotificationId(req, res, next) {
   const notificationId = req.body.notification_id;
 
   if (_.isNil(notificationId) || !_.isNumber(parseInt(notificationId, 10))) {
-    res.status(400).send({ error: 'Invalid Notification Id', description: 'You must pass a notification id to dismiss' });
+    res.status(400).send({ error: 'Invalid Notification Id', description: constants.NOTIFICATION_ID_REQUIRED });
   } else {
     req.notificationId = parseInt(notificationId, 10);
     next();
@@ -227,7 +227,7 @@ function updateUsersPassword(req, res) {
   volunteer.updatePassword(password)
     .then(() => res.status(200).send({ message: `Volunteer ${username} password now updated` }))
     .catch((error) => {
-      res.status(500).send({ error: 'Password updating', description: `Failed to update password for ${username}, error=${error}` });
+      res.status(500).send({ error: 'Password updating', description: constants.VOLUNTEER_FAILED_UPDATE_PASSWORD(username, error) });
     });
 }
 

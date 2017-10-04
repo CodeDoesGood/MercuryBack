@@ -7,11 +7,11 @@ export const EMAIL_BODY_MIN_LENGTH = 5;
 
 export const INVALID_USERNAME_CREDENTIALS_LENGTH = `Username cannot be greater than ${USERNAME_MAX_LENGTH} or less than ${USERNAME_MIN_LENGTH} characters long`;
 export const INVALID_PASSWORD_CREDENTIALS_LENGTH = `Password cannot be longer than ${PASSWORD_MAX_LENGTH} characters long`;
-export const INVALID_EMAIL_CREDENTIALS = '';
 
 export const USERNAME_REQUIRED = 'The username is required.';
 export const PASSWORD_REQUIRED = 'The password is required.';
 export const EMAIL_REQUIRED = 'The email is required.';
+export const RESET_CODE_REQUIRED = 'reset_code must be provided';
 
 export const EMAIL_FIELDS_REQUIRED = 'Please, make sure you\'ve filled all of the required fields';
 export const EMAIL_AND_NAME_LENGTH = 'Please make sure email and name are less than 50 characters each\n';
@@ -39,7 +39,6 @@ export const PROJECT_MUST_CONTAIN = contain => `The projet must contain ${contai
 
 export const PROJECT_MUST_CONTAIN_HIDDEN = 'The project must contain the hidden value';
 export const INVALID_PROJECT_FORMAT = 'The provided project is not a valid format';
-
 
 export const PROJECT_TYPE_ID_INVALID = 'id type is invalid, must be a int';
 export const PROJECT_TYPE_CREATED_DATETIME_INVALID = 'created_datetime type is invalid, must be a string';
@@ -69,3 +68,14 @@ export const INVALID_VOLUNTEER_FORMAT = 'volunteer provided is not in a valid fo
 
 export const VOLUNTEER_REQUIREMENT_NEEDED = requirement => `Volunteer must contain ${requirement}`;
 export const VOLUNTEER_REQUIREMENT_STRING = requirement => `Volunteer ${requirement} must be a string`;
+
+export const VOLUNTEER_EMAIL_MATCH = 'The email passed does not match the volunteer email';
+export const VOLUNTEER_EXISTS = 'Volunteer does not exist';
+
+export const VOLUNTEER_RESET_CODE_FAIL = 'Unable to generate password reset code';
+export const VOLUNTEER_UPDATE_PASSWORD_REQUIRE = 'Both oldPassword and password need to be provided';
+export const VOLUNTEER_FAILED_UPDATE_PASSWORD = (username, error) => `Failed to update password for ${username}, error=${error}`;
+
+export const VOLUNTEER_INVALID_VERIFICATION_CODE = 'The code passed was not the correct code for verification';
+
+export const NOTIFICATION_ID_REQUIRED = 'export const You must pass a notification id to dismiss';
