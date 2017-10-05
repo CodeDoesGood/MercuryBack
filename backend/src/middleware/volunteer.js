@@ -171,7 +171,7 @@ function validateVerifyCodeAuthenticity(req, res, next) {
         res.status(401).send({ error: 'Invalid Code', description: constants.VOLUNTEER_INVALID_VERIFICATION_CODE });
       }
     })
-    .catch(error => res.status(500).send({ error: 'Verification', description: `Failed to get verification code, error=${JSON.stringify(error)}` }));
+    .catch(error => res.status(500).send({ error: 'Verification', description: constants.VOLUNTEER_FAILED_GET_VERIFICATION_CODE(error) }));
 }
 
 /**
@@ -192,12 +192,12 @@ function validatePasswordResetCodeAuthenticity(req, res, next) {
       if (hashedCode.hashedPassword === storedCode) {
         volunteer.removePasswordResetCode()
           .then(() => next())
-          .catch(error => res.status(400).send({ error: 'Code removing', description: `Failed to remove password reset code: error=${JSON.stringify(error)}` }));
+          .catch(error => res.status(400).send({ error: 'Code removing', description: constants.VOLUNTEER_FAILED_REMOVE_RESET_CODE(error) }));
       } else {
         res.status(401).send({ error: 'Invalid Code', description: constants.VOLUNTEER_INVALID_VERIFICATION_CODE });
       }
     })
-    .catch(error => res.status(500).send({ error: 'Verification', description: `Failed to get password reset code, error=${JSON.stringify(error)}` }));
+    .catch(error => res.status(500).send({ error: 'Verification', description: constants.VOLUNTEER_FAILED_GET_RESET_CODE(error) }));
 }
 
 /**
@@ -245,7 +245,7 @@ function verifyVolunteerAccount(req, res) {
     .then(() => res.status(200).send({ message: `Volunteer ${username} email is now verified` }))
     .catch((error) => {
       logger.error(`Failed to mark account ${username} as verified, error=${JSON.stringify(error)}`);
-      res.status(500).send({ error: 'Failed Verifing', description: `Failed to mark account ${username} as verified` });
+      res.status(500).send({ error: 'Failed Verifying', description: constants.VOLUNTEER_VERIFY_MARK_FAIL(username) });
     });
 }
 
@@ -258,7 +258,7 @@ function validateVerifyCodeExists(req, res, next) {
   const userId = req.id;
 
   if (_.isNil(code) || _.isNil(userId)) {
-    res.status(500).send({ error: 'Validate Verify Code', description: 'The code provided was invalid' });
+    res.status(500).send({ error: 'Validate Verify Code', description: constants.VERIFICATION_CODE_REQUIRED });
   }
 
   req.code = code;
@@ -270,7 +270,7 @@ function validateVerifyCodeExists(req, res, next) {
   volunteer.exists()
     .then(() => volunteer.doesVerificationCodeExist())
     .then(() => next())
-    .catch(error => res.status(400).send({ error: 'Code existence', description: 'Verification Code Does not exist', print: error }));
+    .catch(() => res.status(400).send({ error: 'Code existence', description: constants.VOLUNTEER_VERIFICIATION_CODE_DOES_NOT_EXIST }));
 }
 
 /**
@@ -286,7 +286,7 @@ function validateResetCodeExists(req, res, next) {
   volunteer.exists('username')
     .then(() => volunteer.doesPasswordResetCodeExist())
     .then(() => next())
-    .catch(error => res.status(400).send({ error: 'Code existence', description: `Verification Code Does not exist, error=${error}` }));
+    .catch(() => res.status(400).send({ error: 'Code existence', description: constants.VOLUNTEER_VERIFICIATION_CODE_DOES_NOT_EXIST }));
 }
 
 /**
@@ -305,7 +305,8 @@ function createNewVolunteer(req, res, next) {
       req.verificationCode = code;
       next();
     })
-    .catch(error => res.status(500).send({ error, description: `Failed to create the user ${volunteer.username}, error=${error}` }));
+    .catch(error => res.status(500).send({ error,
+      description: constants.VOLUNTEER_CREATE_FAIL(volunteer.username, error) }));
 }
 
 /**
@@ -322,7 +323,7 @@ function gatherActiveNotifications(req, res) {
   volunteer.exists()
     .then(() => volunteer.getActiveNotifications())
     .then(notifications => res.status(200).send({ message: 'Gathered Notifications', content: { notifications } }))
-    .catch(error => res.status(500).send({ error: 'Notifications error', description: `Failed to gather notifications for user ${volunteer.username}, error=${error}` }));
+    .catch(error => res.status(500).send({ error: 'Notifications error', description: constants.VOLUNTEER_GET_NOTIFICATION_FAIL(volunteer.username, error) }));
 }
 
 function markNotificationAsRead(req, res) {
@@ -337,7 +338,7 @@ function markNotificationAsRead(req, res) {
   volunteer.exists()
     .then(() => volunteer.dismissNotification(notificationId))
     .then(() => res.sendStatus(200))
-    .catch(error => res.status(500).send({ error: 'Notification dismissing', description: `Unable to dismiss notification ${notificationId}, error=${error}` }));
+    .catch(error => res.status(500).send({ error: 'Notification dismissing', description: constants.VOLUNTEER_DISMISS_NOTIFICATION_FAIL(notificationId, error) }));
 }
 
 module.exports = {

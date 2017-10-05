@@ -12,6 +12,7 @@ export const USERNAME_REQUIRED = 'The username is required.';
 export const PASSWORD_REQUIRED = 'The password is required.';
 export const EMAIL_REQUIRED = 'The email is required.';
 export const RESET_CODE_REQUIRED = 'reset_code must be provided';
+export const VERIFICATION_CODE_REQUIRED = 'verification must be provided';
 
 export const EMAIL_FIELDS_REQUIRED = 'Please, make sure you\'ve filled all of the required fields';
 export const EMAIL_AND_NAME_LENGTH = 'Please make sure email and name are less than 50 characters each\n';
@@ -75,7 +76,16 @@ export const VOLUNTEER_EXISTS = 'Volunteer does not exist';
 export const VOLUNTEER_RESET_CODE_FAIL = 'Unable to generate password reset code';
 export const VOLUNTEER_UPDATE_PASSWORD_REQUIRE = 'Both oldPassword and password need to be provided';
 export const VOLUNTEER_FAILED_UPDATE_PASSWORD = (username, error) => `Failed to update password for ${username}, error=${error}`;
+export const VOLUNTEER_FAILED_GET_RESET_CODE = error => `Failed to get password reset code, error=${error}`;
+export const VOLUNTEER_FAILED_REMOVE_RESET_CODE = error => `Failed to remove password reset code, error=${error}`;
 
+export const VOLUNTEER_FAILED_GET_VERIFICATION_CODE = error => `Failed to get verification code, error=${error}`;
 export const VOLUNTEER_INVALID_VERIFICATION_CODE = 'The code passed was not the correct code for verification';
+export const VOLUNTEER_VERIFICIATION_CODE_DOES_NOT_EXIST = 'Verification Code Does not exist';
 
+export const VOLUNTEER_VERIFY_MARK_FAIL = username => `Failed to mark account ${username} as verified`;
+export const VOLUNTEER_CREATE_FAIL = (username, error) => `Failed to create the user ${username}, error=${error}`;
+
+export const VOLUNTEER_GET_NOTIFICATION_FAIL = (username, error) => `Failed to gather notifications for user ${username}, error=${error}`;
+export const VOLUNTEER_DISMISS_NOTIFICATION_FAIL = (notificationId, error) => `Unable to dismiss notification ${notificationId}, error=${error}`;
 export const NOTIFICATION_ID_REQUIRED = 'export const You must pass a notification id to dismiss';
