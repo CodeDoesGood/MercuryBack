@@ -7,6 +7,10 @@ const Router = require('express').Router;
 
 const router = Router();
 
+router.get('/hello', (req, res) => {
+  res.status(200).send({ message: 'hello' });
+});
+
 /**
  * routing for gathering volunteers active notifications
  */
