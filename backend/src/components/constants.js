@@ -81,7 +81,7 @@ const errors = {
 
   VOLUNTEER_FAILED_GET_VERIFICATION_CODE: error => `Failed to get verification code, error=${error}`,
   VOLUNTEER_INVALID_VERIFICATION_CODE: 'The code passed was not the correct code for verification',
-  VOLUNTEER_VERIFICIATION_CODE_DOES_NOT_EXIST: 'Verification Code Does not exist',
+  VOLUNTEER_VERIFICATION_CODE_DOES_NOT_EXIST: 'Verification Code Does not exist',
 
   VOLUNTEER_VERIFY_MARK_FAIL: username => `Failed to mark account ${username} as verified`,
   VOLUNTEER_CREATE_FAIL: (username, error) => `Failed to create the user ${username}, error=${error}`,

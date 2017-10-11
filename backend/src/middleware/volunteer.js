@@ -270,7 +270,7 @@ function validateVerifyCodeExists(req, res, next) {
   volunteer.exists()
     .then(() => volunteer.doesVerificationCodeExist())
     .then(() => next())
-    .catch(() => res.status(400).send({ error: 'Code existence', description: constants.VOLUNTEER_VERIFICIATION_CODE_DOES_NOT_EXIST }));
+    .catch(() => res.status(400).send({ error: 'Code existence', description: constants.VOLUNTEER_VERIFICATION_CODE_DOES_NOT_EXIST }));
 }
 
 /**
@@ -286,7 +286,7 @@ function validateResetCodeExists(req, res, next) {
   volunteer.exists('username')
     .then(() => volunteer.doesPasswordResetCodeExist())
     .then(() => next())
-    .catch(() => res.status(400).send({ error: 'Code existence', description: constants.VOLUNTEER_VERIFICIATION_CODE_DOES_NOT_EXIST }));
+    .catch(() => res.status(400).send({ error: 'Code existence', description: constants.VOLUNTEER_VERIFICATION_CODE_DOES_NOT_EXIST }));
 }
 
 /**
