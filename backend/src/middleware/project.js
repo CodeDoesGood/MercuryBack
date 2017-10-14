@@ -39,7 +39,7 @@ function validateProjectUpdateContent(req, res, next) {
   /**
    * hidden is checked outside of the forEach because when you check !project[requirement]
    * with a boolean it would return true if the value is set to true, making it throw a
-   * non existing error, wich in fact it does exit but the value is true, and not false.
+   * non existing error, which in fact it does exit but the value is true, and not false.
    */
   if (!_.isBoolean(project.hidden)) {
     return res.status(400).send({ error: 'Project Validation', description: 'Project must contain hidden' });
