@@ -26,7 +26,7 @@ describe('Project Component', () => {
       return project.exists()
         .then(() => {
           assert.equal(_.isNil(project.project_id), false, 'id should exist after pulling data from the database');
-          assert.equal(_.isNil(project.createdDateTime), false, 'dataEntryDate should exist after pulling data from the database');
+          assert.equal(_.isNil(project.createdDateTime), false, 'createdDateTime should exist after pulling data from the database');
           assert.equal(_.isNil(project.title), false, 'title should exist after pulling data from the database');
           assert.equal(_.isNil(project.status), false, 'status should exist after pulling data from the database');
           assert.equal(_.isNil(project.projectCategory), false, 'projectCategory should exist after pulling data from the database');
@@ -112,12 +112,12 @@ describe('Project Component', () => {
       const content = project.getContent();
 
       assert.equal(_.isUndefined(content.project_id), false, 'id should be returned within the object when calling getContent');
-      assert.equal(_.isUndefined(content.createdDateTime), false, 'dataEntryDate should be returned within the object when calling getContent');
+      assert.equal(_.isUndefined(content.created_datetime), false, 'dataEntryDate should be returned within the object when calling getContent');
       assert.equal(_.isUndefined(content.title), false, 'title should be returned within the object when calling getContent');
       assert.equal(_.isUndefined(content.status), false, 'status should be returned within the object when calling getContent');
-      assert.equal(_.isUndefined(content.projectCategory), false, 'projectCategory should be returned within the object when calling getContent');
+      assert.equal(_.isUndefined(content.project_category), false, 'projectCategory should be returned within the object when calling getContent');
       assert.equal(_.isUndefined(content.hidden), false, 'hidden should be returned within the object when calling getContent');
-      assert.equal(_.isUndefined(content.imageDirectory), false, 'imageDirectory should be returned within the object when calling getContent');
+      assert.equal(_.isUndefined(content.image_directory), false, 'imageDirectory should be returned within the object when calling getContent');
       assert.equal(_.isUndefined(content.summary), false, 'summary should be returned within the object when calling getContent');
       assert.equal(_.isUndefined(content.description), false, 'description should be returned within the object when calling getContent');
     });

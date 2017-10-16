@@ -669,13 +669,14 @@ describe('Volunteer Component', () => {
   });
 
   describe('#getActiveNotifications', () => {
+    // TODO: Should first create the notification for the user and then delete it after
     it('Should return all active notifications if notifications exist for the user', () => {
       const volunteer = new Volunter(null, 'user1');
 
       return volunteer.exists('username')
         .then(() => volunteer.getActiveNotifications())
         .then((notifications) => {
-          assert.equal(!_.isNil(notifications[0]), true, `Notificaitons should be returned instead of a empty array, ${notifications}`);
+          assert.equal(!_.isNil(notifications[0]), true, `Notifications should be returned instead of a empty array, ${notifications}`);
 
           _.forEach(notifications, (notification) => {
             assert.equal(!_.isNil(notification.announcement_id), true, 'Announcement_id should not be undefined or null');
