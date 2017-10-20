@@ -2,6 +2,7 @@ const _ = require('lodash');
 const jwt = require('jsonwebtoken');
 
 const ConfigurationWrapper = require('../components/Configuration/ConfigurationWrapper');
+const constants = require('../components/constants');
 const logger = require('../components/Logger');
 const Volunteer = require('../components/Volunteer');
 
@@ -16,15 +17,15 @@ function validateAuthenticationDetails(req, res, next) {
   const password = req.body.password;
 
   if (_.isNil(username)) {
-    res.status(401).send({ error: 'Authentication', description: 'The username is required' });
+    res.status(401).send({ error: 'Authentication', description: constants.USERNAME_REQUIRED });
   } else if (_.isNil(password)) {
-    res.status(401).send({ error: 'Authentication', description: 'The password is required' });
-  } else if (username < 4) {
-    res.status(401).send({ error: 'Invalid Credentials', description: 'Username can not be less than 4 characters' });
-  } else if (username > 16) {
-    res.status(401).send({ error: 'Invalid Credentials', description: 'Username can not be greater than 16 characters' });
-  } else if (password < 6) {
-    res.status(401).send({ error: 'Invalid Credentials', description: 'Password can not be less than 6 characters' });
+    res.status(401).send({ error: 'Authentication', description: constants.PASSWORD_REQUIRED });
+  } else if (username < constants.USERNAME_MIN_LENGTH) {
+    res.status(401).send({ error: 'Invalid Credentials', description: constants.INVALID_USERNAME_CREDENTIALS_LENGTH });
+  } else if (username > constants.USERNAME_MAX_LENGTH) {
+    res.status(401).send({ error: 'Invalid Credentials', description: constants.INVALID_USERNAME_CREDENTIALS_LENGTH });
+  } else if (password < constants.PASSWORD_MAX_LENGTH) {
+    res.status(401).send({ error: 'Invalid Credentials', description: constants.INVALID_PASSWORD_CREDENTIALS_LENGTH });
   } else {
     req.username = username;
     req.password = password;
@@ -51,12 +52,12 @@ function ValidateUserCredentials(req, res, next) {
         req.volunteer = volunteer;
         next();
       } else {
-        res.status(401).send({ error: 'Validate user credentials', description: 'Password provided was incorrect' });
+        res.status(401).send({ error: 'Validate user credentials', description: constants.INCORRECT_PASSWORD });
       }
     })
     .catch((error) => {
       logger.error(`Failed to gather volunteer login details by username while validating user credentials, error=${error}`);
-      res.status(500).send({ error: 'Validate user credentials', description: `Failed to validate volunteer credentials, error=${error}` });
+      res.status(500).send({ error: 'Validate user credentials', description: constants.FAILED_VALIDATION });
     });
 }
 
@@ -69,7 +70,7 @@ function checkAuthenticationToken(req, res, next) {
   const token = req.header('token');
 
   if (_.isNil(token) || !_.isString(token)) {
-    res.status(401).send({ error: 'Invalid token', description: 'A invalid token was passed to the server' });
+    res.status(401).send({ error: 'Invalid token', description: constants.INVALID_TOKEN });
   }
 
   jwt.verify(token, secret, (error, decoded) => {
@@ -77,7 +78,7 @@ function checkAuthenticationToken(req, res, next) {
       req.decoded = decoded;
       next();
     } else if (!res.headersSent) {
-      res.status(401).send({ error: 'Expired token', description: 'A valid token was not provided, you might require refreshing' });
+      res.status(401).send({ error: 'Expired token', description: constants.NO_TOKEN_PASSED });
     }
   });
 }
@@ -106,12 +107,12 @@ function authenticateLoggingInUser(req, res) {
         const token = jwt.sign({ username, id: userId }, config.getKey('secret'), { expiresIn: '1h' });
         res.status(200).send({ message: `Volunteer ${username} authenticated`, content: { token } });
       } else {
-        res.status(401).send({ error: 'Volunteer authentication', description: 'Password provided was incorrect' });
+        res.status(401).send({ error: 'Volunteer authentication', description: constants.INCORRECT_PASSWORD });
       }
     })
     .catch((error) => {
       logger.error(`Failed to get Volunteer login details, error=${JSON.stringify(error)}`);
-      res.status(500).send({ error: 'Authentication', description: 'Failed to get Volunteer login details' });
+      res.status(500).send({ error: 'Authentication', description: constants.FAILED_VOLUNTEER_GET });
     });
 }
 

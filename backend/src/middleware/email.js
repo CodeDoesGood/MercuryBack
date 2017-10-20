@@ -1,6 +1,7 @@
 const _ = require('lodash');
 
 const ConfigurationWrapper = require('../components/Configuration/ConfigurationWrapper');
+const constants = require('../components/constants');
 const EmailClient = require('../components/Email');
 const logger = require('../components/Logger');
 
@@ -8,14 +9,14 @@ const config = new ConfigurationWrapper('mercury', 'mercury.json');
 const emailClient = new EmailClient(config.getKey('email'));
 /**
  * This will Validate that the email service is currently up and running and call next otherwise
- * send a 500 internal server that the service is currenlty not working but they can still login
+ * send a 500 internal server that the service is currently not working but they can still login
  * and a validation email will be sent out as soon as the service is running again.
  */
 function validateConnectionStatus(req, res, next) {
   if (emailClient.getStatus()) {
     next();
   } else {
-    res.status(503).send({ error: 'Email Service', description: 'The email service is currently unavailable, your email will be sent later' });
+    res.status(503).send({ error: 'Email Service', description: constants.EMAIL_UNAVAILABLE });
   }
 }
 
@@ -42,7 +43,7 @@ function sendVerificationEmail(req, res) {
     })
     .catch((error) => {
       logger.error(`Error attempting to send a email. to=${to} from=${from}, error=${error}`);
-      res.status(503).send({ error: 'Unavailable Service', description: 'Email service is currently unavailable or down' });
+      res.status(503).send({ error: 'Unavailable Service', description: constants.EMAIL_UNAVAILABLE });
     });
 }
 
@@ -77,7 +78,7 @@ function sendPasswordResetLinkToRequestingEmail(req, res) {
     })
     .catch((error) => {
       logger.error(`Error attempting to send a email. to=${to} from=${from}, error=${error}`);
-      res.status(503).send({ error: 'Unavailable Service', description: 'Email service is currently unavailable or down' });
+      res.status(503).send({ error: 'Unavailable Service', description: constants.EMAIL_UNAVAILABLE });
     });
 }
 
@@ -96,11 +97,14 @@ function validateContactUsRequestInformation(req, res, next) {
   _.forEach(sender, (item) => { if (_.isNil(item)) { valid = false; } });
 
   if (!valid) {
-    return res.status(400).send({ error: 'Invalid fields', description: 'Please, make sure you\'ve filled all of the required fields' });
-  } else if (sender.name.length > 50 || sender.email.length > 50 || sender.subject.length > 50) {
-    return res.status(400).send({ error: 'Invalid length', description: 'Please make sure email and name are less than 50 characters each' });
-  } else if (sender.text.length > 500 || sender.text.length < 5) {
-    return res.status(400).send({ error: 'Invalid length', description: 'Please use less than 500 characters for contact text or greater than 5' });
+    return res.status(400).send({ error: 'Invalid fields', description: constants.EMAIL_FIELDS_REQUIRED });
+  } else if (sender.name.length > constants.EMAIL_MAX_LENGTH ||
+    sender.email.length > constants.EMAIL_MAX_LENGTH ||
+    sender.subject.length > constants.EMAIL_MAX_LENGTH) {
+    return res.status(400).send({ error: 'Invalid length', description: constants.EMAIL_AND_NAME_LENGTH });
+  } else if (sender.text.length > constants.EMAIL_BODY_MAX_LENGTH ||
+    sender.text.length < constants.EMAIL_BODY_MIN_LENGTH) {
+    return res.status(400).send({ error: 'Invalid length', description: constants.EMAIL_BODY_LENGTH });
   }
 
   // Bind the sender to the request data to be accessed later
@@ -128,7 +132,7 @@ function sendContactUsRequestInbox(req, res) {
     })
     .catch((error) => {
       logger.error(`Error attempting to send a email. to=${config.getKey(['email']).email} from=${sender.email}, error=${error}`);
-      res.status(503).send({ error: 'Unavailable Service', description: 'Email service is currently unavailable or down' });
+      res.status(503).send({ error: 'Unavailable Service', description: constants.EMAIL_UNAVAILABLE });
     });
 }
 
@@ -136,7 +140,7 @@ function sendContactUsRequestInbox(req, res) {
  * Sends OK or Internal Server Error based on the true / false email status.
  */
 function sendContactUsEmailStatus(req, res) {
-  if (emailClient.getStatus()) { res.sendStatus(200); } else { res.status(503).send({ error: 'Unavailable Service', description: 'Email service is currently unavailable or down' }); }
+  if (emailClient.getStatus()) { res.sendStatus(200); } else { res.status(503).send({ error: 'Unavailable Service', description: constants.EMAIL_UNAVAILABLE }); }
 }
 
 module.exports = {

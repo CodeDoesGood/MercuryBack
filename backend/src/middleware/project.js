@@ -1,5 +1,6 @@
 const _ = require('lodash');
 
+const constants = require('../components/constants');
 const Project = require('../components/Project');
 
 /**
@@ -10,7 +11,7 @@ function validateProjectId(req, res, next) {
   const projectId = req.params.project_id;
 
   if (_.isNil(projectId) || !_.isString(projectId)) {
-    res.status(500).send({ error: 'Status Validation', description: `Id '${projectId}' is in a invalid format or not provided` });
+    res.status(500).send({ error: 'Status Validation', description: constants.INVALID_PROJECT_ID_FORMAT(projectId) });
   } else {
     req.projectId = projectId;
     next();
@@ -26,12 +27,12 @@ function validateProjectUpdateContent(req, res, next) {
   const projectRequirements = ['project_id', 'created_datetime', 'data_entry_user_id', 'title', 'status', 'project_category', 'image_directory', 'summary', 'description'];
 
   if (_.isNil(project) || !_.isObject(project)) {
-    return res.status(400).send({ error: 'Project Validation', description: 'Project provided is not in a valid format' });
+    return res.status(400).send({ error: 'Project Validation', description: constants.INVALID_PROJECT_FORMAT });
   }
 
   _.forEach(projectRequirements, (requirement) => {
     if (!project[requirement] && !res.headersSent) {
-      return res.status(400).send({ error: 'Project Validation', description: `Project must contain ${requirement}` });
+      return res.status(400).send({ error: 'Project Validation', description: constants.PROJECT_MUST_CONTAIN(requirement) });
     }
     return 1;
   });
@@ -42,7 +43,7 @@ function validateProjectUpdateContent(req, res, next) {
    * non existing error, which in fact it does exit but the value is true, and not false.
    */
   if (!_.isBoolean(project.hidden)) {
-    return res.status(400).send({ error: 'Project Validation', description: 'Project must contain hidden' });
+    return res.status(400).send({ error: 'Project Validation', description: constants.PROJECT_MUST_CONTAIN_HIDDEN });
   }
 
   if (!res.headersSent) {
@@ -62,25 +63,25 @@ function validateProjectUpdateContentTypes(req, res, next) {
   const projectId = req.projectId;
 
   if (!_.isInteger(projectId)) {
-    res.status(400).send({ error: 'Project Type Validation', description: 'id type is invalid, must be a int' });
+    res.status(400).send({ error: 'Project Type Validation', description: constants.PROJECT_TYPE_ID_INVALID });
   } else if (!_.isString(project.created_datetime)) {
-    res.status(400).send({ error: 'Project Type Validation', description: 'created_datetime type is invalid, must be a string' });
+    res.status(400).send({ error: 'Project Type Validation', description: constants.PROJECT_TYPE_CREATED_DATETIME_INVALID });
   } else if (!_.isInteger(project.data_entry_user_id)) {
-    res.status(400).send({ error: 'Project Type Validation', description: 'data_entry_user_id type is invalid, must be a int' });
+    res.status(400).send({ error: 'Project Type Validation', description: constants.PROJECT_TYPE_DATA_ENTRY_USER_ID_INVALID });
   } else if (!_.isString(project.title)) {
-    res.status(400).send({ error: 'Project Type Validation', description: 'title type is invalid, must be a string' });
+    res.status(400).send({ error: 'Project Type Validation', description: constants.PROJECT_TYPE_TITLE_INVALID });
   } else if (!_.isString(project.status)) {
-    res.status(400).send({ error: 'Project Type Validation', description: 'status type is invalid, must be a string' });
+    res.status(400).send({ error: 'Project Type Validation', description: constants.PROJECT_TYPE_STATUS_INVALID });
   } else if (!_.isInteger(project.project_category)) {
-    res.status(400).send({ error: 'Project Type Validation', description: 'project_category type is invalid, must be a int' });
+    res.status(400).send({ error: 'Project Type Validation', description: constants.PROJECT_TYPE_PROJECT_CATEGORY_INVALID });
   } else if (!_.isBoolean(project.hidden)) {
-    res.status(400).send({ error: 'Project Type Validation', description: 'hidden type is invalid, must be a bool' });
+    res.status(400).send({ error: 'Project Type Validation', description: constants.PROJECT_TYPE_HIDDEN_INVALID });
   } else if (!_.isString(project.image_directory)) {
-    res.status(400).send({ error: 'Project Type Validation', description: 'image_directory type is invalid, must be a string' });
+    res.status(400).send({ error: 'Project Type Validation', description: constants.PROJECT_TYPE_IMAGE_DIRECTORY_INVALID });
   } else if (!_.isString(project.summary)) {
-    res.status(400).send({ error: 'Project Type Validation', description: 'summary type is invalid, must be a string' });
+    res.status(400).send({ error: 'Project Type Validation', description: constants.PROJECT_TYPE_SUMMARY_INVALID });
   } else if (!_.isString(project.description)) {
-    res.status(400).send({ error: 'Project Type Validation', description: 'description type is invalid, must be a string' });
+    res.status(400).send({ error: 'Project Type Validation', description: constants.PROJECT_TYPE_DESCRIPTION_INVALID });
   } else {
     next();
   }
@@ -101,7 +102,7 @@ function updateProjectById(req, res) {
   project.exists()
     .then(() => project.updateContent(content))
     .then(() => res.status(200).send({ message: `Project updated id ${projectId}` }))
-    .catch(error => res.status(500).send({ error: `${JSON.stringify(error)}`, description: `Unable to update project by id ${projectId}` }));
+    .catch(error => res.status(500).send({ error: `${JSON.stringify(error)}`, description: constants.UNABLE_TO_UPDATE_PROJECT(projectId) }));
 }
 /**
  * Gets and sends the project requested by id.
@@ -117,7 +118,7 @@ function getProjectById(req, res) {
       const content = project.getContent();
       res.status(200).send({ message: `Project By id ${projectId}`, content: { project: content } });
     })
-    .catch(error => res.status(500).send({ error: `${JSON.stringify(error)}`, description: `Unable to gather project by id ${projectId}` }));
+    .catch(error => res.status(500).send({ error: `${JSON.stringify(error)}`, description: constants.UNABLE_TO_GATHER_PROJECT(projectId) }));
 }
 
 module.exports = {
