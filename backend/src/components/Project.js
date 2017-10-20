@@ -85,12 +85,12 @@ class Project extends Database {
   getContent() {
     return {
       project_id: this.project_id,
-      createdDateTime: this.createdDateTime,
+      created_datetime: this.createdDateTime,
       title: this.title,
       status: this.status,
-      projectCategory: this.projectCategory,
+      project_category: this.projectCategory,
       hidden: this.hidden,
-      imageDirectory: this.imageDirectory,
+      image_directory: this.imageDirectory,
       summary: this.summary,
       description: this.description,
     };

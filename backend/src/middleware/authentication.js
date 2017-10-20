@@ -98,7 +98,6 @@ function authenticateLoggingInUser(req, res) {
   const username = req.username;
   const password = req.password;
   const userId = parseInt(req.id, 10);
-
   const volunteer = new Volunteer(userId, username);
 
   volunteer.exists()
