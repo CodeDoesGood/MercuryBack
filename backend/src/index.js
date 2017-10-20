@@ -1,4 +1,5 @@
 const bodyParser = require('body-parser');
+const cors = require('cors');
 const express = require('express');
 const RateLimit = require('express-rate-limit');
 
@@ -16,6 +17,7 @@ const rateLimit = new RateLimit({
   delayMs: 0,
 });
 
+app.use(cors());
 app.use(rateLimit);
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());

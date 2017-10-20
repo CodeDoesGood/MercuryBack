@@ -254,7 +254,7 @@ function verifyVolunteerAccount(req, res) {
  * otherwise sends a bad request.
  */
 function validateVerifyCodeExists(req, res, next) {
-  const code = req.params.code;
+  const code = req.body.code;
   const userId = req.id;
 
   if (_.isNil(code) || _.isNil(userId)) {
