@@ -46,7 +46,7 @@ router.post('/volunteer/create', [
  * Verify is after a volunteer registers with a account, a email would be sent to the
  * volunteer to verify there account
  */
-router.post('/volunteer/verify/:username/:code', [
+router.post('/volunteer/verify', [
   database.validateConnectionStatus.bind(this),
   database.validateUsernameDoesExist.bind(this),
   volunteer.validateVerifyCodeExists.bind(this),
