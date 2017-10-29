@@ -11,6 +11,7 @@ export default class Home extends React.Component {
   constructor(props) {
     super(props);
 
+    this.displayWelcomeMessage = this.displayWelcomeMessage.bind(this);
     this.displayNotifications = this.displayNotifications.bind(this);
     this.displayAnnouncements = this.displayAnnouncements.bind(this);
 
@@ -52,14 +53,28 @@ export default class Home extends React.Component {
         </div>
       );
     }
-
     return null;
+  }
+
+  displayWelcomeMessage() {
+    const currentHour = new Date().getHours();
+    const username = (this.props.authentication.result) ? this.props.authentication.username : 'Volunteer';
+
+    if (currentHour < 12) {
+      return (<div className={style.welcomeMessage}>Good Morning, {username}</div>)
+    } else if (currentHour < 18) {
+      return (<div className={style.welcomeMessage}>Good Afternoon, {username}</div>)
+    } else {
+      return (<div className={style.welcomeMessage}>Good Evening, {username}</div>)
+    }
+
   }
 
   render() {
     return (
       <div>
         <div className={style.homeTitle}>Volunteer Home</div>
+        {this.displayWelcomeMessage()}
         {this.displayAnnouncements()}
         {this.displayNotifications()}
         <Navigation authentication={this.props.authentication}/>

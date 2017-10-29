@@ -1,6 +1,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import Link from 'react-router-dom';
+// Make sure to use { Link } otherwise you get a error
+import { Link } from 'react-router-dom';
+
+import * as routes from '../Application/routePaths';
 
 const style = require('./navigation.less');
 
@@ -10,13 +13,13 @@ export default function Navigation(props) {
       <nav>
         <div className={style.menuNavigation}>
           <ul>
-            <li className={style.textNavigation}>My Profile</li>
-            <li className={style.textNavigation}>Projects</li>
-            <li className={style.textNavigation}>Org Wiki</li>
-            <li className={style.textNavigation}>Dev Hatchery</li>
-            <li className={style.textNavigation}>Contact Us</li>
-            <li className={style.textNavigation}>Past Announcements</li>
-            <li className={style.textNavigation}>Sign Out</li>
+            <li className={style.textNavigation}><Link to={routes.myProfile}>My Profile</Link></li>
+            <li className={style.textNavigation}><Link to={routes.projects}>Projects</Link></li>
+            <li className={style.textNavigation}><Link to={routes.orgWiki}>Org Wiki</Link></li>
+            <li className={style.textNavigation}><Link to={routes.devHatchery}>Dev Hatchery</Link></li>
+            <li className={style.textNavigation}><Link to={routes.contactUs}>Contact Us</Link></li>
+            <li className={style.textNavigation}><Link to={routes.pastAnnouncements}>Past Announcements</Link></li>
+            <li className={style.textNavigation}><Link to={routes.signOut}>Sign Out</Link></li>
           </ul>
         </div>
       </nav>
@@ -26,12 +29,12 @@ export default function Navigation(props) {
     <nav>
       <div className={style.menuNavigation}>
         <ul>
-          <li className={style.textNavigation}>Projects</li>
-          <li className={style.textNavigation}>Org Wiki</li>
-          <li className={style.textNavigation}>Dev Hatchery</li>
-          <li className={style.textNavigation}>Contact Us</li>
-          <li className={style.textNavigation}>Past Announcements</li>
-          <li className={style.textNavigation}>Sign In</li>
+          <li className={style.textNavigation}><Link to={routes.projects}>Projects</Link></li>
+          <li className={style.textNavigation}><Link to={routes.orgWiki}>Org Wiki</Link></li>
+          <li className={style.textNavigation}><Link to={routes.devHatchery}>Dev Hatchery</Link></li>
+          <li className={style.textNavigation}><Link to={routes.contactUs}>Contact Us</Link></li>
+          <li className={style.textNavigation}><Link to={routes.pastAnnouncements}>Past Announcements</Link></li>
+          <li className={style.textNavigation}><Link to={routes.login}>Sign In</Link></li>
         </ul>
       </div>
     </nav>
