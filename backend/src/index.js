@@ -1,5 +1,6 @@
 const bodyParser = require('body-parser');
 const express = require('express');
+const cors = require('cors');
 const RateLimit = require('express-rate-limit');
 
 const error = require('./middleware/error');
@@ -16,6 +17,7 @@ const rateLimit = new RateLimit({
   delayMs: 0,
 });
 
+app.use(cors());
 app.use(rateLimit);
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());

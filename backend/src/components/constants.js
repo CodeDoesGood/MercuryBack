@@ -92,5 +92,9 @@ const errors = {
 };
 
 
-module.exports = Object.assign({}, constants, errors);
+const constantsAndErrors = Object.assign(constants, errors);
+
+console.log(constantsAndErrors);
+
+module.exports = constantsAndErrors;
 
