@@ -91,10 +91,7 @@ const errors = {
   NOTIFICATION_ID_REQUIRED: 'export const You must pass a notification id to dismiss',
 };
 
-
 const constantsAndErrors = Object.assign(constants, errors);
-
-console.log(constantsAndErrors);
 
 module.exports = constantsAndErrors;
 

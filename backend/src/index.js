@@ -1,6 +1,6 @@
 const bodyParser = require('body-parser');
-const express = require('express');
 const cors = require('cors');
+const express = require('express');
 const RateLimit = require('express-rate-limit');
 
 const error = require('./middleware/error');
