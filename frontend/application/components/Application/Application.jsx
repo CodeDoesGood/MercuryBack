@@ -8,6 +8,7 @@ import * as routePaths from './routePaths';
 import Header from '../Layout/Header';
 
 import Login from '../Login/Login';
+import SignOut from '../Login/SignOut';
 import Reset from '../Reset/Reset';
 import Verify from '../Verify/Verify';
 import Home from '../Home/Home';
@@ -25,7 +26,7 @@ export default class Application extends React.Component {
 
     return (
       <Router>
-        <div>
+          <div>
           <Header logo={'/components/img/logo.png'} />
           <Route
             exact
@@ -41,7 +42,11 @@ export default class Application extends React.Component {
           />
           <Route
             path={this.routePaths.login}
-            render={() => <Login client={client} authenticating={authenticating} />}
+            render={(history) => <Login history={history.history} client={client} authenticating={authenticating} />}
+          />
+          <Route
+            path={this.routePaths.signOut}
+            render={(history) => <SignOut history={history.history} />}
           />
           <Route
             path={this.routePaths.reset}
