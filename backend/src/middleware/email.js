@@ -27,7 +27,14 @@ function validateConnectionStatus(req, res, next) {
 function sendVerificationEmail(req, res) {
   const volunteer = req.volunteer;
   const code = req.verificationCode;
-  const verificationLink = `http://localhost:3000/verify/${volunteer.username}/${code}`;
+  let verificationLink;
+
+
+  if(config.getKey('online')) {
+    verificationLink = `${config.getKey('online_address')}/verify/${volunteer.username}/${code}`;
+  } else {
+    verificationLink = `http://localhost:8080/verify/${volunteer.username}/${code}`;
+  }
 
   // This is currently here because we have no email service
   logger.debug('link for user', volunteer.username, verificationLink);
@@ -59,9 +66,16 @@ function sendPasswordResetLinkToRequestingEmail(req, res) {
   const username = volunteer.username;
   const email = volunteer.email;
 
-  const link = `http://localhost:3000/reset/${username}/${code}`;
+  let link;
 
-  const content = `A password reset has been requested for the Volunteer: ${username}. If you did not make this request you` +
+  if(config.getKey('online')) {
+    link = `${config.getKey('online_address')}/reset/${username}/${code}`;
+  } else {
+    link = `http://localhost:8080/reset/${username}/${code}`;
+  }
+
+
+  const content = `A password reset has been requested for the Volunteer: ${username}. If you did not make this request you ` +
     `can safely ignore this email.\\n\\nIf you do actually want to reset your password, visit this link: ${link}`;
 
 
@@ -74,7 +88,7 @@ function sendPasswordResetLinkToRequestingEmail(req, res) {
 
   emailClient.send(from, to, subject, text, text)
     .then(() => {
-      res.status(200).send({ message: `Account ${volunteer.username} created, you will soon get a verification email` });
+      res.status(200).send({ message: constants.EMAIL_RESET_SENT });
     })
     .catch((error) => {
       logger.error(`Error attempting to send a email. to=${to} from=${from}, error=${error}`);

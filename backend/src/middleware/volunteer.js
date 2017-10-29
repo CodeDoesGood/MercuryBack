@@ -35,6 +35,8 @@ function validateVolunteerCreationDetails(req, res, next) {
   if (!res.headersSent) {
     if (volunteer.username < 4) {
       return res.status(400).send({ error: 'Invalid Credentials', description: constants.INVALID_USERNAME_CREDENTIALS_LENGTH });
+    } else if (volunteer.username.includes(" ")) {
+      return res.status(400).send({ error: 'Invalid Credentials', description: constants.INVALID_USERNAME_CREDENTIALS_SPACES });
     } else if (volunteer.username > 16) {
       return res.status(400).send({ error: 'Invalid Credentials', description: constants.INVALID_USERNAME_CREDENTIALS_LENGTH });
     } else if (volunteer.password < 6) {

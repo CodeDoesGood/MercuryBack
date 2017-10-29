@@ -5,7 +5,7 @@ const Router = require('express').Router;
 
 const router = Router();
 
-router.post('/authenticate/standard', [
+router.post('/volunteer/authenticate', [
   authentication.validateAuthenticationDetails.bind(this),
   database.validateUsernameDoesExist.bind(this),
   authentication.authenticateLoggingInUser.bind(this),

@@ -105,7 +105,7 @@ function authenticateLoggingInUser(req, res) {
     .then(() => {
       if (volunteer.compareAuthenticatingPassword(password)) {
         const token = jwt.sign({ username, id: userId }, config.getKey('secret'), { expiresIn: '1h' });
-        res.status(200).send({ message: `Volunteer ${username} authenticated`, content: { token } });
+        res.status(200).send({ message: `Volunteer ${username} authenticated`, content: { token, username, id: userId } });
       } else {
         res.status(401).send({ error: 'Volunteer authentication', description: constants.INCORRECT_PASSWORD });
       }
