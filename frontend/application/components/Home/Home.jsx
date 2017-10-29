@@ -2,6 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 import Notifications from './Notifications/Notifications';
+import Navigation from '../Navigation/Navigation';
 import Announcements from './Announcements/Announcements';
 
 const style = require('./home.less');
@@ -61,6 +62,7 @@ export default class Home extends React.Component {
         <div className={style.homeTitle}>Volunteer Home</div>
         {this.displayAnnouncements()}
         {this.displayNotifications()}
+        <Navigation authentication={this.props.authentication}/>
       </div>
     );
   }

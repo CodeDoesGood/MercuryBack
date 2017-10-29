@@ -34,13 +34,6 @@ export default function adminAPICall(options) {
     }
   };
 
-  const getError = (error) => {
-    if (error.constructor.name === 'Error') {
-      return `{ "error": "${error.name}", "description": "${error.message.replace(/(?:\r\n|\r|\n)/g, ' ')}" }`;
-    }
-    return error.response.text;
-  };
-
   const token = utils.TOKEN;
 
   return new Promise((resolve, reject) => {
@@ -49,7 +42,7 @@ export default function adminAPICall(options) {
       .set('token', token)
       .end((error, result) => {
         if (error) {
-          const message = getError(error);
+          const message = error.response.text;
 
           reject((parseApiCall(message, {
             error: 'Could not found error',

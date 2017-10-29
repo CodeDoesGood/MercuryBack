@@ -1,5 +1,5 @@
 const utils = {
-  API_URL: 'http://api.codedoesgood.org:3000/api',
+  API_URL: 'http://localhost:3000/api',
   TOKEN: '',
   buildOptions: (apiUrl, path, method, body) => ({
     apiUrl,
