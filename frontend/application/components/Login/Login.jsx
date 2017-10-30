@@ -13,6 +13,7 @@ export default class Login extends React.Component {
 
     this.switchRegisteringState = this.switchRegisteringState.bind(this);
     this.switchForgotState = this.switchForgotState.bind(this);
+    this.emptyStatusMessage = this.emptyStatusMessage.bind(this);
 
     this.state = {
       message: '',
@@ -23,48 +24,50 @@ export default class Login extends React.Component {
   }
 
   /**
-   * Gets the username, password from the login from and attempts to authenticate the details with the server.
+   * Gets the username, password from the login from and attempts to
+   * authenticate the details with the server.
    */
   login(e) {
     e.preventDefault();
 
     const username = this.formUsername.value;
     const password = this.formPassword.value;
-    const volunteer = this.props.client.volunteer;
+    const { volunteer } = this.props.client;
 
     this.loginForm.reset();
     this.emptyStatusMessage();
 
     volunteer.authenticate(username, password)
-    .then((result) => {
-      this.props.client.setUtil('TOKEN', result.content.token);
-      this.props.authenticating(result.content);
-      this.setState({ message: result.message, error: false });
-      this.props.history.push('/')
-    })
-    .catch((error) => {
-      this.setState({ message: error.description, error: true });
-    });
+      .then((result) => {
+        this.props.client.setUtil('TOKEN', result.content.token);
+        this.props.authenticating(result.content);
+        this.setState({ message: result.message, error: false });
+        this.props.history.push('/');
+      })
+      .catch((error) => {
+        this.setState({ message: error.description, error: true });
+      });
   }
 
   register(e) {
     e.preventDefault();
 
-    // TODO: We need to validate name, username, passowrd and email on the client as well as the server (server done)
+    // TODO: We need to validate name, username, password and email on the
+    // TODO: client as well as the server (server done)
 
     const name = this.registeringFormName.value;
     const username = this.registeringFormUsername.value;
     const password = this.registeringFormPassword.value;
-    const verifyVassword = this.registeringFormVerifyPassword.value;
+    const verifyPassword = this.registeringFormVerifyPassword.value;
     const email = this.registeringFormEmail.value;
-    const volunteer = this.props.client.volunteer;
+    const { volunteer } = this.props.client;
 
     this.loginForm.reset();
     this.emptyStatusMessage();
     this.switchRegisteringState();
 
-    if(password !== verifyVassword) {
-      this.setState({ message: 'passwords don\'t match', error: true })
+    if (password !== verifyPassword) {
+      this.setState({ message: 'passwords don\'t match', error: true });
     } else {
       volunteer.create(name, username, password, email)
         .then(result => this.setState({ message: result.message, error: false }))
@@ -80,7 +83,7 @@ export default class Login extends React.Component {
 
     const username = this.forgotFormUsername.value;
     const email = this.forgotFormEmail.value;
-    const volunteer = this.props.client.volunteer;
+    const { volunteer } = this.props.client;
 
     this.loginForm.reset();
     this.emptyStatusMessage();
@@ -94,15 +97,15 @@ export default class Login extends React.Component {
   emptyStatusMessage() {
     this.setState({
       message: '',
-      error: false
-    })
+      error: false,
+    });
   }
 
   switchRegisteringState() {
     this.loginForm.reset();
 
     this.setState({
-      registering: !this.state.registering
+      registering: !this.state.registering,
     });
   }
 
@@ -111,7 +114,7 @@ export default class Login extends React.Component {
 
     this.setState({
       registering: false,
-      forgot: !this.state.forgot
+      forgot: !this.state.forgot,
     });
   }
 
@@ -119,7 +122,7 @@ export default class Login extends React.Component {
     if (this.state.error && this.state.message !== '') {
       return (
         <div className={style.alertBox}>
-          <span role="button" tabIndex={0} onClick={this.emptyStatusMessage.bind(this)} className={style.boxClose}>&times;</span>
+          <span role="button" tabIndex={0} onClick={this.emptyStatusMessage} onKeyPress={this.emptyStatusMessage} className={style.boxClose}>&times;</span>
           <strong className={style.message}>Warning: </strong>
           {this.state.message}
         </div>
@@ -127,7 +130,7 @@ export default class Login extends React.Component {
     } else if (!this.state.error && this.state.message !== '') {
       return (
         <div className={style.successBox}>
-          <span role="button" tabIndex={0} onClick={this.emptyStatusMessage.bind(this)} className={style.boxClose}>&times;</span>
+          <span role="button" tabIndex={0} onClick={this.emptyStatusMessage} onKeyPress={this.emptyStatusMessage} className={style.boxClose}>&times;</span>
           <strong className={style.message}>Success: </strong>
           {this.state.message}
         </div>
@@ -144,10 +147,12 @@ export default class Login extends React.Component {
         <div className={style.loginForms}>
           {this.alertBox()}
           <form ref={(loginForm) => { this.loginForm = loginForm; }}>
-            <input placeholder={'username'} type={'username'} ref={(forgotFormUsername) => { this.forgotFormUsername = forgotFormUsername; }} required="required" />
-            <input placeholder={'email'} type={'email'} ref={(forgotFormEmail) => { this.forgotFormEmail = forgotFormEmail; }} required="required" />
+            <input placeholder="username" type="username" ref={(forgotFormUsername) => { this.forgotFormUsername = forgotFormUsername; }} required="required" />
+            <input placeholder="email" type="email" ref={(forgotFormEmail) => { this.forgotFormEmail = forgotFormEmail; }} required="required" />
             <button type="submit" onClick={this.requestReset}>Request Reset</button>
-            <p className={style.registerMessage}>Need to login? <span onClick={this.switchForgotState}>Login</span></p>
+            <p className={style.registerMessage}>Need to login?
+              <span role="button" tabIndex={0} onClick={this.switchForgotState} onKeyPress={this.switchForgotState}> Login</span>
+            </p>
           </form>
         </div>
       </div>
@@ -160,11 +165,15 @@ export default class Login extends React.Component {
         <div className={style.loginForms}>
           {this.alertBox()}
           <form ref={(loginForm) => { this.loginForm = loginForm; }}>
-            <input placeholder={'username'} type={'username'} ref={(formUsername) => { this.formUsername = formUsername; }} required="required" />
-            <input placeholder={'password'} type={'password'} ref={(formPassword) => { this.formPassword = formPassword; }} required="required" />
+            <input placeholder="username" type="username" ref={(formUsername) => { this.formUsername = formUsername; }} required="required" />
+            <input placeholder="password" type="password" ref={(formPassword) => { this.formPassword = formPassword; }} required="required" />
             <button type="submit" onClick={this.login}>Sign In</button>
-            <p className={style.registerMessage}>Not a CDG volunteer? Sign up <span onClick={this.switchRegisteringState}>here</span></p>
-            <p className={style.forgotMessage}><span onClick={this.switchForgotState}>forgot my username / password</span></p>
+            <p className={style.registerMessage}>Not a CDG volunteer? Sign up
+              <span role="button" tabIndex={0} onClick={this.switchRegisteringState} onKeyPress={this.switchRegisteringState}> here</span>
+            </p>
+            <p className={style.forgotMessage}>
+              <span role="button" tabIndex={0} onClick={this.switchForgotState} onKeyPress={this.switchForgotState}>forgot my username / password</span>
+            </p>
           </form>
         </div>
       </div>
@@ -177,14 +186,18 @@ export default class Login extends React.Component {
         <div className={style.loginForms}>
           {this.alertBox()}
           <form ref={(loginForm) => { this.loginForm = loginForm; }}>
-            <input placeholder={'name'} type={'name'} ref={(registeringFormName) => { this.registeringFormName = registeringFormName; }} required="required" />
-            <input placeholder={'username'} type={'username'} ref={(registeringFormUsername) => { this.registeringFormUsername = registeringFormUsername; }} required="required" />
-            <input placeholder={'password'} type={'password'} ref={(registeringFormPassword) => { this.registeringFormPassword = registeringFormPassword; }} required="required" />
-            <input placeholder={'verify password'} type={'password'} ref={(registeringFormVerifyPassword) => { this.registeringFormVerifyPassword = registeringFormVerifyPassword; }} required="required" />
-            <input placeholder={'email'} type={'email'} ref={(registeringFormEmail) => { this.registeringFormEmail = registeringFormEmail; }} required="required" />
+            <input placeholder="name" type="name" ref={(registeringFormName) => { this.registeringFormName = registeringFormName; }} required="required" />
+            <input placeholder="username" type="username" ref={(registeringFormUsername) => { this.registeringFormUsername = registeringFormUsername; }} required="required" />
+            <input placeholder="password" type="password" ref={(registeringFormPassword) => { this.registeringFormPassword = registeringFormPassword; }} required="required" />
+            <input placeholder="verify password" type="password" ref={(registeringFormVerifyPassword) => { this.registeringFormVerifyPassword = registeringFormVerifyPassword; }} required="required" />
+            <input placeholder="email" type="email" ref={(registeringFormEmail) => { this.registeringFormEmail = registeringFormEmail; }} required="required" />
             <button type="submit" onClick={this.register}>Start Volunteering</button>
-            <p className={style.registerMessage}>Need to login? <span onClick={this.switchRegisteringState}>Login</span></p>
-            <p className={style.forgotMessage}><span onClick={this.switchForgotState}>forgot my username / password</span></p>
+            <p className={style.registerMessage}>Need to login?
+              <span role="button" tabIndex={0} onClick={this.switchRegisteringState} onKeyPress={this.switchRegisteringState}> Login</span>
+            </p>
+            <p className={style.forgotMessage}>
+              <span role="button" tabIndex={0} onClick={this.switchForgotState} onKeyPress={this.switchForgotState}>forgot my username / password</span>
+            </p>
           </form>
         </div>
       </div>
@@ -198,11 +211,11 @@ export default class Login extends React.Component {
       return this.registeringBox();
     }
     return this.loginBox();
-
   }
 }
 
 Login.propTypes = {
   client: PropTypes.shape().isRequired,
+  history: PropTypes.shape().isRequired,
   authenticating: PropTypes.func.isRequired,
 };

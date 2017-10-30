@@ -8,23 +8,21 @@ export default class Announcements extends React.Component {
   constructor(props) {
     super(props);
 
-    const volunteer = this.props.volunteer;
+    const { volunteer } = this.props;
 
     volunteer.getAnnouncements()
       .then(gainedAnnouncements => this.props.updateAnnouncements(gainedAnnouncements))
       .catch(() => this.props.updateAnnouncements([]));
-
-    this.state = {
-      message: '',
-      error: false,
-    };
   }
 
   render() {
     if (!_.isNil(this.props.announcements) && !_.isNil(this.props.announcements[0])) {
-      return (<div>{(_.map(this.props.announcements,
-        (announcement, index) => (<Announcement key={index} announcement={announcement} />))
-      )}</div>);
+      return (
+        <div>{(_.map(
+        this.props.announcements,
+        (announcement, index) => (<Announcement key={index} announcement={announcement} />),
+          ))}
+        </div>);
     }
     return (<div>No Announcements</div>);
   }

@@ -8,4 +8,4 @@ export const contactUs = '/contactus';
 export const devHatchery = '/devhatchery';
 export const pastAnnouncements = '/pastannouncements';
 export const orgWiki = '/wiki';
-export const myProfile = '/myprofile'
+export const myProfile = '/myprofile';

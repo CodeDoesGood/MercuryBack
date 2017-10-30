@@ -4,8 +4,7 @@ export default function authentication(state = { username: null, result: false }
   switch (action.type) {
     case 'UPDATE_AUTHENTICATED': {
       if (!_.isNil(action.authentication.username)) {
-        action.authentication.result = true;
-        return action.authentication
+        return Object.assign({}, action.authentication, { result: true });
       }
       return action.authentication;
     }

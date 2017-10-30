@@ -8,8 +8,12 @@ const volunteerEndpoint = endpoint({
     const options = utils.buildOptions(this.apiUrl, `${this.path}/authenticate`, 'post', { username, password });
     return this.apiCall(options);
   },
-  create(name, username, password, email, dataEntryUserId=1) {
-    const options = utils.buildOptions(this.apiUrl, `${this.path}/create`, 'post', { volunteer: { name, username, password, email, data_entry_user_id: dataEntryUserId } });
+  create(name, username, password, email, dataEntryUserId = 1) {
+    const options = utils.buildOptions(this.apiUrl, `${this.path}/create`, 'post', {
+      volunteer: {
+        name, username, password, email, data_entry_user_id: dataEntryUserId,
+      },
+    });
     return this.apiCall(options);
   },
   resetRequest(username, email) {

@@ -1,4 +1,4 @@
-const { Router } = require('express').Router;
+const { Router } = require('express');
 
 const authentication = require('./authentication');
 const project = require('./project');

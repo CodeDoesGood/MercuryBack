@@ -21,13 +21,12 @@ export default class Application extends React.Component {
   }
 
   render() {
-    const authenticating = this.props.authenticating;
-    const client = this.props.client;
+    const { authenticating, client } = this.props;
 
     return (
       <Router>
-          <div>
-          <Header logo={'/components/img/logo.png'} />
+        <div>
+          <Header logo="/components/img/logo.png" />
           <Route
             exact
             path="/"
@@ -42,11 +41,15 @@ export default class Application extends React.Component {
           />
           <Route
             path={this.routePaths.login}
-            render={(history) => <Login history={history.history} client={client} authenticating={authenticating} />}
+            render={history => (<Login
+              history={history.history}
+              client={client}
+              authenticating={authenticating}
+            />)}
           />
           <Route
             path={this.routePaths.signOut}
-            render={(history) => <SignOut history={history.history} />}
+            render={history => <SignOut history={history.history} />}
           />
           <Route
             path={this.routePaths.reset}

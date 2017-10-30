@@ -27,20 +27,19 @@ export default class Verify extends React.Component {
   }
 
   verifyAccount() {
-    const code = this.state.code;
-    const username = this.state.username;
-    const volunteer = this.props.volunteer;
+    const { code, username } = this.state;
+    const { volunteer } = this.props;
 
     volunteer.verifyAccount(username, code)
-    .then(result => this.setState({ message: result.message, error: false }))
-    .catch(error => this.setState({ message: error.description, error: true }));
+      .then(result => this.setState({ message: result.message, error: false }))
+      .catch(error => this.setState({ message: error.description, error: true }));
   }
 
   alertBox() {
     if (this.state.error && this.state.message !== '') {
       return (
         <div className={style.alertBox}>
-          <span role="button" tabIndex={0} onClick={this.emptyStatusMessage} className={style.boxClose}>&times;</span>
+          <span role="button" tabIndex={0} onClick={this.emptyStatusMessage} onKeyPress={this.emptyStatusMessage} className={style.boxClose}>&times;</span>
           <strong className={style.message}>Warning! </strong>
           {this.state.message}
         </div>
@@ -48,7 +47,7 @@ export default class Verify extends React.Component {
     } else if (!this.state.error && this.state.message !== '') {
       return (
         <div className={style.successBox}>
-          <span role="button" tabIndex={0} onClick={this.emptyStatusMessage} className={style.boxClose}>&times;</span>
+          <span role="button" tabIndex={0} onClick={this.emptyStatusMessage} onKeyPress={this.emptyStatusMessage} className={style.boxClose}>&times;</span>
           <strong className={style.message}>Success! </strong>
           {this.state.message}
         </div>
