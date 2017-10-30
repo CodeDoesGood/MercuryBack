@@ -3,7 +3,7 @@ const database = require('../middleware/database');
 const email = require('../middleware/email');
 const volunteer = require('../middleware/volunteer');
 
-const Router = require('express').Router;
+const { Router } = require('express').Router;
 
 const router = Router();
 

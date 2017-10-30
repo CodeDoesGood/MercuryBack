@@ -89,22 +89,27 @@ class Volunteer extends Database {
     const hashedPassword = this.saltAndHash(password);
     const date = new Date();
 
-    const volunteer = Object.assign({
-      name: this.name,
-      username: this.username,
-      email: this.email,
-      data_entry_user_id: dataEntryUserId },
+    const volunteer = Object.assign(
+      {
+        name: this.name,
+        username: this.username,
+        email: this.email,
+        data_entry_user_id: dataEntryUserId,
+      },
       {
         created_datetime: `${date.getFullYear()}-${date.getMonth()}-${date.getDay()}`,
         password: hashedPassword.hashedPassword,
         salt: hashedPassword.salt,
-      });
+      },
+    );
 
     return this.connect()
       .then(() => this.knex('volunteer').insert(volunteer))
       .then((id) => {
-        this.volunteer_id = id[0];
         const code = this.createVerificationCode();
+        const { 0: volunteerId } = id;
+
+        this.volunteer_id = volunteerId;
         this.password = hashedPassword.hashedPassword;
         this.salt = hashedPassword.salt;
 

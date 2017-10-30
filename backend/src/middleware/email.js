@@ -25,12 +25,12 @@ function validateConnectionStatus(req, res, next) {
  * to confirm there current email address.
  */
 function sendVerificationEmail(req, res) {
-  const volunteer = req.volunteer;
+  const { volunteer } = req;
   const code = req.verificationCode;
   let verificationLink;
 
 
-  if(config.getKey('online')) {
+  if (config.getKey('online')) {
     verificationLink = `${config.getKey('online_address')}/verify/${volunteer.username}/${code}`;
   } else {
     verificationLink = `http://localhost:8080/verify/${volunteer.username}/${code}`;
@@ -60,15 +60,14 @@ function sendVerificationEmail(req, res) {
  * to reset the users password.
  */
 function sendPasswordResetLinkToRequestingEmail(req, res) {
-  const volunteer = req.volunteer;
+  const { volunteer } = req.volunteer;
+  const { username, email } = volunteer;
 
   const code = req.resetPasswordCode;
-  const username = volunteer.username;
-  const email = volunteer.email;
 
   let link;
 
-  if(config.getKey('online')) {
+  if (config.getKey('online')) {
     link = `${config.getKey('online_address')}/reset/${username}/${code}`;
   } else {
     link = `http://localhost:8080/reset/${username}/${code}`;
@@ -107,7 +106,10 @@ function validateContactUsRequestInformation(req, res, next) {
 
   let valid = true;
 
-  const sender = { name: senderName, email: senderEmail, subject: senderSubject, text: senderText };
+  const sender = {
+    name: senderName, email: senderEmail, subject: senderSubject, text: senderText,
+  };
+
   _.forEach(sender, (item) => { if (_.isNil(item)) { valid = false; } });
 
   if (!valid) {
@@ -135,10 +137,10 @@ function DenyInvalidAndBlockedDomains(req, res, next) {
 
 /**
  * After validation of the name, email and senderText then send the email to the
- * email to the deafult CodeDoesGood inbox.
+ * email to the default CodeDoesGood inbox.
  */
 function sendContactUsRequestInbox(req, res) {
-  const sender = req.sender;
+  const { sender } = req;
 
   emailClient.send(sender.email, config.getKey(['email']).email, sender.subject, sender.text, sender.text)
     .then(() => {

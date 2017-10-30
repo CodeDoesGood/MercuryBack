@@ -13,8 +13,7 @@ const config = new ConfigurationWrapper('mercury', 'mercury.json');
  * will be called otherwise a bad request would be sent to the server.
  */
 function validateAuthenticationDetails(req, res, next) {
-  const username = req.body.username;
-  const password = req.body.password;
+  const { username, password } = req.body;
 
   if (_.isNil(username)) {
     res.status(401).send({ error: 'Authentication', description: constants.USERNAME_REQUIRED });
@@ -41,7 +40,7 @@ function validateAuthenticationDetails(req, res, next) {
  * This would be used when updating a existing password but not actually logging in.
  */
 function ValidateUserCredentials(req, res, next) {
-  const username = req.body.username;
+  const { username } = req;
   const password = req.oldPassword;
 
   const volunteer = new Volunteer(null, username);
@@ -96,8 +95,7 @@ function checkAdminAuthenticationLevel(req, res, next) {
  * requests
  */
 function authenticateLoggingInUser(req, res) {
-  const username = req.username;
-  const password = req.password;
+  const { username, password } = req;
   const userId = parseInt(req.id, 10);
   const volunteer = new Volunteer(userId, username);
 

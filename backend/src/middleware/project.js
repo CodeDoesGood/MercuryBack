@@ -23,7 +23,7 @@ function validateProjectId(req, res, next) {
  * creating a new project.
  */
 function validateProjectUpdateContent(req, res, next) {
-  const project = req.body.project;
+  const { project } = req.body;
   const projectRequirements = ['project_id', 'created_datetime', 'data_entry_user_id', 'title', 'status', 'project_category', 'image_directory', 'summary', 'description'];
 
   if (_.isNil(project) || !_.isObject(project)) {
@@ -59,8 +59,7 @@ function validateProjectUpdateContent(req, res, next) {
  * Validates that all provided values are the correct type.
  */
 function validateProjectUpdateContentTypes(req, res, next) {
-  const project = req.project;
-  const projectId = req.projectId;
+  const { project, projectId } = req;
 
   if (!_.isInteger(projectId)) {
     res.status(400).send({ error: 'Project Type Validation', description: constants.PROJECT_TYPE_ID_INVALID });
@@ -87,7 +86,7 @@ function validateProjectUpdateContentTypes(req, res, next) {
   }
 }
 
-  /**
+/**
  * Updates a project in the project table by the project id,
  *
  * id is required in the req and so is the project object, bith are validated by the
@@ -95,7 +94,7 @@ function validateProjectUpdateContentTypes(req, res, next) {
  */
 function updateProjectById(req, res) {
   const content = req.project;
-  const projectId = req.projectId;
+  const { projectId } = req;
 
   const project = new Project(projectId);
 
@@ -109,7 +108,7 @@ function updateProjectById(req, res) {
  * @return a object containing all the project data.
  */
 function getProjectById(req, res) {
-  const projectId = req.projectId;
+  const { projectId } = req;
 
   const project = new Project(projectId);
 
