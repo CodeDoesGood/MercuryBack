@@ -102,8 +102,12 @@ function authenticateLoggingInUser(req, res) {
   volunteer.exists()
     .then(() => {
       if (volunteer.compareAuthenticatingPassword(password)) {
-        const token = jwt.sign({ username, id: userId }, config.getKey('secret'), { expiresIn: '1h' });
-        res.status(200).send({ message: `Volunteer ${username} authenticated`, content: { token, username, id: userId } });
+        if (!volunteer.getVerification()) {
+          res.status(403).send({ error: 'Failed verification check', description: constants.VOLUNTEER_VERIFICATION_REQUIRED(volunteer.username) });
+        } else {
+          const token = jwt.sign({ username, id: userId }, config.getKey('secret'), { expiresIn: '1h' });
+          res.status(200).send({ message: `Volunteer ${username} authenticated`, content: { token, username, id: userId } });
+        }
       } else {
         res.status(401).send({ error: 'Volunteer authentication', description: constants.INCORRECT_PASSWORD });
       }

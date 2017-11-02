@@ -47,7 +47,7 @@ class Volunteer extends Database {
     }
 
     return this.connect()
-      .then(() => this.knex('volunteer').where(type, this[type]).select('volunteer_id', 'username', 'email', 'password', 'salt').first())
+      .then(() => this.knex('volunteer').where(type, this[type]).select('volunteer_id', 'username', 'email', 'password', 'salt', 'verified').first())
       .then((volunteer) => {
         if (_.isNil(volunteer)) {
           return Promise.reject(`Volunteer does not exist by type=${type}`);
@@ -57,6 +57,7 @@ class Volunteer extends Database {
         this.email = volunteer.email;
         this.password = volunteer.password;
         this.salt = volunteer.salt;
+        this.verified = volunteer.verified;
         this.doesExist = true;
         return Promise.resolve(true);
       })
@@ -129,6 +130,19 @@ class Volunteer extends Database {
         return Promise.resolve();
       })
       .catch(error => Promise.reject(error));
+  }
+
+  /**
+   * Returns true or false based on the verification of the user.
+   * @returns {boolean}
+   */
+  getVerification() {
+    if (_.isNil(this.username)) {
+      return false;
+    } else if (this.verified) {
+      return true;
+    }
+    return false;
   }
 
   /**
