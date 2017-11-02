@@ -174,8 +174,7 @@ export default class Login extends React.Component {
             <button type="submit" onClick={this.login}>Sign In</button>
             <div className={style.registerMessage}>Not a CDG volunteer?
               <div>
-                Sign up
-                <span role="button" tabIndex={0} onClick={this.switchRegisteringState} onKeyPress={this.switchRegisteringState}> here</span>
+                Sign up <span role="button" tabIndex={0} onClick={this.switchRegisteringState} onKeyPress={this.switchRegisteringState}>here</span>
               </div>
             </div>
             <p className={style.forgotMessage}>

@@ -27,7 +27,6 @@ class Volunteer extends Database {
     this.linkedInId = null;
     this.slackId = null;
     this.githubId = null;
-    this.isHatchling = null;
     this.developerLevel = null;
     this.adminPortalAccess = null;
     this.adminOverallLevel = null;
@@ -143,6 +142,29 @@ class Volunteer extends Database {
       return true;
     }
     return false;
+  }
+
+  /**
+   * Returns the current user profile information, returns a empty string if its null / empty
+   */
+  getProfile() {
+    return {
+      volunteer_id: _.defaultTo(this.volunteer_id, ''),
+      username: _.defaultTo(this.username, ''),
+      position: _.defaultTo(this.position, ''),
+      email: _.defaultTo(this.email, ''),
+      volunteer_status: _.defaultTo(this.volunteerStatus, ''),
+      name: _.defaultTo(this.name, ''),
+      about: _.defaultTo(this.about, ''),
+      phone: _.defaultTo(this.phone, ''),
+      location: _.defaultTo(this.location, ''),
+      timezone: _.defaultTo(this.timezone, ''),
+      linked_in_id: _.defaultTo(this.linkedInId, ''),
+      slack_id: _.defaultTo(this.slackId, ''),
+      github_id: _.defaultTo(this.githubId, ''),
+      developer_level: _.defaultTo(this.developerLevel, ''),
+      verified: _.defaultTo(this.verified, ''),
+    };
   }
 
   /**

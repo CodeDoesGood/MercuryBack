@@ -334,6 +334,19 @@ function markNotificationAsRead(req, res) {
     .catch(error => res.status(500).send({ error: 'Notification dismissing', description: constants.VOLUNTEER_DISMISS_NOTIFICATION_FAIL(notificationId, error) }));
 }
 
+function gatherVolunteerProfile(req, res) {
+  const decodedToken = req.decoded;
+
+  const { username } = decodedToken;
+  const volunteerId = decodedToken.id;
+
+  const volunteer = new Volunteer(volunteerId, username);
+
+  volunteer.exists()
+    .then(() => res.status(200).send({ message: 'Volunteer Profile', content: { volunteer: volunteer.getProfile() } }))
+    .catch(() => res.status(500).send({ error: 'User existing', description: constants.UNKNOWN_ERROR }));
+}
+
 module.exports = {
   validateVolunteerCreationDetails,
   validateRequestResetDetails,
@@ -350,5 +363,6 @@ module.exports = {
   validatePasswordResetCodeAuthenticity,
   validateNotificationId,
   gatherActiveNotifications,
+  gatherVolunteerProfile,
   markNotificationAsRead,
 };

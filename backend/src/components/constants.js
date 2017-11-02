@@ -93,6 +93,8 @@ const errors = {
   VOLUNTEER_GET_NOTIFICATION_FAIL: (username, error) => `Failed to gather notifications for user ${username}, error=${error}`,
   VOLUNTEER_DISMISS_NOTIFICATION_FAIL: (notificationId, error) => `Unable to dismiss notification ${notificationId}, error=${error}`,
   NOTIFICATION_ID_REQUIRED: 'export const You must pass a notification id to dismiss',
+
+  UNKNOWN_ERROR: 'Something went wrong',
 };
 
 const constantsAndErrors = Object.assign(constants, errors);

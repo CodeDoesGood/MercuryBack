@@ -29,6 +29,14 @@ router.post('/volunteer/notification/dismiss', [
 ]);
 
 /**
+ * Gets the volunteers profile
+ */
+router.get('/volunteer/profile', [
+  authentication.checkAuthenticationToken.bind(this),
+  volunteer.gatherVolunteerProfile.bind(this),
+]);
+
+/**
  * These routes are for getting and updating single projects by id
  */
 
