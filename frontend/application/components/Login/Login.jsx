@@ -52,9 +52,6 @@ export default class Login extends React.Component {
   register(e) {
     e.preventDefault();
 
-    // TODO: We need to validate name, username, password and email on the
-    // TODO: client as well as the server (server done)
-
     const name = this.registeringFormName.value;
     const username = this.registeringFormUsername.value;
     const password = this.registeringFormPassword.value;
@@ -164,13 +161,23 @@ export default class Login extends React.Component {
       <div className={style.loginWrapper}>
         <div className={style.loginForms}>
           {this.alertBox()}
+          <div className={style.loginTitle}>CDG Volunteer Sign In</div>
           <form ref={(loginForm) => { this.loginForm = loginForm; }}>
-            <input placeholder="username" type="username" ref={(formUsername) => { this.formUsername = formUsername; }} required="required" />
-            <input placeholder="password" type="password" ref={(formPassword) => { this.formPassword = formPassword; }} required="required" />
+            <div>
+              <label>username</label>
+              <input type="username" ref={(formUsername) => { this.formUsername = formUsername; }} required="required" />
+            </div>
+            <div>
+              <label>password</label>
+              <input type="password" ref={(formPassword) => { this.formPassword = formPassword; }} required="required" />
+            </div>
             <button type="submit" onClick={this.login}>Sign In</button>
-            <p className={style.registerMessage}>Not a CDG volunteer? Sign up
-              <span role="button" tabIndex={0} onClick={this.switchRegisteringState} onKeyPress={this.switchRegisteringState}> here</span>
-            </p>
+            <div className={style.registerMessage}>Not a CDG volunteer?
+              <div>
+                Sign up
+                <span role="button" tabIndex={0} onClick={this.switchRegisteringState} onKeyPress={this.switchRegisteringState}> here</span>
+              </div>
+            </div>
             <p className={style.forgotMessage}>
               <span role="button" tabIndex={0} onClick={this.switchForgotState} onKeyPress={this.switchForgotState}>forgot my username / password</span>
             </p>
