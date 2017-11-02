@@ -164,11 +164,11 @@ export default class Login extends React.Component {
           <div className={style.loginTitle}>CDG Volunteer Sign In</div>
           <form ref={(loginForm) => { this.loginForm = loginForm; }}>
             <div>
-              <label>username</label>
+              <span>username</span>
               <input type="username" ref={(formUsername) => { this.formUsername = formUsername; }} required="required" />
             </div>
             <div>
-              <label>password</label>
+              <span>password</span>
               <input type="password" ref={(formPassword) => { this.formPassword = formPassword; }} required="required" />
             </div>
             <button type="submit" onClick={this.login}>Sign In</button>
