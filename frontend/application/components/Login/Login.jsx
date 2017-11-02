@@ -42,6 +42,10 @@ export default class Login extends React.Component {
         this.props.client.setUtil('TOKEN', result.content.token);
         this.props.authenticating(result.content);
         this.setState({ message: result.message, error: false });
+        return volunteer.getProfile();
+      })
+      .then((profile) => {
+        this.props.updateVolunteerProfile(profile.content.volunteer);
         this.props.history.push('/');
       })
       .catch((error) => {
@@ -224,4 +228,5 @@ Login.propTypes = {
   client: PropTypes.shape().isRequired,
   history: PropTypes.shape().isRequired,
   authenticating: PropTypes.func.isRequired,
+  updateVolunteerProfile: PropTypes.func.isRequired,
 };

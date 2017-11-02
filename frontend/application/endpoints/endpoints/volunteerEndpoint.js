@@ -16,6 +16,10 @@ const volunteerEndpoint = endpoint({
     });
     return this.apiCall(options);
   },
+  getProfile() {
+    const options = utils.buildOptions(this.apiUrl, `${this.path}/profile`, 'get', {});
+    return this.apiCall(options);
+  },
   resetRequest(username, email) {
     const options = utils.buildOptions(this.apiUrl, `${this.path}/password/request_reset`, 'post', { username, email });
     return this.apiCall(options);
