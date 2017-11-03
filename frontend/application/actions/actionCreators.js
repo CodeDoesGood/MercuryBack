@@ -1,8 +1,7 @@
 import * as actionTypes from './actionTypes';
 
 
-// Autentication
-
+// Authentication
 export function authenticating(authentication) {
   return {
     type: actionTypes.UPDATE_AUTHENTICATED,
@@ -41,16 +40,28 @@ export function updateAnnouncements(announcements) {
   };
 }
 
-export function removeNotification(notification) {
+export function removeNotification() {
   return {
     type: actionTypes.REMOVE_NOTIFICATION,
-    notification,
   };
 }
 
-export function removeAnnouncements(announcement) {
+export function removeAnnouncements() {
   return {
     type: actionTypes.REMOVE_ANNOUNCEMENT,
-    announcement,
+  };
+}
+
+// Profile
+export function updateVolunteerProfile(profile) {
+  return {
+    type: actionTypes.UPDATE_VOLUNTEER_PROFILE,
+    profile,
+  };
+}
+
+export function removeVolunteerProfile() {
+  return {
+    type: actionTypes.REMOVE_VOLUNTEER_PROFILE,
   };
 }

@@ -80,7 +80,9 @@ class Email {
    */
   send(from, to, subject, text, html = undefined) {
     return new Promise((resolve, reject) => {
-      const message = this.buildMessage({ from, to, subject, text, html });
+      const message = this.buildMessage({
+        from, to, subject, text, html,
+      });
       this.transporter.sendMail(message, (error, info) => {
         if (error) {
           reject(error);

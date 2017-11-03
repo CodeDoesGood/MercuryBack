@@ -1,11 +1,11 @@
 const authentication = require('../middleware/authentication');
 const database = require('../middleware/database');
 
-const Router = require('express').Router;
+const { Router } = require('express');
 
 const router = Router();
 
-router.post('/authenticate/standard', [
+router.post('/volunteer/authenticate', [
   authentication.validateAuthenticationDetails.bind(this),
   database.validateUsernameDoesExist.bind(this),
   authentication.authenticateLoggingInUser.bind(this),

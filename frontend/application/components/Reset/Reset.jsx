@@ -2,6 +2,8 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import _ from 'lodash';
 
+const style = require('./reset.less');
+
 export default class Reset extends React.Component {
   constructor(props) {
     super(props);
@@ -24,11 +26,11 @@ export default class Reset extends React.Component {
   resetPassword(e) {
     e.preventDefault();
 
-    const code = this.state.code;
-    const username = this.state.username;
+    const { code, username } = this.state;
+    const { volunteer } = this.props;
+
     const password = this.formPassword.value;
     const verifyPassword = this.formVerifyPassword.value;
-    const volunteer = this.props.volunteer;
 
     this.loginForm.reset();
 
@@ -38,8 +40,33 @@ export default class Reset extends React.Component {
     }
 
     volunteer.resetPassword(username, code, password)
-    .then(result => this.setState({ message: result.message, error: false }))
-    .catch(error => this.setState({ message: error.description, error: true }));
+      .then(result => this.setState({ message: result.message, error: false }))
+      .catch((error) => {
+        this.setState({ message: error.description, error: true });
+      });
+  }
+
+  alertBox() {
+    if (this.state.error && this.state.message !== '') {
+      return (
+        <div className={style.alertBox}>
+          <span role="button" tabIndex={0} onClick={this.emptyStatusMessage} onKeyPress={this.emptyStatusMessage} className={style.boxClose}>&times;</span>
+          <strong className={style.message}>Warning! </strong>
+          {this.state.message}
+        </div>
+      );
+    } else if (!this.state.error && this.state.message !== '') {
+      return (
+        <div className={style.successBox}>
+          <span role="button" tabIndex={0} onClick={this.emptyStatusMessage} onKeyPress={this.emptyStatusMessage} className={style.boxClose}>&times;</span>
+          <strong className={style.message}>Success! </strong>
+          {this.state.message}
+        </div>
+      );
+    }
+    return (
+      <div />
+    );
   }
 
   render() {
@@ -53,6 +80,7 @@ export default class Reset extends React.Component {
           <input ref={(formVerifyPassword) => { this.formVerifyPassword = formVerifyPassword; }} type="password" required="required" /><br />
           <button type="submit" onClick={this.resetPassword}><span>Request Reset</span></button>
         </form>
+        {this.alertBox()}
       </div>
     );
   }
