@@ -8,23 +8,21 @@ export default class Notifications extends React.Component {
   constructor(props) {
     super(props);
 
-    const volunteer = this.props.volunteer;
+    const { volunteer } = this.props;
 
     volunteer.getNotifications()
       .then(notifications => this.props.updateNotifications(notifications))
       .catch(() => this.props.updateNotifications([]));
-
-    this.state = {
-      message: '',
-      error: false,
-    };
   }
 
   render() {
     if (!_.isNil(this.props.notifications) && !_.isNil(this.props.notifications[0])) {
-      return (<div>{(_.map(this.props.notifications,
-          (notification, index) => (<Notification key={index} notification={notification} />))
-      )}</div>);
+      return (
+        <div>{(_.map(
+        this.props.notifications,
+          (notification, index) => (<Notification key={index} notification={notification} />),
+        ))}
+        </div>);
     }
     return (<div>No Notifications</div>);
   }

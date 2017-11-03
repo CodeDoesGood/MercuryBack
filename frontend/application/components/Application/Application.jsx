@@ -8,9 +8,11 @@ import * as routePaths from './routePaths';
 import Header from '../Layout/Header';
 
 import Login from '../Login/Login';
+import SignOut from '../Login/SignOut';
 import Reset from '../Reset/Reset';
 import Verify from '../Verify/Verify';
 import Home from '../Home/Home';
+import Profile from '../Profile/Profile';
 
 export default class Application extends React.Component {
   constructor(props) {
@@ -20,13 +22,12 @@ export default class Application extends React.Component {
   }
 
   render() {
-    const authenticating = this.props.authenticating;
-    const client = this.props.client;
+    const { authenticating, client } = this.props;
 
     return (
       <Router>
         <div>
-          <Header logo={'/components/img/logo.png'} />
+          <Header logo="/components/img/logo.png" />
           <Route
             exact
             path="/"
@@ -41,7 +42,16 @@ export default class Application extends React.Component {
           />
           <Route
             path={this.routePaths.login}
-            render={() => <Login client={client} authenticating={authenticating} />}
+            render={history => (<Login
+              history={history.history}
+              client={client}
+              authenticating={authenticating}
+              updateVolunteerProfile={this.props.updateVolunteerProfile}
+            />)}
+          />
+          <Route
+            path={this.routePaths.signOut}
+            render={history => <SignOut history={history.history} />}
           />
           <Route
             path={this.routePaths.reset}
@@ -50,6 +60,17 @@ export default class Application extends React.Component {
           <Route
             path={this.routePaths.verify}
             render={props => <Verify volunteer={client.volunteer} {...props} />}
+          />
+          <Route
+            path={this.routePaths.myProfile}
+            render={history => (<Profile
+              volunteer={client.volunteer}
+              authentication={this.props.authentication}
+              updateVolunteerProfile={this.props.updateVolunteerProfile}
+              removeVolunteerProfile={this.props.removeVolunteerProfile}
+              profile={this.props.profile}
+              history={history.history}
+            />)}
           />
         </div>
       </Router>
@@ -61,8 +82,11 @@ Application.propTypes = {
   authenticating: PropTypes.func.isRequired,
   authentication: PropTypes.shape().isRequired,
   updateNotifications: PropTypes.func.isRequired,
+  updateVolunteerProfile: PropTypes.func.isRequired,
+  removeVolunteerProfile: PropTypes.func.isRequired,
   updateAnnouncements: PropTypes.func.isRequired,
   client: PropTypes.shape().isRequired,
+  profile: PropTypes.shape().isRequired,
   notifications: PropTypes.arrayOf(PropTypes.shape()).isRequired,
   announcements: PropTypes.arrayOf(PropTypes.shape()).isRequired,
 };

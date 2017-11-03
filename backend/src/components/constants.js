@@ -10,6 +10,7 @@ const constants = {
 const errors = {
   INVALID_USERNAME_CREDENTIALS_LENGTH: `Username cannot be greater than ${constants.USERNAME_MAX_LENGTH} or less than ${constants.USERNAME_MIN_LENGTH} characters long`,
   INVALID_PASSWORD_CREDENTIALS_LENGTH: `Password cannot be longer than ${constants.PASSWORD_MAX_LENGTH} characters long`,
+  INVALID_USERNAME_CREDENTIALS_SPACES: 'Username cannot contain spaces',
 
   USERNAME_REQUIRED: 'The username is required.',
   PASSWORD_REQUIRED: 'The password is required.',
@@ -29,6 +30,8 @@ const errors = {
 
   DATABASE_UNAVAILABLE: 'The database service is currently unavailable',
   EMAIL_UNAVAILABLE: 'The email service is currently unavailable, your email will be sent later',
+
+  EMAIL_RESET_SENT: 'An email will be sent to that account\'s address shortly',
 
   USERNAME_ALREADY_EXISTS: username => `The username ${username} already exists`,
   EMAIL_ALREADY_EXISTS: email => `The email ${email} already exists`,
@@ -73,6 +76,7 @@ const errors = {
   VOLUNTEER_EMAIL_MATCH: 'The email passed does not match the volunteer email',
   VOLUNTEER_EXISTS: 'Volunteer does not exist',
 
+  VOLUNTEER_VERIFICATION_REQUIRED: username => `Volunteer ${username} must be verified to continue`,
   VOLUNTEER_RESET_CODE_FAIL: 'Unable to generate password reset code',
   VOLUNTEER_UPDATE_PASSWORD_REQUIRE: 'Both oldPassword and password need to be provided',
   VOLUNTEER_FAILED_UPDATE_PASSWORD: (username, error) => `Failed to update password for ${username}, error=${error}`,
@@ -89,6 +93,8 @@ const errors = {
   VOLUNTEER_GET_NOTIFICATION_FAIL: (username, error) => `Failed to gather notifications for user ${username}, error=${error}`,
   VOLUNTEER_DISMISS_NOTIFICATION_FAIL: (notificationId, error) => `Unable to dismiss notification ${notificationId}, error=${error}`,
   NOTIFICATION_ID_REQUIRED: 'export const You must pass a notification id to dismiss',
+
+  UNKNOWN_ERROR: 'Something went wrong',
 };
 
 const constantsAndErrors = Object.assign(constants, errors);

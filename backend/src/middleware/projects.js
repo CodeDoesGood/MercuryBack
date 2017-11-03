@@ -36,7 +36,7 @@ function getAllActiveProjects(req, res) {
  * If the status is valid then next would be called to move onto the next middleware.
  */
 function validateProjectStatus(req, res, next) {
-  const status = req.params.status;
+  const { status } = req.params;
 
   if (_.isNil(status) || !_.isString(status)) {
     res.status(500).send({ error: 'Status Validation', description: constants.INVALID_STATUS_FORMAT });
@@ -50,7 +50,7 @@ function validateProjectStatus(req, res, next) {
  * Validates that the category is a valid format
  */
 function validateProjectCategory(req, res, next) {
-  const category = req.params.category;
+  const { category } = req.params;
 
   if (_.isNil(category) || !_.isString(category)) {
     res.status(500).send({ error: 'Category validation', description: constants.INVALID_CATEGORY_FORMAT });
@@ -66,7 +66,7 @@ function validateProjectCategory(req, res, next) {
  * status.
  */
 function getAllProjectsByStatus(req, res) {
-  const status = req.status;
+  const { status } = req;
 
   projectsWrapper.getAllProjectsByStatus(status)
     .then(projects => res.status(200).send({ message: 'All projects by status', content: { projects } }))
@@ -79,7 +79,7 @@ function getAllProjectsByStatus(req, res) {
  * category.
  */
 function getAllProjectsByCategory(req, res) {
-  const category = req.category;
+  const { category } = req;
 
   projectsWrapper.getAllProjectsByCategory(category)
     .then(projects => res.status(200).send({ message: 'All projects by category', content: { projects } }))

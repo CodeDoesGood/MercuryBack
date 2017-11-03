@@ -35,6 +35,8 @@ function validateVolunteerCreationDetails(req, res, next) {
   if (!res.headersSent) {
     if (volunteer.username < 4) {
       return res.status(400).send({ error: 'Invalid Credentials', description: constants.INVALID_USERNAME_CREDENTIALS_LENGTH });
+    } else if (volunteer.username.includes(' ')) {
+      return res.status(400).send({ error: 'Invalid Credentials', description: constants.INVALID_USERNAME_CREDENTIALS_SPACES });
     } else if (volunteer.username > 16) {
       return res.status(400).send({ error: 'Invalid Credentials', description: constants.INVALID_USERNAME_CREDENTIALS_LENGTH });
     } else if (volunteer.password < 6) {
@@ -51,8 +53,7 @@ function validateVolunteerCreationDetails(req, res, next) {
  * Validates that the user exists and that the email and username was passed.
  */
 function validateRequestResetDetails(req, res, next) {
-  const username = req.body.username;
-  const email = req.body.email;
+  const { username, email } = req.body;
 
   if (_.isNil(username)) {
     res.status(400).send({ error: 'Username validation', description: constants.USERNAME_REQUIRED });
@@ -82,7 +83,7 @@ function validateRequestResetDetails(req, res, next) {
  * will allow them to to send a reset request with the code and there new password.
  */
 function createPasswordResetCode(req, res, next) {
-  const volunteer = req.volunteer;
+  const { volunteer } = req;
 
   volunteer.createPasswordResetCode()
     .then((code) => {
@@ -97,8 +98,7 @@ function createPasswordResetCode(req, res, next) {
  * requirements otherwise sends 400.
  */
 function validatePasswordDetails(req, res, next) {
-  const password = req.body.password;
-  const oldPassword = req.body.oldPassword;
+  const { password, oldPassword } = req.body;
 
   if (_.isNil(password) || _.isNil(oldPassword)) {
     res.status(400).send({ error: 'Param not provided', description: constants.VOLUNTEER_UPDATE_PASSWORD_REQUIRE });
@@ -115,7 +115,7 @@ function validatePasswordDetails(req, res, next) {
  * Checks if the password (req.password) meets the required needs.
  */
 function validatePasswordDetail(req, res, next) {
-  const password = req.password;
+  const { password } = req;
 
   if (_.isNil(password)) {
     res.status(400).send({ error: 'Param not provided', description: constants.PASSWORD_REQUIRED });
@@ -131,8 +131,7 @@ function validatePasswordDetail(req, res, next) {
  */
 function validatePasswordResetDetails(req, res, next) {
   const resetCode = req.body.reset_code;
-  const username = req.body.username;
-  const password = req.body.password;
+  const { username, password } = req.body;
 
   if (_.isNil(resetCode)) {
     res.status(400).send({ error: 'Param not provided', description: constants.RESET_CODE_REQUIRED });
@@ -155,9 +154,7 @@ function validatePasswordResetDetails(req, res, next) {
  * the code used into trying to verify the account was not the correct code).
  */
 function validateVerifyCodeAuthenticity(req, res, next) {
-  const code = req.code;
-
-  const volunteer = req.volunteer;
+  const { code, volunteer } = req;
 
   volunteer.getVerificationCode()
     .then((details) => {
@@ -180,8 +177,7 @@ function validateVerifyCodeAuthenticity(req, res, next) {
  */
 function validatePasswordResetCodeAuthenticity(req, res, next) {
   const code = req.resetCode;
-
-  const volunteer = req.volunteer;
+  const { volunteer } = req;
 
   volunteer.getPasswordResetCode()
     .then((details) => {
@@ -219,10 +215,8 @@ function validateNotificationId(req, res, next) {
  * users id and then tells the client that there password has been updated.
  */
 function updateUsersPassword(req, res) {
-  const volunteer = req.volunteer;
-
-  const username = volunteer.username;
-  const password = req.password;
+  const { volunteer, password } = req;
+  const { username } = volunteer;
 
   volunteer.updatePassword(password)
     .then(() => res.status(200).send({ message: `Volunteer ${username} password now updated` }))
@@ -236,9 +230,7 @@ function updateUsersPassword(req, res) {
  * set time period.
  */
 function verifyVolunteerAccount(req, res) {
-  const username = req.username;
-
-  const volunteer = req.volunteer;
+  const { username, volunteer } = req;
 
   volunteer.removeVerificationCode()
     .then(() => volunteer.verify())
@@ -254,7 +246,7 @@ function verifyVolunteerAccount(req, res) {
  * otherwise sends a bad request.
  */
 function validateVerifyCodeExists(req, res, next) {
-  const code = req.params.code;
+  const { code } = req.body;
   const userId = req.id;
 
   if (_.isNil(code) || _.isNil(userId)) {
@@ -277,7 +269,7 @@ function validateVerifyCodeExists(req, res, next) {
  * Checks that the given code matches the code (if any) in the password_reset_code table
  */
 function validateResetCodeExists(req, res, next) {
-  const username = req.username;
+  const { username } = req;
 
   const volunteer = new Volunteer(null, username);
 
@@ -305,8 +297,9 @@ function createNewVolunteer(req, res, next) {
       req.verificationCode = code;
       next();
     })
-    .catch(error => res.status(500).send({ error,
-      description: constants.VOLUNTEER_CREATE_FAIL(volunteer.username, error) }));
+    .catch(error => res.status(500).send({
+      error, description: constants.VOLUNTEER_CREATE_FAIL(volunteer.username, error),
+    }));
 }
 
 /**
@@ -315,7 +308,7 @@ function createNewVolunteer(req, res, next) {
 function gatherActiveNotifications(req, res) {
   const decodedToken = req.decoded;
 
-  const username = decodedToken.username;
+  const { username } = decodedToken;
   const volunteerId = decodedToken.id;
 
   const volunteer = new Volunteer(volunteerId, username);
@@ -329,8 +322,8 @@ function gatherActiveNotifications(req, res) {
 function markNotificationAsRead(req, res) {
   const decodedToken = req.decoded;
 
-  const notificationId = req.notificationId;
-  const username = decodedToken.username;
+  const { notificationId } = req;
+  const { username } = decodedToken;
   const volunteerId = decodedToken.id;
 
   const volunteer = new Volunteer(volunteerId, username);
@@ -339,6 +332,19 @@ function markNotificationAsRead(req, res) {
     .then(() => volunteer.dismissNotification(notificationId))
     .then(() => res.sendStatus(200))
     .catch(error => res.status(500).send({ error: 'Notification dismissing', description: constants.VOLUNTEER_DISMISS_NOTIFICATION_FAIL(notificationId, error) }));
+}
+
+function gatherVolunteerProfile(req, res) {
+  const decodedToken = req.decoded;
+
+  const { username } = decodedToken;
+  const volunteerId = decodedToken.id;
+
+  const volunteer = new Volunteer(volunteerId, username);
+
+  volunteer.exists()
+    .then(() => res.status(200).send({ message: 'Volunteer Profile', content: { volunteer: volunteer.getProfile() } }))
+    .catch(() => res.status(500).send({ error: 'User existing', description: constants.UNKNOWN_ERROR }));
 }
 
 module.exports = {
@@ -357,5 +363,6 @@ module.exports = {
   validatePasswordResetCodeAuthenticity,
   validateNotificationId,
   gatherActiveNotifications,
+  gatherVolunteerProfile,
   markNotificationAsRead,
 };

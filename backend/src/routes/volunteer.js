@@ -3,7 +3,7 @@ const database = require('../middleware/database');
 const email = require('../middleware/email');
 const volunteer = require('../middleware/volunteer');
 
-const Router = require('express').Router;
+const { Router } = require('express');
 
 const router = Router();
 
@@ -29,6 +29,14 @@ router.post('/volunteer/notification/dismiss', [
 ]);
 
 /**
+ * Gets the volunteers profile
+ */
+router.get('/volunteer/profile', [
+  authentication.checkAuthenticationToken.bind(this),
+  volunteer.gatherVolunteerProfile.bind(this),
+]);
+
+/**
  * These routes are for getting and updating single projects by id
  */
 
@@ -46,7 +54,7 @@ router.post('/volunteer/create', [
  * Verify is after a volunteer registers with a account, a email would be sent to the
  * volunteer to verify there account
  */
-router.post('/volunteer/verify/:username/:code', [
+router.post('/volunteer/verify', [
   database.validateConnectionStatus.bind(this),
   database.validateUsernameDoesExist.bind(this),
   volunteer.validateVerifyCodeExists.bind(this),

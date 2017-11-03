@@ -26,7 +26,7 @@ function validateConnectionStatus(req, res, next) {
  * calls next.
  */
 function validateUsernameDoesNotExist(req, res, next) {
-  const username = req.volunteer.username;
+  const { username } = req.volunteer;
 
   databaseWrapper.doesUsernameExist(username)
     .then(() => res.status(403).send({ error: 'Username exists', description: constants.USERNAME_ALREADY_EXISTS(username) }))
@@ -38,7 +38,7 @@ function validateUsernameDoesNotExist(req, res, next) {
  * calls next.
  */
 function validateEmailDoesNotExist(req, res, next) {
-  const email = req.volunteer.email;
+  const { email } = req.volunteer;
 
   databaseWrapper.doesEmailExist(email)
     .then(() => res.status(403).send({ error: 'Email exists', description: constants.EMAIL_ALREADY_EXISTS(email) }))
@@ -50,26 +50,30 @@ function validateEmailDoesNotExist(req, res, next) {
  * throws a bad request otherwise.
  */
 function validateUsernameDoesExist(req, res, next) {
+  const { username: username1 } = req.params;
+  const { username: username2 } = req.body;
+  const { username: username3 } = req;
+
   let username;
 
-  if (!_.isNil(req.params.username)) {
-    username = req.params.username;
-  } else if (!_.isNil(req.body.username)) {
-    username = req.body.username;
-  } else if (!_.isNil(req.username)) {
-    username = req.username;
+  if (!_.isNil(username1)) {
+    username = username1;
+  } else if (!_.isNil(username2)) {
+    username = username2;
+  } else if (!_.isNil(username3)) {
+    username = username3;
   } else {
     res.status(400).send({ error: 'Username validation', description: constants.USERNAME_REQUIRED });
   }
 
   if (!res.headersSent) {
     databaseWrapper.doesUsernameExist(username)
-    .then((id) => {
-      req.id = id;
-      req.username = username;
-      next();
-    })
-    .catch(() => res.status(400).send({ error: 'Username does not exists', description: constants.USERNAME_DOES_NOT_EXIST(username) }));
+      .then((id) => {
+        req.id = id;
+        req.username = username;
+        next();
+      })
+      .catch(() => res.status(400).send({ error: 'Username does not exists', description: constants.USERNAME_DOES_NOT_EXIST(username) }));
   }
 }
 
@@ -78,22 +82,26 @@ function validateUsernameDoesExist(req, res, next) {
  * throws a bad request.
  */
 function validateEmailDoesExist(req, res, next) {
+  const { email: email1 } = req.params;
+  const { email: email2 } = req.body;
+  const { email: email3 } = req;
+
   let email;
 
-  if (!_.isNil(req.params.email)) {
-    email = req.params.email;
-  } else if (!_.isNil(req.body.email)) {
-    email = req.body.email;
-  } else if (!_.isNil(req.email)) {
-    email = req.email;
+  if (!_.isNil(email1)) {
+    email = email1;
+  } else if (!_.isNil(email2)) {
+    email = email2;
+  } else if (!_.isNil(email3)) {
+    email = email3;
   } else {
     res.status(400).send({ error: 'Email validation', description: constants.EMAIL_REQUIRED });
   }
 
   if (!res.headersSent) {
     databaseWrapper.doesEmailExist(email)
-    .then(() => next())
-    .catch(() => res.status(400).send({ error: 'Email Does not exists', description: constants.EMAIL_DOES_NOT_EXIST(email) }));
+      .then(() => next())
+      .catch(() => res.status(400).send({ error: 'Email Does not exists', description: constants.EMAIL_DOES_NOT_EXIST(email) }));
   }
 }
 

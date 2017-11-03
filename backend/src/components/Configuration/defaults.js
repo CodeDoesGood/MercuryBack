@@ -1,4 +1,8 @@
 const defaultConfig = {
+
+  online_address: 'http://138.197.154.150:8080',
+  online: false,
+
   // Email details
   email: {
     service: 'gmail',

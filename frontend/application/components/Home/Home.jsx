@@ -2,6 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 import Notifications from './Notifications/Notifications';
+import Navigation from '../Navigation/Navigation';
 import Announcements from './Announcements/Announcements';
 
 const style = require('./home.less');
@@ -10,13 +11,9 @@ export default class Home extends React.Component {
   constructor(props) {
     super(props);
 
+    this.displayWelcomeMessage = this.displayWelcomeMessage.bind(this);
     this.displayNotifications = this.displayNotifications.bind(this);
     this.displayAnnouncements = this.displayAnnouncements.bind(this);
-
-    this.state = {
-      message: '',
-      error: false,
-    };
   }
 
   /**
@@ -51,16 +48,29 @@ export default class Home extends React.Component {
         </div>
       );
     }
-
     return null;
+  }
+
+  displayWelcomeMessage() {
+    const currentHour = new Date().getHours();
+    const username = (this.props.authentication.result) ? this.props.authentication.username : 'Volunteer';
+
+    if (currentHour < 12) {
+      return (<div className={style.welcomeMessage}>Good Morning, {username}</div>);
+    } else if (currentHour < 18) {
+      return (<div className={style.welcomeMessage}>Good Afternoon, {username}</div>);
+    }
+    return (<div className={style.welcomeMessage}>Good Evening, {username}</div>);
   }
 
   render() {
     return (
       <div>
         <div className={style.homeTitle}>Volunteer Home</div>
+        {this.displayWelcomeMessage()}
         {this.displayAnnouncements()}
         {this.displayNotifications()}
+        <Navigation authentication={this.props.authentication} />
       </div>
     );
   }

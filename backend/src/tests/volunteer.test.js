@@ -22,7 +22,6 @@ describe('Volunteer Component', () => {
       assert.equal(_.isUndefined(volunteer.linkedInId), false, 'Volunteer class must contain: "linkedInId"');
       assert.equal(_.isUndefined(volunteer.slackId), false, 'Volunteer class must contain: "slackId"');
       assert.equal(_.isUndefined(volunteer.githubId), false, 'Volunteer class must contain: "githubId"');
-      assert.equal(_.isUndefined(volunteer.isHatchling), false, 'Volunteer class must contain: "isHatchling"');
       assert.equal(_.isUndefined(volunteer.developerLevel), false, 'Volunteer class must contain: "developerLevel"');
       assert.equal(_.isUndefined(volunteer.adminPortalAccess), false, 'Volunteer class must contain: "adminPortalAccess"');
       assert.equal(_.isUndefined(volunteer.adminOverallLevel), false, 'Volunteer class must contain: "adminOverallLevel"');

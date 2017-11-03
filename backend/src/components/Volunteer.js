@@ -27,7 +27,6 @@ class Volunteer extends Database {
     this.linkedInId = null;
     this.slackId = null;
     this.githubId = null;
-    this.isHatchling = null;
     this.developerLevel = null;
     this.adminPortalAccess = null;
     this.adminOverallLevel = null;
@@ -47,7 +46,7 @@ class Volunteer extends Database {
     }
 
     return this.connect()
-      .then(() => this.knex('volunteer').where(type, this[type]).select('volunteer_id', 'username', 'email', 'password', 'salt').first())
+      .then(() => this.knex('volunteer').where(type, this[type]).select('volunteer_id', 'username', 'email', 'password', 'salt', 'verified').first())
       .then((volunteer) => {
         if (_.isNil(volunteer)) {
           return Promise.reject(`Volunteer does not exist by type=${type}`);
@@ -57,6 +56,7 @@ class Volunteer extends Database {
         this.email = volunteer.email;
         this.password = volunteer.password;
         this.salt = volunteer.salt;
+        this.verified = volunteer.verified;
         this.doesExist = true;
         return Promise.resolve(true);
       })
@@ -89,22 +89,23 @@ class Volunteer extends Database {
     const hashedPassword = this.saltAndHash(password);
     const date = new Date();
 
-    const volunteer = Object.assign({
+    const volunteer = {
       name: this.name,
       username: this.username,
       email: this.email,
-      data_entry_user_id: dataEntryUserId },
-      {
-        created_datetime: `${date.getFullYear()}-${date.getMonth()}-${date.getDay()}`,
-        password: hashedPassword.hashedPassword,
-        salt: hashedPassword.salt,
-      });
+      data_entry_user_id: dataEntryUserId,
+      created_datetime: `${date.getFullYear()}-${date.getMonth()}-${date.getDay()}`,
+      password: hashedPassword.hashedPassword,
+      salt: hashedPassword.salt,
+    };
 
     return this.connect()
       .then(() => this.knex('volunteer').insert(volunteer))
       .then((id) => {
-        this.volunteer_id = id[0];
         const code = this.createVerificationCode();
+        const { 0: volunteerId } = id;
+
+        this.volunteer_id = volunteerId;
         this.password = hashedPassword.hashedPassword;
         this.salt = hashedPassword.salt;
 
@@ -128,6 +129,42 @@ class Volunteer extends Database {
         return Promise.resolve();
       })
       .catch(error => Promise.reject(error));
+  }
+
+  /**
+   * Returns true or false based on the verification of the user.
+   * @returns {boolean}
+   */
+  getVerification() {
+    if (_.isNil(this.username)) {
+      return false;
+    } else if (this.verified) {
+      return true;
+    }
+    return false;
+  }
+
+  /**
+   * Returns the current user profile information, returns a empty string if its null / empty
+   */
+  getProfile() {
+    return {
+      volunteer_id: _.defaultTo(this.volunteer_id, ''),
+      username: _.defaultTo(this.username, ''),
+      position: _.defaultTo(this.position, ''),
+      email: _.defaultTo(this.email, ''),
+      volunteer_status: _.defaultTo(this.volunteerStatus, ''),
+      name: _.defaultTo(this.name, ''),
+      about: _.defaultTo(this.about, ''),
+      phone: _.defaultTo(this.phone, ''),
+      location: _.defaultTo(this.location, ''),
+      timezone: _.defaultTo(this.timezone, ''),
+      linked_in_id: _.defaultTo(this.linkedInId, ''),
+      slack_id: _.defaultTo(this.slackId, ''),
+      github_id: _.defaultTo(this.githubId, ''),
+      developer_level: _.defaultTo(this.developerLevel, ''),
+      verified: _.defaultTo(this.verified, ''),
+    };
   }
 
   /**
