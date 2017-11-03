@@ -144,16 +144,19 @@ export default class Login extends React.Component {
 
   forgotBox() {
     return (
-      <div className={style.loginWrapper}>
-        <div className={style.loginForms}>
+      <div className={style.registerWrapper}>
+        <div className={style.forgotForm}>
           {this.alertBox()}
+          <div className={style.loginTitle}>Request Reset</div>
           <form ref={(loginForm) => { this.loginForm = loginForm; }}>
             <input placeholder="username" type="username" ref={(forgotFormUsername) => { this.forgotFormUsername = forgotFormUsername; }} required="required" />
             <input placeholder="email" type="email" ref={(forgotFormEmail) => { this.forgotFormEmail = forgotFormEmail; }} required="required" />
             <button type="submit" onClick={this.requestReset}>Request Reset</button>
-            <p className={style.registerMessage}>Need to login?
-              <span role="button" tabIndex={0} onClick={this.switchForgotState} onKeyPress={this.switchForgotState}> Login</span>
-            </p>
+            <div className={style.loginMessage}>
+              <div>
+                Need to login? <span role="button" tabIndex={0} onClick={this.switchForgotState} onKeyPress={this.switchForgotState}>Login</span>
+              </div>
+            </div>
           </form>
         </div>
       </div>
@@ -162,7 +165,7 @@ export default class Login extends React.Component {
 
   loginBox() {
     return (
-      <div className={style.loginWrapper}>
+      <div className={style.registerWrapper}>
         <div className={style.loginForms}>
           {this.alertBox()}
           <div className={style.loginTitle}>CDG Volunteer Sign In</div>
@@ -192,9 +195,10 @@ export default class Login extends React.Component {
 
   registeringBox() {
     return (
-      <div className={style.loginWrapper}>
-        <div className={style.loginForms}>
+      <div className={style.registerWrapper}>
+        <div className={style.registeringForm}>
           {this.alertBox()}
+          <div className={style.loginTitle}>Registering</div>
           <form ref={(loginForm) => { this.loginForm = loginForm; }}>
             <input placeholder="name" type="name" ref={(registeringFormName) => { this.registeringFormName = registeringFormName; }} required="required" />
             <input placeholder="username" type="username" ref={(registeringFormUsername) => { this.registeringFormUsername = registeringFormUsername; }} required="required" />
@@ -202,9 +206,11 @@ export default class Login extends React.Component {
             <input placeholder="verify password" type="password" ref={(registeringFormVerifyPassword) => { this.registeringFormVerifyPassword = registeringFormVerifyPassword; }} required="required" />
             <input placeholder="email" type="email" ref={(registeringFormEmail) => { this.registeringFormEmail = registeringFormEmail; }} required="required" />
             <button type="submit" onClick={this.register}>Start Volunteering</button>
-            <p className={style.registerMessage}>Need to login?
-              <span role="button" tabIndex={0} onClick={this.switchRegisteringState} onKeyPress={this.switchRegisteringState}> Login</span>
-            </p>
+            <div className={style.loginMessage}>
+              <div>
+                Need to login? <span role="button" tabIndex={0} onClick={this.switchRegisteringState} onKeyPress={this.switchRegisteringState}>Login</span>
+              </div>
+            </div>
             <p className={style.forgotMessage}>
               <span role="button" tabIndex={0} onClick={this.switchForgotState} onKeyPress={this.switchForgotState}>forgot my username / password</span>
             </p>

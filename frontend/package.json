@@ -4,7 +4,7 @@
     "author": "CodeDoesGood",
     "description": "Merucry webapp front",
     "scripts": {
-        "builddev": "webpack-dashboard -- webpack-dev-server --content-base ./public -d --hot --config ./webpack.config.development.js",
+        "builddev": "webpack-dashboard -- webpack-dev-server --content-base ./public -d --hot --history-api-fallback true --config ./webpack.config.development.js",
         "build": "webpack --config ./webpack.config.production.js",
         "lint": "eslint -c ../.eslintrc.js --ext .js,.jsx --ignore-path ../.gitignore . || true"
     },
