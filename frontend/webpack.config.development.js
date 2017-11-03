@@ -1,4 +1,4 @@
-// const webpack = require('webpack');
+const DashboardPlugin = require('webpack-dashboard/plugin');
 const path = require('path');
 
 const BUILD_DIR = path.resolve(__dirname, 'public/components/js');
@@ -24,6 +24,9 @@ const config = {
       },
     ],
   },
+  plugins: [
+    new DashboardPlugin(),
+  ],
   resolve: {
     extensions: ['.js', '.jsx'],
   },
