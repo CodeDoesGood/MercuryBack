@@ -8,7 +8,7 @@ export default function Header() {
     <header className="Header">
       <div className={style.headerBox}>
         <span className={style.headerText}><Link href to="/">&lt; Code Does Good /&gt;</Link></span>
-</div>
-</header>
-);
+      </div>
+    </header>
+  );
 }
