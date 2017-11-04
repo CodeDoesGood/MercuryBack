@@ -4,6 +4,7 @@ const ConfigurationWrapper = require('../components/Configuration/ConfigurationW
 const constants = require('../components/constants');
 const EmailClient = require('../components/Email');
 const logger = require('../components/Logger');
+const Volunteer = require('../components/Volunteer');
 
 const config = new ConfigurationWrapper('mercury', 'mercury.json');
 const emailClient = new EmailClient(config.getKey('email'));
@@ -52,6 +53,28 @@ function sendVerificationEmail(req, res) {
       logger.error(`Error attempting to send a email. to=${to} from=${from}, error=${error}`);
       res.status(503).send({ error: 'Unavailable Service', description: constants.EMAIL_UNAVAILABLE });
     });
+}
+
+/**
+ * Resend the verification code to user,
+ */
+function resendVerificationEmail(req, res) {
+  const volunteerId = req.id;
+  const volunteer = new Volunteer(volunteerId);
+
+  volunteer.exists()
+    .then(() => {
+      if (!volunteer.getVerification()) {
+        return volunteer.createVerificationCode();
+      }
+      return res.status(400).send({ error: 'Verification', description: constants.VOLUNTEER_IS_VERIFIED(volunteer.username) });
+    })
+    .then((code) => {
+      req.volunteer = volunteer;
+      req.verificationCode = code;
+      sendVerificationEmail(req, res);
+    })
+    .catch(error => res.status(500).send({ error: 'Authentication', description: constants.FAILED_VOLUNTEER_GET(error) }));
 }
 
 /**
@@ -163,6 +186,7 @@ module.exports = {
   validateConnectionStatus,
   sendVerificationEmail,
   sendPasswordResetLinkToRequestingEmail,
+  resendVerificationEmail,
   sendContactUsEmailStatus,
   sendContactUsRequestInbox,
   DenyInvalidAndBlockedDomains,

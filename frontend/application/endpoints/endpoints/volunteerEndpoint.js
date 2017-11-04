@@ -32,6 +32,10 @@ const volunteerEndpoint = endpoint({
     const options = utils.buildOptions(this.apiUrl, `${this.path}/verify`, 'post', { username, code });
     return this.apiCall(options);
   },
+  resendVerification(username) {
+    const options = utils.buildOptions(this.apiUrl, `${this.path}/verify/${username}`, 'get', {});
+    return this.apiCall(options);
+  },
   getNotifications() {
     const options = utils.buildOptions(this.apiUrl, `${this.path}/notifications`, 'get', {});
     return this.apiCall(options);

@@ -103,7 +103,7 @@ function authenticateLoggingInUser(req, res) {
     .then(() => {
       if (volunteer.compareAuthenticatingPassword(password)) {
         if (!volunteer.getVerification()) {
-          res.status(403).send({ error: 'Failed verification check', description: constants.VOLUNTEER_VERIFICATION_REQUIRED(volunteer.username) });
+          res.status(403).send({ error: 'Failed verification check', description: constants.VOLUNTEER_VERIFICATION_REQUIRED(volunteer.username), failed_verify: true });
         } else {
           const token = jwt.sign({ username, id: userId }, config.getKey('secret'), { expiresIn: '1h' });
           res.status(200).send({ message: `Volunteer ${username} authenticated`, content: { token, username, id: userId } });
@@ -114,7 +114,7 @@ function authenticateLoggingInUser(req, res) {
     })
     .catch((error) => {
       logger.error(`Failed to get Volunteer login details, error=${JSON.stringify(error)}`);
-      res.status(500).send({ error: 'Authentication', description: constants.FAILED_VOLUNTEER_GET });
+      res.status(500).send({ error: 'Authentication', description: constants.FAILED_VOLUNTEER_GET(error) });
     });
 }
 

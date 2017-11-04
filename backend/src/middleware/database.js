@@ -98,6 +98,8 @@ function validateEmailDoesExist(req, res, next) {
     res.status(400).send({ error: 'Email validation', description: constants.EMAIL_REQUIRED });
   }
 
+  req.email = email;
+
   if (!res.headersSent) {
     databaseWrapper.doesEmailExist(email)
       .then(() => next())

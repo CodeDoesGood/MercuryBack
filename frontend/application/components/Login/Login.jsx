@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import _ from 'lodash';
 
 import style from './login.less';
 
@@ -10,6 +11,7 @@ export default class Login extends React.Component {
     this.login = this.login.bind(this);
     this.register = this.register.bind(this);
     this.requestReset = this.requestReset.bind(this);
+    this.resendVerification = this.resendVerification.bind(this);
 
     this.switchRegisteringState = this.switchRegisteringState.bind(this);
     this.switchForgotState = this.switchForgotState.bind(this);
@@ -20,7 +22,20 @@ export default class Login extends React.Component {
       error: false,
       registering: false,
       forgot: false,
+      username: null,
     };
+  }
+
+  /**
+   * resend the verification email
+   */
+  resendVerification() {
+    const { username } = this.state;
+    const { volunteer } = this.props.client;
+
+    volunteer.resendVerification(username)
+      .then(result => this.setState({ message: result.message, error: false }))
+      .catch(error => this.setState({ message: error.description, error: true }));
   }
 
   /**
@@ -33,6 +48,8 @@ export default class Login extends React.Component {
     const username = this.formUsername.value;
     const password = this.formPassword.value;
     const { volunteer } = this.props.client;
+
+    this.setState({ username });
 
     this.loginForm.reset();
     this.emptyStatusMessage();
@@ -49,7 +66,19 @@ export default class Login extends React.Component {
         this.props.history.push('/');
       })
       .catch((error) => {
-        this.setState({ message: error.description, error: true });
+        if (!_.isNil(error.failed_verify) && error.failed_verify) {
+          this.setState({
+            message: (
+              <span>{error.description}, resend verification code?
+                <span role="button" tabIndex={0} onKeyPress={this.resendVerification} onClick={this.resendVerification}>
+                  Click here
+                </span>
+              </span>),
+            error: true,
+          });
+        } else {
+          this.setState({ message: error.description, error: true });
+        }
       });
   }
 
@@ -62,6 +91,8 @@ export default class Login extends React.Component {
     const verifyPassword = this.registeringFormVerifyPassword.value;
     const email = this.registeringFormEmail.value;
     const { volunteer } = this.props.client;
+
+    this.setState({ username });
 
     this.loginForm.reset();
     this.emptyStatusMessage();
