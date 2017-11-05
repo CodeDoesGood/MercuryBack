@@ -69,10 +69,9 @@ export default class Login extends React.Component {
         if (!_.isNil(error.failed_verify) && error.failed_verify) {
           this.setState({
             message: (
-              <span>{error.description}, resend verification code?
-                <span role="button" tabIndex={0} onKeyPress={this.resendVerification} onClick={this.resendVerification}>
-                  Click here
-                </span>
+              <span>
+                {error.description} Resend verification code?
+                <div role="button" tabIndex={0} onKeyPress={this.resendVerification} onClick={this.resendVerification}>Click here</div>
               </span>),
             error: true,
           });
@@ -202,11 +201,11 @@ export default class Login extends React.Component {
           <div className={style.loginTitle}>CDG Volunteer Sign In</div>
           <form ref={(loginForm) => { this.loginForm = loginForm; }}>
             <div>
-              <span>username</span>
+              <span className={style.loginInputTexts}>username</span>
               <input type="username" ref={(formUsername) => { this.formUsername = formUsername; }} required="required" />
             </div>
             <div>
-              <span>password</span>
+              <span className={style.loginInputTexts}>password</span>
               <input type="password" ref={(formPassword) => { this.formPassword = formPassword; }} required="required" />
             </div>
             <button type="submit" onClick={this.login}>Sign In</button>
