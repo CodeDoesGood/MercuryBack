@@ -4,6 +4,8 @@ import _ from 'lodash';
 
 import Loading from '../Loading/Loading';
 
+import constants from '../utils/constants';
+
 import style from './login.less';
 
 export default class Login extends React.Component {
@@ -28,6 +30,47 @@ export default class Login extends React.Component {
       username: null,
       loading: false,
     };
+  }
+
+  /**
+   * Validates that the registering details match the constants.
+   * @returns {*} Returns a bool if it passes and a string if it fails.
+   */
+  clientValidation(password, email, name, user = null) {
+    const username = _.defaultTo(this.state.username, user);
+    const passLen = password.length;
+    const userLen = username.length;
+    const emailLen = email.length;
+    const nameLen = name.length;
+
+    const re = new RegExp('^[a-zA-Z0-9]+$');
+    const reName = new RegExp('^[a-zA-Z- ]+$');
+    const reEmail = new RegExp('^[a-zA-Z0-9@._-]+$');
+
+    if (constants.PASSWORD_MIN_LENGTH > passLen || passLen > constants.PASSWORD_MAX_LENGTH) {
+      return `Password cannot be less than ${constants.PASSWORD_MIN_LENGTH} or greater than ${constants.PASSWORD_MAX_LENGTH} characters.`;
+    } else if (constants.USERNAME_MIN_LENGTH > userLen || userLen > constants.USERNAME_MAX_LENGTH) {
+      return `Username cannot be less than ${constants.USERNAME_MIN_LENGTH} or greater than ${constants.USERNAME_MAX_LENGTH} characters`;
+    } else if (constants.EMAIL_BODY_MIN_LENGTH > emailLen ||
+      emailLen > constants.EMAIL_MAX_LENGTH) {
+      return `Email cannot be less than ${constants.EMAIL_BODY_MIN_LENGTH} or greater than ${constants.EMAIL_BODY_MAX_LENGTH} characters`;
+    } else if (constants.NAME_MIN_LENGTH > nameLen || nameLen > constants.NAME_MAX_LENGTH) {
+      return `Name cannot be less than ${constants.NAME_MIN_LENGTH} or greater than ${constants.NAME_MAX_LENGTH} characters`;
+    }
+
+    if (email.indexOf('@') === -1) {
+      return 'Email must be a valid email address format';
+    }
+
+    if (!re.test(username)) {
+      return 'Username can only contain alphabetical and numeric characters';
+    } else if (!reEmail.test(email)) {
+      return 'Email can only contain alphabetical and numeric characters and @';
+    } else if (!reName.test(name)) {
+      return 'Name can only contain alphabetical characters and -';
+    }
+
+    return true;
   }
 
   /**
@@ -99,12 +142,15 @@ export default class Login extends React.Component {
     const { volunteer } = this.props.client;
 
     this.setState({ username, loading: true });
+    const clientValidation = this.clientValidation(password, email, name, username);
 
     this.loginForm.reset();
     this.emptyStatusMessage();
     this.switchRegisteringState();
 
-    if (password !== verifyPassword) {
+    if (!_.isBoolean(clientValidation)) {
+      this.setState({ message: clientValidation, error: true, loading: false });
+    } else if (password !== verifyPassword) {
       this.setState({ message: 'passwords don\'t match', error: true, loading: false });
     } else {
       volunteer.create(name, username, password, email)

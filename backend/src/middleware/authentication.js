@@ -23,7 +23,7 @@ function validateAuthenticationDetails(req, res, next) {
     res.status(401).send({ error: 'Invalid Credentials', description: constants.INVALID_USERNAME_CREDENTIALS_LENGTH });
   } else if (username > constants.USERNAME_MAX_LENGTH) {
     res.status(401).send({ error: 'Invalid Credentials', description: constants.INVALID_USERNAME_CREDENTIALS_LENGTH });
-  } else if (password < constants.PASSWORD_MAX_LENGTH) {
+  } else if (password < constants.PASSWORD_MIN_LENGTH) {
     res.status(401).send({ error: 'Invalid Credentials', description: constants.INVALID_PASSWORD_CREDENTIALS_LENGTH });
   } else {
     req.username = username;

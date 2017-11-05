@@ -1,16 +1,30 @@
 const constants = {
   USERNAME_MAX_LENGTH: 16,
   USERNAME_MIN_LENGTH: 4,
-  PASSWORD_MAX_LENGTH: 6,
+  PASSWORD_MIN_LENGTH: 6,
+  PASSWORD_MAX_LENGTH: 24,
   EMAIL_MAX_LENGTH: 50,
   EMAIL_BODY_MAX_LENGTH: 500,
   EMAIL_BODY_MIN_LENGTH: 5,
+  NAME_MIN_LENGTH: 5,
+  NAME_MAX_LENGTH: 50,
 };
 
 const errors = {
   INVALID_USERNAME_CREDENTIALS_LENGTH: `Username cannot be greater than ${constants.USERNAME_MAX_LENGTH} or less than ${constants.USERNAME_MIN_LENGTH} characters long`,
   INVALID_PASSWORD_CREDENTIALS_LENGTH: `Password cannot be longer than ${constants.PASSWORD_MAX_LENGTH} characters long`,
+  INVALID_PASSWORD_CREDENTIALS_LENGTH_MIN: `Password cannot be longer than ${constants.PASSWORD_MIN_LENGTH} characters long`,
   INVALID_USERNAME_CREDENTIALS_SPACES: 'Username cannot contain spaces',
+
+  INVALID_PASSWORD_LENGTH_ALL: `Password cannot be greater than ${constants.PASSWORD_MAX_LENGTH} or less than ${constants.PASSWORD_MIN_LENGTH} characters`,
+  INVALID_USERNAME_LENGTH_ALL: `Username cannot be greater than ${constants.USERNAME_MAX_LENGTH} or less than ${constants.USERNAME_MIN_LENGTH} characters`,
+  INVALID_EMAIL_LENGTH_ALL: `Email cannot be greater than ${constants.EMAIL_MAX_LENGTH} or less than ${constants.EMAIL_BODY_MIN_LENGTH} characters`,
+  INVALID_EMAIL_NO_TYPE: 'Email must be a valid email address format',
+  INVALID_NAME_TYPE: `Name cannot be less than ${constants.NAME_MIN_LENGTH} or greater than ${constants.NAME_MAX_LENGTH} characters`,
+
+  INVALID_USERNAME_SYMBOLS: 'Username can only contain alphabetical and numeric characters',
+  INVALID_EMAIL_SYMBOLS: 'Email can only contain alphabetical and numeric characters and @',
+  INVALID_NAME_SYMBOLS: 'Name can only contain alphabetical and -',
 
   USERNAME_REQUIRED: 'The username is required.',
   PASSWORD_REQUIRED: 'The password is required.',
