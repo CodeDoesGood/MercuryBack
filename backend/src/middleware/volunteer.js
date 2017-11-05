@@ -33,11 +33,13 @@ function validateVolunteerCreationDetails(req, res, next) {
   }
 
   const re = new RegExp('^[a-zA-Z0-9]+$');
+  const reName = new RegExp('^[a-zA-Z- ]+$');
   const reEmail = new RegExp('^[a-zA-Z0-9@._-]+$');
 
   const userLen = volunteer.username.length;
   const passwordLen = volunteer.password.length;
   const emailLen = volunteer.email.length;
+  const nameLen = volunteer.name.length;
 
   if (constants.PASSWORD_MIN_LENGTH > passwordLen || passwordLen > constants.PASSWORD_MAX_LENGTH) {
     return res.status(400).send({ error: 'Invalid Credentials', description: constants.INVALID_PASSWORD_LENGTH_ALL });
@@ -45,6 +47,8 @@ function validateVolunteerCreationDetails(req, res, next) {
     return res.status(400).send({ error: 'Invalid Credentials', description: constants.INVALID_USERNAME_LENGTH_ALL });
   } else if (constants.EMAIL_BODY_MIN_LENGTH > emailLen || emailLen > constants.EMAIL_MAX_LENGTH) {
     return res.status(400).send({ error: 'Invalid Credentials', description: constants.INVALID_EMAIL_LENGTH_ALL });
+  } else if (constants.NAME_MIN_LENGTH > nameLen || nameLen > constants.NAME_MAX_LENGTH) {
+    return res.status(400).send({ error: 'Invalid Credentials', description: constants.INVALID_NAME_TYPE });
   }
 
   if (volunteer.email.indexOf('@') === -1) {
@@ -55,6 +59,8 @@ function validateVolunteerCreationDetails(req, res, next) {
     return res.status(400).send({ error: 'Invalid Credentials', description: constants.INVALID_USERNAME_SYMBOLS });
   } else if (!reEmail.test(volunteer.email)) {
     return res.status(400).send({ error: 'Invalid Credentials', description: constants.INVALID_EMAIL_SYMBOLS });
+  } else if (!reName.test(volunteer.name)) {
+    return res.status(400).send({ error: 'Invalid Credentials', description: constants.INVALID_NAME_SYMBOLS });
   }
 
   volunteer.email = volunteer.email.toLowerCase();

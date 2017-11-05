@@ -6,6 +6,8 @@ const constants = {
   EMAIL_MAX_LENGTH: 50,
   EMAIL_BODY_MAX_LENGTH: 500,
   EMAIL_BODY_MIN_LENGTH: 5,
+  NAME_MIN_LENGTH: 5,
+  NAME_MAX_LENGTH: 50,
 };
 
 export default constants;
