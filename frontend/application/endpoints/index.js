@@ -3,6 +3,7 @@ import utils from './utils';
 
 import contactEndpoint from './endpoints/contactEndpoint';
 import volunteerEndpoint from './endpoints/volunteerEndpoint';
+import projectsEndpoint from './endpoints/projectsEndpoint';
 
 export default function endpointApi(token = null) {
   const setUtil = (key, value) => {
@@ -19,6 +20,7 @@ export default function endpointApi(token = null) {
     apiCall,
     contact: contactEndpoint,
     volunteer: volunteerEndpoint,
+    projects: projectsEndpoint,
     setUtil,
     getUtil,
     utils,

@@ -32,6 +32,21 @@ export function updateNotifications(notifications) {
   };
 }
 
+// Projects / project
+export function updateProjects(projects) {
+  return {
+    type: actionTypes.UPDATE_PROJECTS,
+    projects,
+  };
+}
+
+export function removeProject(projectId) {
+  return {
+    type: actionTypes.REMOVE_PROJECT,
+    projectId,
+  };
+}
+
 // announcements
 export function updateAnnouncements(announcements) {
   return {

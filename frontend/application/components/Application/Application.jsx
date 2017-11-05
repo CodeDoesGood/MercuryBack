@@ -13,6 +13,9 @@ import Reset from '../Reset/Reset';
 import Verify from '../Verify/Verify';
 import Home from '../Home/Home';
 import Profile from '../Profile/Profile';
+import Projects from '../Projects/Projects';
+
+import style from './application.less';
 
 export default class Application extends React.Component {
   constructor(props) {
@@ -26,7 +29,7 @@ export default class Application extends React.Component {
 
     return (
       <Router>
-        <div>
+        <div className={style.applicationScale}>
           <Header logo="/components/img/logo.png" />
           <Route
             exact
@@ -62,6 +65,16 @@ export default class Application extends React.Component {
             render={props => <Verify volunteer={client.volunteer} {...props} />}
           />
           <Route
+            path={this.routePaths.projects}
+            render={() => (<Projects
+              projectsClient={client.projects}
+              authentication={this.props.authentication}
+              updateProjects={this.props.updateProjects}
+              removeProject={this.props.removeProject}
+              projects={this.props.projects}
+            />)}
+          />
+          <Route
             path={this.routePaths.myProfile}
             render={history => (<Profile
               volunteer={client.volunteer}
@@ -81,12 +94,15 @@ export default class Application extends React.Component {
 Application.propTypes = {
   authenticating: PropTypes.func.isRequired,
   authentication: PropTypes.shape().isRequired,
+  updateProjects: PropTypes.func.isRequired,
+  removeProject: PropTypes.func.isRequired,
   updateNotifications: PropTypes.func.isRequired,
   updateVolunteerProfile: PropTypes.func.isRequired,
   removeVolunteerProfile: PropTypes.func.isRequired,
   updateAnnouncements: PropTypes.func.isRequired,
   client: PropTypes.shape().isRequired,
   profile: PropTypes.shape().isRequired,
+  projects: PropTypes.arrayOf(PropTypes.shape()).isRequired,
   notifications: PropTypes.arrayOf(PropTypes.shape()).isRequired,
   announcements: PropTypes.arrayOf(PropTypes.shape()).isRequired,
 };
