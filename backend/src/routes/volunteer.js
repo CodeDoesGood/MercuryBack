@@ -63,6 +63,14 @@ router.post('/volunteer/verify', [
 ]);
 
 /**
+ * Resend the verification email if the volunteer is not already verified.
+ */
+router.get('/volunteer/verify/:username', [
+  database.validateUsernameDoesExist.bind(this),
+  email.resendVerificationEmail.bind(this),
+]);
+
+/**
  * Request a password reset email to the users account
  */
 router.post('/volunteer/password/request_reset', [

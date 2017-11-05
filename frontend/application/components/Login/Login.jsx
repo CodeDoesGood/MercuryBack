@@ -1,5 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import _ from 'lodash';
+
+import Loading from '../Loading/Loading';
 
 import style from './login.less';
 
@@ -10,17 +13,35 @@ export default class Login extends React.Component {
     this.login = this.login.bind(this);
     this.register = this.register.bind(this);
     this.requestReset = this.requestReset.bind(this);
+    this.resendVerification = this.resendVerification.bind(this);
 
     this.switchRegisteringState = this.switchRegisteringState.bind(this);
     this.switchForgotState = this.switchForgotState.bind(this);
     this.emptyStatusMessage = this.emptyStatusMessage.bind(this);
+    this.loadingBox = this.loadingBox.bind(this);
 
     this.state = {
       message: '',
       error: false,
       registering: false,
       forgot: false,
+      username: null,
+      loading: false,
     };
+  }
+
+  /**
+   * resend the verification email
+   */
+  resendVerification() {
+    const { username } = this.state;
+    const { volunteer } = this.props.client;
+
+    this.setState({ loading: true });
+
+    volunteer.resendVerification(username)
+      .then(result => this.setState({ message: result.message, error: false, loading: false }))
+      .catch(error => this.setState({ message: error.description, error: true, loading: false }));
   }
 
   /**
@@ -34,6 +55,8 @@ export default class Login extends React.Component {
     const password = this.formPassword.value;
     const { volunteer } = this.props.client;
 
+    this.setState({ username, loading: true });
+
     this.loginForm.reset();
     this.emptyStatusMessage();
 
@@ -41,7 +64,7 @@ export default class Login extends React.Component {
       .then((result) => {
         this.props.client.setUtil('TOKEN', result.content.token);
         this.props.authenticating(result.content);
-        this.setState({ message: result.message, error: false });
+        this.setState({ message: result.message, error: false, loading: false });
         return volunteer.getProfile();
       })
       .then((profile) => {
@@ -49,7 +72,19 @@ export default class Login extends React.Component {
         this.props.history.push('/');
       })
       .catch((error) => {
-        this.setState({ message: error.description, error: true });
+        if (!_.isNil(error.failed_verify) && error.failed_verify) {
+          this.setState({
+            message: (
+              <span>
+                {error.description} Resend verification code?
+                <div role="button" tabIndex={0} onKeyPress={this.resendVerification} onClick={this.resendVerification}>Click here</div>
+              </span>),
+            error: true,
+            loading: false,
+          });
+        } else {
+          this.setState({ message: error.description, error: true, loading: false });
+        }
       });
   }
 
@@ -63,16 +98,18 @@ export default class Login extends React.Component {
     const email = this.registeringFormEmail.value;
     const { volunteer } = this.props.client;
 
+    this.setState({ username, loading: true });
+
     this.loginForm.reset();
     this.emptyStatusMessage();
     this.switchRegisteringState();
 
     if (password !== verifyPassword) {
-      this.setState({ message: 'passwords don\'t match', error: true });
+      this.setState({ message: 'passwords don\'t match', error: true, loading: false });
     } else {
       volunteer.create(name, username, password, email)
-        .then(result => this.setState({ message: result.message, error: false }))
-        .catch(error => this.setState({ message: error.description, error: true }));
+        .then(result => this.setState({ message: result.message, error: false, loading: false }))
+        .catch(error => this.setState({ message: error.description, error: true, loading: false }));
     }
   }
 
@@ -86,13 +123,15 @@ export default class Login extends React.Component {
     const email = this.forgotFormEmail.value;
     const { volunteer } = this.props.client;
 
+    this.setState({ loading: true });
+
     this.loginForm.reset();
     this.emptyStatusMessage();
     this.switchForgotState();
 
     volunteer.resetRequest(username, email)
-      .then(result => this.setState({ message: result.message, error: false }))
-      .catch(error => this.setState({ message: error.description, error: true }));
+      .then(result => this.setState({ message: result.message, error: false, loading: false }))
+      .catch(error => this.setState({ message: error.description, error: true, loading: false }));
   }
 
   emptyStatusMessage() {
@@ -171,11 +210,11 @@ export default class Login extends React.Component {
           <div className={style.loginTitle}>CDG Volunteer Sign In</div>
           <form ref={(loginForm) => { this.loginForm = loginForm; }}>
             <div>
-              <span>username</span>
+              <span className={style.loginInputTexts}>username</span>
               <input type="username" ref={(formUsername) => { this.formUsername = formUsername; }} required="required" />
             </div>
             <div>
-              <span>password</span>
+              <span className={style.loginInputTexts}>password</span>
               <input type="password" ref={(formPassword) => { this.formPassword = formPassword; }} required="required" />
             </div>
             <button type="submit" onClick={this.login}>Sign In</button>
@@ -220,8 +259,23 @@ export default class Login extends React.Component {
     );
   }
 
+  loadingBox() {
+    if (this.state.loading) {
+      return (
+        <div className={style.registerWrapper}>
+          <div className={style.registeringForm}>
+            <Loading />
+          </div>
+        </div>
+      );
+    }
+    return (<div />);
+  }
+
   render() {
-    if (this.state.forgot) {
+    if (this.state.loading) {
+      return this.loadingBox();
+    } else if (this.state.forgot) {
       return this.forgotBox();
     } else if (this.state.registering) {
       return this.registeringBox();

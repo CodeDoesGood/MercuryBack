@@ -185,7 +185,7 @@ class Volunteer extends Database {
 
 
     return this.connect()
-      .then(() => this.removePasswordResetCode())
+      .then(() => this.removeVerificationCode())
       .then(() => this.knex('verification_code').insert({
         verification_code_id: this.volunteer_id,
         code: hashedNumber.hashedPassword,

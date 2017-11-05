@@ -76,7 +76,7 @@ const errors = {
   VOLUNTEER_EMAIL_MATCH: 'The email passed does not match the volunteer email',
   VOLUNTEER_EXISTS: 'Volunteer does not exist',
 
-  VOLUNTEER_VERIFICATION_REQUIRED: username => `Volunteer ${username} must be verified to continue`,
+  VOLUNTEER_VERIFICATION_REQUIRED: username => `Volunteer ${username} must be verified to continue.`,
   VOLUNTEER_RESET_CODE_FAIL: 'Unable to generate password reset code',
   VOLUNTEER_UPDATE_PASSWORD_REQUIRE: 'Both oldPassword and password need to be provided',
   VOLUNTEER_FAILED_UPDATE_PASSWORD: (username, error) => `Failed to update password for ${username}, error=${error}`,
@@ -93,6 +93,9 @@ const errors = {
   VOLUNTEER_GET_NOTIFICATION_FAIL: (username, error) => `Failed to gather notifications for user ${username}, error=${error}`,
   VOLUNTEER_DISMISS_NOTIFICATION_FAIL: (notificationId, error) => `Unable to dismiss notification ${notificationId}, error=${error}`,
   NOTIFICATION_ID_REQUIRED: 'export const You must pass a notification id to dismiss',
+
+  VOLUNTEER_IS_VERIFIED: username => `Volunteer ${username} is already verified`,
+  FAILED_VOLUNTEER_GET: error => `Failed to get volunteer, error=${error}`,
 
   UNKNOWN_ERROR: 'Something went wrong',
 };
