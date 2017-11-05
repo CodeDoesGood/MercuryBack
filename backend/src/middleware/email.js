@@ -83,7 +83,7 @@ function resendVerificationEmail(req, res) {
  * to reset the users password.
  */
 function sendPasswordResetLinkToRequestingEmail(req, res) {
-  const { volunteer } = req.volunteer;
+  const { volunteer } = req;
   const { username, email } = volunteer;
 
   const code = req.resetPasswordCode;
