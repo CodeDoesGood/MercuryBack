@@ -28,25 +28,38 @@ function validateVolunteerCreationDetails(req, res, next) {
     return 1;
   });
 
-  /**
-   * This will require better username and password requirements later on,
-   * including blocking symbols etc
-   */
-  if (!res.headersSent) {
-    if (volunteer.username < 4) {
-      return res.status(400).send({ error: 'Invalid Credentials', description: constants.INVALID_USERNAME_CREDENTIALS_LENGTH });
-    } else if (volunteer.username.includes(' ')) {
-      return res.status(400).send({ error: 'Invalid Credentials', description: constants.INVALID_USERNAME_CREDENTIALS_SPACES });
-    } else if (volunteer.username > 16) {
-      return res.status(400).send({ error: 'Invalid Credentials', description: constants.INVALID_USERNAME_CREDENTIALS_LENGTH });
-    } else if (volunteer.password < 6) {
-      return res.status(400).send({ error: 'Invalid Credentials', description: constants.INVALID_PASSWORD_CREDENTIALS_LENGTH });
-    }
-    volunteer.email = volunteer.email.toLowerCase();
-    req.volunteer = volunteer;
-    return next();
+  if (res.headersSent) {
+    return 1;
   }
-  return 1;
+
+  const re = new RegExp('^[a-zA-Z0-9]+$');
+  const reEmail = new RegExp('^[a-zA-Z0-9@._-]+$');
+
+  const userLen = volunteer.username.length;
+  const passwordLen = volunteer.password.length;
+  const emailLen = volunteer.email.length;
+
+  if (constants.PASSWORD_MIN_LENGTH > passwordLen || passwordLen > constants.PASSWORD_MAX_LENGTH) {
+    return res.status(400).send({ error: 'Invalid Credentials', description: constants.INVALID_PASSWORD_LENGTH_ALL });
+  } else if (constants.USERNAME_MIN_LENGTH > userLen || userLen > constants.USERNAME_MAX_LENGTH) {
+    return res.status(400).send({ error: 'Invalid Credentials', description: constants.INVALID_USERNAME_LENGTH_ALL });
+  } else if (constants.EMAIL_BODY_MIN_LENGTH > emailLen || emailLen > constants.EMAIL_MAX_LENGTH) {
+    return res.status(400).send({ error: 'Invalid Credentials', description: constants.INVALID_EMAIL_LENGTH_ALL });
+  }
+
+  if (volunteer.email.indexOf('@') === -1) {
+    return res.status(400).send({ error: 'Invalid Credentials', description: constants.INVALID_EMAIL_NO_TYPE });
+  }
+
+  if (!re.test(volunteer.username)) {
+    return res.status(400).send({ error: 'Invalid Credentials', description: constants.INVALID_USERNAME_SYMBOLS });
+  } else if (!reEmail.test(volunteer.email)) {
+    return res.status(400).send({ error: 'Invalid Credentials', description: constants.INVALID_EMAIL_SYMBOLS });
+  }
+
+  volunteer.email = volunteer.email.toLowerCase();
+  req.volunteer = volunteer;
+  return next();
 }
 
 /**
@@ -102,8 +115,9 @@ function validatePasswordDetails(req, res, next) {
 
   if (_.isNil(password) || _.isNil(oldPassword)) {
     res.status(400).send({ error: 'Param not provided', description: constants.VOLUNTEER_UPDATE_PASSWORD_REQUIRE });
-  } else if (password.length < 6 || oldPassword.length < 6) {
-    res.status(400).send({ error: 'Invalid Credentials', description: constants.PASSWORD_MAX_LENGTH });
+  } else if (constants.PASSWORD_MAX_LENGTH < password.length < constants.PASSWORD_MIN_LENGTH ||
+    constants.PASSWORD_MAX_LENGTH < oldPassword.length < constants.PASSWORD_MIN_LENGTH) {
+    res.status(400).send({ error: 'Invalid Credentials', description: constants.PASSWORD_MIN_LENGTH });
   } else {
     req.password = password;
     req.oldPassword = oldPassword;
@@ -120,7 +134,7 @@ function validatePasswordDetail(req, res, next) {
   if (_.isNil(password)) {
     res.status(400).send({ error: 'Param not provided', description: constants.PASSWORD_REQUIRED });
   } else if (password.length < 6) {
-    res.status(400).send({ error: 'Invalid Credentials', description: constants.PASSWORD_MAX_LENGTH });
+    res.status(400).send({ error: 'Invalid Credentials', description: constants.PASSWORD_MIN_LENGTH });
   } else {
     next();
   }
