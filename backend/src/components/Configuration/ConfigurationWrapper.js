@@ -1,9 +1,22 @@
+const _ = require('lodash');
 const fs = require('fs');
 
 const defaultConfiguration = require('./defaults');
 
 class ConfigurationWrapper {
   constructor(folder, name) {
+    if (_.isNil(folder)) {
+      throw new Error('Folder cannot be null or undefined');
+    } else if (!_.isString(folder)) {
+      throw new Error('Folder must be a string');
+    }
+
+    if (_.isNil(name)) {
+      throw new Error('name cannot be null or undefined');
+    } else if (!_.isString(name)) {
+      throw new Error('name must be of type string');
+    }
+
     // the folder
     this.folder = folder;
 

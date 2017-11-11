@@ -58,10 +58,23 @@ class Email {
 
   /**
    * Returns a build object ready to be passed into the transporter for sending a email.
-   * @param {object} message The object containing the message details,
+   * @param {object} content The object containing the message details,
    * from, to, subject, text, html.
    */
-  buildMessage(message) {
+  buildMessage(content) {
+    if (!_.isObject(content)) {
+      throw new Error('Build message must be of type string');
+    }
+
+    const buildRequirements = ['to', 'subject', 'text', 'html'];
+    const message = _.pick(content, buildRequirements);
+
+    _.forEach(buildRequirements, (item) => {
+      if (!message[item] || !_.isString(message[item])) {
+        throw new Error(`${item} must be provided and of type string`);
+      }
+    });
+
     return {
       from: this.username,
       to: message.to,
@@ -76,9 +89,17 @@ class Email {
    * @param {string} to The person who is getting sent the email.
    * @param {string} subject The subject text for the email.
    * @param {string} text  The content text for the email.
-   * @param {string} html The html to be used instead of the text (defaults to the text)
+   * @param {undefined} html The html to be used instead of the text (defaults to the text)
    */
   send(from, to, subject, text, html = undefined) {
+    const content = [{ name: 'from', type: from }, { name: 'subject',  type: subject }, { name: 'text',  type: text }, { name: 'to',  type: to }];
+
+    _.forEach(content, (item) => {
+      if (_.isNil(item.type) || !_.isString(item.type)) {
+        throw new Error(`${item.name} has to be specified and of type string`);
+      }
+    });
+
     return new Promise((resolve, reject) => {
       const message = this.buildMessage({
         from, to, subject, text, html,
