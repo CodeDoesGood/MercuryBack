@@ -14,6 +14,10 @@ const config = new ConfigurationWrapper('mercury', 'mercury.json');
  */
 class Project extends Database {
   constructor(projectId = null) {
+    if (!_.isNil(projectId) && !_.isInteger(projectId)) {
+      throw new Error('When provided projectId must be a integer');
+    }
+
     super(config.getKey('database'));
     this.doesExist = false;
 
@@ -64,6 +68,9 @@ class Project extends Database {
     } else if (!this.doesExist) {
       return Promise.reject(`Project ${this.project_id} does not exist or has not been checked for existence yet`);
     }
+
+    // TODO: This must validate that the content of the project being updated
+    // TODO: all the correct format and not null when required
 
     return this.connect()
       .then(() => this.knex('project').where('project_id', this.project_id).update({
