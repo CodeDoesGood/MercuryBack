@@ -11,6 +11,13 @@ const config = new ConfigurationWrapper('mercury', 'mercury.json');
  */
 class Volunteer extends Database {
   constructor(VolunteerId = null, username = null) {
+    if (!_.isNil(VolunteerId) && !_.isInteger(VolunteerId)) {
+      throw new Error('When provided VolunteerId must be a integer');
+    }
+    if (!_.isNil(username) && !_.isString(username)) {
+      throw new Error('When provided username must be a integer');
+    }
+
     super(config.getKey('database'));
     this.doesExist = false;
 
