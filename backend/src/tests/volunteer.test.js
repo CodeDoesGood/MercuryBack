@@ -90,7 +90,7 @@ describe('Volunteer Component', () => {
         .then(() => {
           throw new Error('Exist shouldn\'t resolve when the volunteer doesn\'t exist');
         }, (error) => {
-          assert.equal(error, 'Volunteer does not exist by type=volunteer_id', error);
+          assert.equal(error.message, 'Volunteer does not exist by type=volunteer_id', error);
         });
     });
 
@@ -101,7 +101,7 @@ describe('Volunteer Component', () => {
         .then(() => {
           throw new Error('Shouldn\'t resolve if the project_id is not set');
         }, (error) => {
-          assert.equal(error, 'Type must be defined or valid, type=null', error);
+          assert.equal(error.message, 'Type must be defined or valid, type=null', error);
         });
     });
 
@@ -210,7 +210,7 @@ describe('Volunteer Component', () => {
         .then(() => {
           throw new Error('Shoudln\'t resolve with a invalid volunteer_id');
         }, (error) => {
-          assert.equal(error, `volunteerId "${volunteer.volunteer_id}" passed is not a valid number`, error);
+          assert.equal(error.message, `volunteerId "${volunteer.volunteer_id}" passed is not a valid number`, error);
         });
     });
 
@@ -238,7 +238,7 @@ describe('Volunteer Component', () => {
         .then(() => {
           throw new Error('Shouldn\'t resolve when the volunteer_id is invalid');
         }, (error) => {
-          assert.equal(error, `volunteerId "${volunteer.volunteer_id}" passed is not a valid number`, error);
+          assert.equal(error.message, `volunteerId "${volunteer.volunteer_id}" passed is not a valid number`, error);
         });
     });
 
@@ -364,7 +364,7 @@ describe('Volunteer Component', () => {
         .then(() => {
           throw new Error('Shoudln\'t resolve with a invalid volunteer_id');
         }, (error) => {
-          assert.equal(error, `volunteerId "${volunteer.volunteer_id}" passed is not a valid number`, error);
+          assert.equal(error.message, `volunteerId "${volunteer.volunteer_id}" passed is not a valid number`, error);
         });
     });
 
@@ -392,7 +392,7 @@ describe('Volunteer Component', () => {
         .then(() => {
           throw new Error('Shouldn\'t resolve when the volunteer_id is invalid');
         }, (error) => {
-          assert.equal(error, `volunteerId "${volunteer.volunteer_id}" passed is not a valid number`, error);
+          assert.equal(error.message, `volunteerId "${volunteer.volunteer_id}" passed is not a valid number`, error);
         });
     });
 
@@ -438,7 +438,7 @@ describe('Volunteer Component', () => {
         .then(() => {
           throw new Error('Shouldn\'t resolve when no password reset code exists');
         }, (error) => {
-          assert.equal(error, `No password reset code exists for user ${volunteer.volunteer_id}`, error);
+          assert.equal(error.message, `No password reset code exists for user ${volunteer.volunteer_id}`, error);
         });
     });
 
@@ -460,7 +460,7 @@ describe('Volunteer Component', () => {
         .then(() => {
           throw new Error('Shouldn\'t resolve when a the project_id is invalid');
         }, (error) => {
-          assert.equal(error, `volunteerId "${volunteer.volunteer_id}" passed is not a valid number`, error);
+          assert.equal(error.message, `volunteerId "${volunteer.volunteer_id}" passed is not a valid number`, error);
         });
     });
 
@@ -499,7 +499,7 @@ describe('Volunteer Component', () => {
         .then(() => {
           throw new Error('shouldn\'t resolve when the project_id is invalid');
         }, (error) => {
-          assert.equal(error, `volunteerId "${volunteer.volunteer_id}" passed is not a valid number`, error);
+          assert.equal(error.message, `volunteerId "${volunteer.volunteer_id}" passed is not a valid number`, error);
         });
     });
 
@@ -549,7 +549,7 @@ describe('Volunteer Component', () => {
         .then(() => {
           throw new Error('volunteer creation shouldn\'t create the name is not defined.');
         }, (error) => {
-          assert.equal(error, `name, username, email and password are required, name=${volunteer.name}, username=${volunteer.username}, email=${volunteer.email}`, error);
+          assert.equal(error.message, `name, username, email and password are required, name=${volunteer.name}, username=${volunteer.username}, email=${volunteer.email}`, error);
         });
     });
 
@@ -562,7 +562,7 @@ describe('Volunteer Component', () => {
         .then(() => {
           throw new Error('volunteer creation shouldn\'t create the name is not defined.');
         }, (error) => {
-          assert.equal(error, `name, username, email and password are required, name=${volunteer.name}, username=${volunteer.username}, email=${volunteer.email}`, error);
+          assert.equal(error.message, `name, username, email and password are required, name=${volunteer.name}, username=${volunteer.username}, email=${volunteer.email}`, error);
         });
     });
 
@@ -576,7 +576,7 @@ describe('Volunteer Component', () => {
         .then(() => {
           throw new Error('volunteer creation shouldn\'t create the name is not defined.');
         }, (error) => {
-          assert.equal(error, `name, username, email and password are required, name=${volunteer.name}, username=${volunteer.username}, email=${volunteer.email}`, error);
+          assert.equal(error.message, `name, username, email and password are required, name=${volunteer.name}, username=${volunteer.username}, email=${volunteer.email}`, error);
         });
     });
 
@@ -590,7 +590,7 @@ describe('Volunteer Component', () => {
         .then(() => {
           throw new Error('Creation shouldn\'t resolve when no password is given');
         }, (error) => {
-          assert.equal(error, `You must provide a password to create the volunteer=${volunteer.username}`, error);
+          assert.equal(error.message, `You must provide a password to create the volunteer=${volunteer.username}`, error);
         });
     });
 
@@ -623,7 +623,7 @@ describe('Volunteer Component', () => {
         .then(() => {
           throw new Error('Shouldn\'t resolve when no password reset code exists');
         }, (error) => {
-          assert.equal(error, `No verification code exists for user ${volunteer.volunteer_id}`, error);
+          assert.equal(error.message, `No verification code exists for user ${volunteer.volunteer_id}`, error);
         });
     });
 
@@ -647,7 +647,7 @@ describe('Volunteer Component', () => {
         .then(() => {
           throw new Error('Shouldn\'t resolve when a the project_id is invalid');
         }, (error) => {
-          assert.equal(error, `volunteerId "${volunteer.volunteer_id}" passed is not a valid number`, error);
+          assert.equal(error.message, `volunteerId "${volunteer.volunteer_id}" passed is not a valid number`, error);
         });
     });
 
@@ -692,7 +692,7 @@ describe('Volunteer Component', () => {
     });
 
     it('Should return a empty array if no notifications exist', () => {
-      const volunteer = new Volunter(null, 'user2');
+      const volunteer = new Volunter(null, 'user1');
 
       return volunteer.exists('username')
         .then(() => volunteer.getActiveNotifications())
@@ -743,7 +743,7 @@ describe('Volunteer Component', () => {
         .then(() => {
           throw new Error('Dismiss should reject if the volunteer id does not exist');
         }, (error) => {
-          assert.equal(error, `volunteerId "${volunteer.volunteer_id}" passed is not a valid number`, error);
+          assert.equal(error.message, `volunteerId "${volunteer.volunteer_id}" passed is not a valid number`, error);
         });
     });
 
@@ -778,7 +778,7 @@ describe('Volunteer Component', () => {
         .then(() => {
           throw new Error('Dismiss should reject if the announcement id is not passed');
         }, (error) => {
-          assert.equal(error, 'Announcement Id must be passed and also a valid number, announcement id=undefined', error);
+          assert.equal(error.message, 'Announcement Id must be passed and also a valid number, announcement id=undefined', error);
         });
     });
 

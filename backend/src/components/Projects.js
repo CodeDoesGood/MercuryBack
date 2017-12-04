@@ -39,7 +39,7 @@ class Projects extends Database {
    */
   getAllProjectsByStatus(status) {
     if (!_.isString(status) && !_.isNumber(status)) {
-      return Promise.reject(`volunteerId "${status}" passed is not a valid string or number`);
+      return Promise.reject(new Error(`volunteerId "${status}" passed is not a valid string or number`));
     }
 
     return this.connect()
@@ -54,7 +54,7 @@ class Projects extends Database {
    */
   getAllProjectsByCategory(category) {
     if (!_.isString(category) && !_.isNumber(category)) {
-      return Promise.reject(`volunteerId "${category}" passed is not a valid string or number`);
+      return Promise.reject(new Error(`volunteerId "${category}" passed is not a valid string or number`));
     }
 
     return this.connect()

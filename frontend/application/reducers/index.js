@@ -7,6 +7,7 @@ import notifications from './notifications';
 import contact from './contact';
 import client from './client';
 import profile from './profile';
+import projects from './projects';
 
 // setup the master reducer
 const rootReducer = combineReducers({
@@ -16,6 +17,7 @@ const rootReducer = combineReducers({
   client,
   notifications,
   profile,
+  projects,
   routing: routerReducer,
 });
 
