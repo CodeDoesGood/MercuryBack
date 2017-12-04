@@ -32,13 +32,13 @@ export default class Projects extends React.Component {
         <div className={style.welcomeProjects}>Projects</div>
         <table>
           <thead>
-          <tr>
-            <th>Title</th>
-            <th>Status</th>
-            <th>Category</th>
-            <th>Platforms</th>
-            <th>Latest Activity</th>
-          </tr>
+            <tr>
+              <th>Title</th>
+              <th>Status</th>
+              <th>Category</th>
+              <th>Platforms</th>
+              <th>Latest Activity</th>
+            </tr>
           </thead>
           <tbody>
             {this.projectTables()}
@@ -51,8 +51,6 @@ export default class Projects extends React.Component {
 
 Projects.propTypes = {
   updateProjects: PropTypes.func.isRequired,
-  removeProject: PropTypes.func.isRequired,
   projects: PropTypes.arrayOf(PropTypes.shape()).isRequired,
-  authentication: PropTypes.shape().isRequired,
   projectsClient: PropTypes.shape().isRequired,
 };
