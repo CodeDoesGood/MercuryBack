@@ -50,7 +50,7 @@ describe('Projects Component', () => {
       return projects.getAllActiveProjects()
         .then((gotProjects) => {
           _.forEach(gotProjects, (project) => {
-            assert.equal(project.status === 1, true, 'Status should be marked as active for all active projects');
+            assert.equal(project.status === '1', true, 'Status should be marked as active for all active projects');
           });
         }, (error) => { throw new Error(error); });
     });
@@ -104,7 +104,7 @@ describe('Projects Component', () => {
       return projects.getAllProjectsByStatus(1)
         .then((gotProjects) => {
           _.forEach(gotProjects, (project) => {
-            assert.equal(project.status === 1, true, 'status should be marked as the passed status id "1" for all projects gathered');
+            assert.equal(project.status === '1', true, 'status should be marked as the passed status id "1" for all projects gathered');
           });
         }, (error) => { throw new Error(error); });
     });

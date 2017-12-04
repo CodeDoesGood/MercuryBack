@@ -54,7 +54,7 @@ class Database {
    */
   doesUsernameExist(username) {
     if (!_.isString(username)) {
-      return Promise.reject(`volunteerId "${username}" passed is not a valid string`);
+      return Promise.reject(new Error(`volunteerId "${username}" passed is not a valid string`));
     }
 
     return this.connect()
@@ -69,13 +69,13 @@ class Database {
    */
   doesEmailExist(email) {
     if (!_.isString(email)) {
-      return Promise.reject(`email "${email}" passed is not a valid string`);
+      return Promise.reject(new Error(`email "${email}" passed is not a valid string`));
     }
 
     return this.connect()
       .then(() => this.knex('volunteer').select('volunteer_id').where('email', email).first())
       .then(result => Promise.resolve(result.volunteer_id))
-      .catch(() => Promise.reject(0));
+      .catch(() => Promise.reject());
   }
 
   /**

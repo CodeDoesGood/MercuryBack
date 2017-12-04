@@ -33,14 +33,14 @@ class Project extends Database {
    */
   exists() {
     if (_.isNil(this.project_id) || !_.isNumber(parseInt(this.project_id, 10))) {
-      return Promise.reject(`id '${this.project_id}' passed is not a valid number`);
+      return Promise.reject(new Error(`id '${this.project_id}' passed is not a valid number`));
     }
 
     return this.connect()
       .then(() => this.knex('project').where('project_id', this.project_id).first())
       .then((project) => {
         if (_.isNil(project)) {
-          return Promise.reject(`Project ${this.project_id} does not exist`);
+          return Promise.reject(new Error(`Project ${this.project_id} does not exist`));
         }
         this.createdDateTime = project['created_datetime'];
         this.title = project.title;
@@ -60,9 +60,9 @@ class Project extends Database {
    */
   updateContent() {
     if (_.isNil(this.project_id) || !_.isNumber(this.project_id)) {
-      return Promise.reject(`Id "${this.project_id}" passed is not a valid number`);
+      return Promise.reject(new Error(`Id "${this.project_id}" passed is not a valid number`));
     } else if (!this.doesExist) {
-      return Promise.reject(`Project ${this.project_id} does not exist or has not been checked for existence yet`);
+      return Promise.reject(new Error(`Project ${this.project_id} does not exist or has not been checked for existence yet`));
     }
 
     return this.connect()

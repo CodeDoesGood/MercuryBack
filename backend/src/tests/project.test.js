@@ -16,7 +16,7 @@ describe('Project Component', () => {
         .then(() => {
           throw new Error('Resolved when the project did not exist');
         }, (error) => {
-          assert.equal(error, `Project ${project.project_id} does not exist`, error);
+          assert.equal(error.message, `Project ${project.project_id} does not exist`, error);
         });
     });
 
@@ -41,7 +41,7 @@ describe('Project Component', () => {
         .then(() => {
           throw new Error('Resolved when the project did not exist');
         }, (error) => {
-          assert.equal(error, `id '${project.project_id}' passed is not a valid number`, error);
+          assert.equal(error.message, `id '${project.project_id}' passed is not a valid number`, error);
         });
     });
   });
@@ -54,7 +54,7 @@ describe('Project Component', () => {
         .then(() => {
           throw new Error('Content should not update if project id was not passed, or project does not exist');
         }, (error) => {
-          assert.equal(error, `Id "${project.project_id}" passed is not a valid number`, error);
+          assert.equal(error.message, `Id "${project.project_id}" passed is not a valid number`, error);
         });
     });
 
@@ -65,7 +65,7 @@ describe('Project Component', () => {
         .then(() => {
           throw new Error('Content should not update if project id was not passed, or project does not exist');
         }, (error) => {
-          assert.equal(error, `Project ${project.project_id} does not exist or has not been checked for existence yet`, error);
+          assert.equal(error.message, `Project ${project.project_id} does not exist or has not been checked for existence yet`, error);
         });
     });
 
@@ -77,7 +77,7 @@ describe('Project Component', () => {
         .then(() => {
           throw new Error('Content should not update if project id was not passed, or project does not exist');
         }, (error) => {
-          assert.equal(error, `Project ${project.project_id} does not exist`, error);
+          assert.equal(error.message, `Project ${project.project_id} does not exist`, error);
         });
     });
 
@@ -89,7 +89,7 @@ describe('Project Component', () => {
         .then(() => {
           throw new Error(`Updated content when doesExist is false, doesExist=${project.doesExist}`);
         }, (error) => {
-          assert.equal(error === `Project ${project.project_id} does not exist or has not been checked for existence yet`, true, error);
+          assert.equal(error.message === `Project ${project.project_id} does not exist or has not been checked for existence yet`, true, error);
         });
     });
 
@@ -101,7 +101,7 @@ describe('Project Component', () => {
         .then(() => {
           throw new Error(`Updated content when project id is not a valid number, project_id=${project.project_id}`);
         }, (error) => {
-          assert.equal(error === `Id "${project.project_id}" passed is not a valid number`, true, error);
+          assert.equal(error.message === `Id "${project.project_id}" passed is not a valid number`, true, error);
         });
     });
   });

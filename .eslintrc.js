@@ -12,7 +12,6 @@ module.exports = {
   rules: {
     'linebreak-style': 0,
     'sort-requires/sort-requires': 2,
-    'prefer-promise-reject-errors': 0
   },
   globals: {
     'describe': 0,

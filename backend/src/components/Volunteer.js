@@ -42,14 +42,14 @@ class Volunteer extends Database {
    */
   exists(type = 'volunteer_id') {
     if (_.isNil(this[type])) {
-      return Promise.reject(`Type must be defined or valid, type=${this[type]}`);
+      return Promise.reject(new Error(`Type must be defined or valid, type=${this[type]}`));
     }
 
     return this.connect()
       .then(() => this.knex('volunteer').where(type, this[type]).select('volunteer_id', 'username', 'email', 'password', 'salt', 'verified').first())
       .then((volunteer) => {
         if (_.isNil(volunteer)) {
-          return Promise.reject(`Volunteer does not exist by type=${type}`);
+          return Promise.reject(new Error(`Volunteer does not exist by type=${type}`));
         }
         this.volunteer_id = volunteer.volunteer_id;
         this.username = volunteer.username;
@@ -81,9 +81,9 @@ class Volunteer extends Database {
    */
   create(password, dataEntryUserId = 1) {
     if (_.isNil(this.name) || _.isNil(this.username) || _.isNil(this.email)) {
-      return Promise.reject(`name, username, email and password are required, name=${this.name}, username=${this.username}, email=${this.email}`);
+      return Promise.reject(new Error(`name, username, email and password are required, name=${this.name}, username=${this.username}, email=${this.email}`));
     } else if (_.isNil(password)) {
-      return Promise.reject(`You must provide a password to create the volunteer=${this.username}`);
+      return Promise.reject(new Error(`You must provide a password to create the volunteer=${this.username}`));
     }
 
     const hashedPassword = this.saltAndHash(password);
@@ -119,7 +119,7 @@ class Volunteer extends Database {
    */
   verify() {
     if (!_.isNumber(this.volunteer_id)) {
-      return Promise.reject(`volunteerId "${this.volunteer_id}" passed is not a valid number`);
+      return Promise.reject(new Error(`volunteerId "${this.volunteer_id}" passed is not a valid number`));
     }
 
     return this.connect()
@@ -228,7 +228,7 @@ class Volunteer extends Database {
    */
   removeVerificationCode() {
     if (!_.isNumber(this.volunteer_id)) {
-      return Promise.reject(`volunteerId "${this.volunteer_id}" passed is not a valid number`);
+      return Promise.reject(new Error(`volunteerId "${this.volunteer_id}" passed is not a valid number`));
     }
 
     return this.connect()
@@ -242,7 +242,7 @@ class Volunteer extends Database {
    */
   removePasswordResetCode() {
     if (!_.isNumber(this.volunteer_id)) {
-      return Promise.reject(`volunteerId "${this.volunteer_id}" passed is not a valid number`);
+      return Promise.reject(new Error(`volunteerId "${this.volunteer_id}" passed is not a valid number`));
     }
 
     return this.connect()
@@ -256,7 +256,7 @@ class Volunteer extends Database {
    */
   getVerificationCode() {
     if (!_.isNumber(this.volunteer_id)) {
-      return Promise.reject(`volunteerId "${this.volunteer_id}" passed is not a valid number`);
+      return Promise.reject(new Error(`volunteerId "${this.volunteer_id}" passed is not a valid number`));
     }
 
     return this.connect()
@@ -270,7 +270,7 @@ class Volunteer extends Database {
    */
   getPasswordResetCode() {
     if (!_.isNumber(this.volunteer_id)) {
-      return Promise.reject(`volunteerId "${this.volunteer_id}" passed is not a valid number`);
+      return Promise.reject(new Error(`volunteerId "${this.volunteer_id}" passed is not a valid number`));
     }
 
     return this.connect()
@@ -285,14 +285,14 @@ class Volunteer extends Database {
    */
   doesVerificationCodeExist() {
     if (!_.isNumber(this.volunteer_id)) {
-      return Promise.reject(`volunteerId "${this.volunteer_id}" passed is not a valid number`);
+      return Promise.reject(new Error(`volunteerId "${this.volunteer_id}" passed is not a valid number`));
     }
 
     return this.connect()
       .then(() => this.knex('verification_code').select('verification_code_id').where('verification_code_id', this.volunteer_id).first())
       .then((result) => {
         if (_.isNil(result) || _.isNil(result.verification_code_id)) {
-          return Promise.reject(`No verification code exists for user ${this.volunteer_id}`);
+          return Promise.reject(new Error(`No verification code exists for user ${this.volunteer_id}`));
         }
         return Promise.resolve(result.verification_code_id);
       })
@@ -304,14 +304,14 @@ class Volunteer extends Database {
    */
   doesPasswordResetCodeExist() {
     if (!_.isNumber(this.volunteer_id)) {
-      return Promise.reject(`volunteerId "${this.volunteer_id}" passed is not a valid number`);
+      return Promise.reject(new Error(`volunteerId "${this.volunteer_id}" passed is not a valid number`));
     }
 
     return this.connect()
       .then(() => this.knex('password_reset_code').select('password_reset_code_id').where('password_reset_code_id', this.volunteer_id).first())
       .then((result) => {
         if (_.isNil(result) || _.isNil(result.password_reset_code_id)) {
-          return Promise.reject(`No password reset code exists for user ${this.volunteer_id}`);
+          return Promise.reject(new Error(`No password reset code exists for user ${this.volunteer_id}`));
         }
         return Promise.resolve(result.password_reset_code_id);
       })
@@ -325,7 +325,7 @@ class Volunteer extends Database {
    */
   updatePassword(password) {
     if (!_.isNumber(this.volunteer_id) || !_.isString(password)) {
-      return Promise.reject('password or id passed was not a valid number or string');
+      return Promise.reject(new Error('password or id passed was not a valid number or string'));
     }
 
     const salted = this.saltAndHash(password);
@@ -366,9 +366,9 @@ class Volunteer extends Database {
    */
   dismissNotification(announcementId) {
     if (_.isNil(announcementId) || !_.isNumber(announcementId)) {
-      return Promise.reject(`Announcement Id must be passed and also a valid number, announcement id=${announcementId}`);
+      return Promise.reject(new Error(`Announcement Id must be passed and also a valid number, announcement id=${announcementId}`));
     } else if (!_.isNumber(this.volunteer_id)) {
-      return Promise.reject(`volunteerId "${this.volunteer_id}" passed is not a valid number`);
+      return Promise.reject(new Error(`volunteerId "${this.volunteer_id}" passed is not a valid number`));
     }
 
     return this.connect()
