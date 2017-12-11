@@ -24,13 +24,18 @@ function validateConnectionStatus(req, res, next) {
 /**
  * Checks with the database to see if the username already exists and throws a bad request otherwise
  * calls next.
+ * @param {string} req.volunteer.username The username of the volunteer
  */
 function validateUsernameDoesNotExist(req, res, next) {
   const { username } = req.volunteer;
 
-  databaseWrapper.doesUsernameExist(username)
-    .then(() => res.status(403).send({ error: 'Username exists', description: constants.USERNAME_ALREADY_EXISTS(username) }))
-    .catch(() => next());
+  if (_.isNil(username)) {
+    res.status(403).send({ error: 'Username required', description: constants.USERNAME_REQUIRED });
+  } else {
+    databaseWrapper.doesUsernameExist(username)
+      .then(() => res.status(403).send({ error: 'Username exists', description: constants.USERNAME_ALREADY_EXISTS(username) }))
+      .catch(() => next());
+  }
 }
 
 /**

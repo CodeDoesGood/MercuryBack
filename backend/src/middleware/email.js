@@ -30,28 +30,24 @@ function sendVerificationEmail(req, res) {
   const code = req.verificationCode;
   let verificationLink;
 
-
-  if (config.getKey('online')) {
+  if (_.isNil(code)) {
+    return res.status(503).send({ error: 'Unavailable Service', description: constants.VERIFICATION_CODE_REQUIRED });
+  } else if (config.getKey('online')) {
     verificationLink = `${config.getKey('online_address')}/verify/${volunteer.username}/${code}`;
   } else {
     verificationLink = `http://localhost:8080/verify/${volunteer.username}/${code}`;
   }
-
-  // This is currently here because we have no email service
-  logger.debug('link for user', volunteer.username, verificationLink);
 
   const to = req.volunteer.email;
   const from = config.getKey(['email']).email;
   const subject = '[CodeDoesGood] Verification Email';
   const text = verificationLink;
 
-  emailClient.send(from, to, subject, text, text)
-    .then(() => {
-      res.status(200).send({ message: `Account ${volunteer.username} created, you will soon get a verification email` });
-    })
+  return emailClient.send(from, to, subject, text, text)
+    .then(() => res.status(200).send({ message: `Account ${volunteer.username} created, you will soon get a verification email` }))
     .catch((error) => {
       logger.error(`Error attempting to send a email. to=${to} from=${from}, error=${error}`);
-      res.status(503).send({ error: 'Unavailable Service', description: constants.EMAIL_UNAVAILABLE });
+      return res.status(503).send({ error: 'Unavailable Service', description: constants.EMAIL_UNAVAILABLE });
     });
 }
 
@@ -62,19 +58,23 @@ function resendVerificationEmail(req, res) {
   const volunteerId = req.id;
   const volunteer = new Volunteer(volunteerId);
 
-  volunteer.exists()
-    .then(() => {
-      if (!volunteer.getVerification()) {
-        return volunteer.createVerificationCode();
-      }
-      return res.status(400).send({ error: 'Verification', description: constants.VOLUNTEER_IS_VERIFIED(volunteer.username) });
-    })
-    .then((code) => {
-      req.volunteer = volunteer;
-      req.verificationCode = code;
-      sendVerificationEmail(req, res);
-    })
-    .catch(error => res.status(500).send({ error: 'Authentication', description: constants.FAILED_VOLUNTEER_GET(error) }));
+  if (_.isNil(volunteerId)) {
+    res.status(403).send({ error: 'Volunteer Id', description: constants.VOLUNTEER_ID_REQUIRED });
+  } else {
+    volunteer.exists()
+      .then(() => {
+        if (!volunteer.getVerification()) {
+          return volunteer.createVerificationCode();
+        }
+        return res.status(400).send({ error: 'Verification', description: constants.VOLUNTEER_IS_VERIFIED(volunteer.username) });
+      })
+      .then((code) => {
+        req.volunteer = volunteer;
+        req.verificationCode = code;
+        sendVerificationEmail(req, res);
+      })
+      .catch(error => res.status(500).send({ error: 'Authentication', description: constants.FAILED_VOLUNTEER_GET(error) }));
+  }
 }
 
 /**

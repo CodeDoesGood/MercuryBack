@@ -94,7 +94,7 @@ class Volunteer extends Database {
     }
 
     const hashedPassword = this.saltAndHash(password);
-    const date = new Date();
+    const date = Date.now();
 
     const volunteer = {
       name: this.name,
@@ -188,7 +188,7 @@ class Volunteer extends Database {
 
     const number = Math.floor((Math.random() * ((maxNumber - minNumber) + 1000000000000)));
     const hashedNumber = this.saltAndHash(number.toString());
-    const date = new Date();
+    const date = Date.now();
 
 
     return this.connect()
@@ -215,7 +215,7 @@ class Volunteer extends Database {
 
     const number = Math.floor((Math.random() * ((maxNumber - minNumber) + 1000000000000)));
     const hashedNumber = this.saltAndHash(number.toString());
-    const date = new Date();
+    const date = Date.now();
 
 
     return this.connect()
@@ -384,7 +384,7 @@ class Volunteer extends Database {
         volunteer_id: this.volunteer_id,
       }).update({
         read: true,
-        read_date: new Date(),
+        read_date: Date.now(),
       }))
       .then(() => Promise.resolve())
       .catch(error => Promise.reject(error));

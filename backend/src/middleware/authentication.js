@@ -11,6 +11,8 @@ const config = new ConfigurationWrapper('mercury', 'mercury.json');
 /**
  * Validates that the details provided are a valid type, format and content. If all true then next
  * will be called otherwise a bad request would be sent to the server.
+ * @param {string} req.body.username The users username to be validate
+ * @param {string} req.body.password  The old password of the user to validate
  */
 function validateAuthenticationDetails(req, res, next) {
   const { username, password } = req.body;
@@ -38,6 +40,8 @@ function validateAuthenticationDetails(req, res, next) {
  * match up then it will call next, otherwise send a 401 back.
  *
  * This would be used when updating a existing password but not actually logging in.
+ * @param {string} req.username The users username to be validate
+ * @param {string} req.oldPassword  The old password of the user to validate
  */
 function ValidateUserCredentials(req, res, next) {
   const { username } = req;
@@ -63,6 +67,7 @@ function ValidateUserCredentials(req, res, next) {
 /**
  * Checks to see if the requesting user has a valid token
  * before continuing otherwise send a error back
+ * @param {string} req.header('token') The token used for checking authentication
  */
 function checkAuthenticationToken(req, res, next) {
   const secret = config.getKey('secret');
@@ -93,6 +98,8 @@ function checkAdminAuthenticationLevel(req, res, next) {
  * Attempts to authenticate the user with the active directory
  * and binds them a token that will be used for all future
  * requests
+ * @param {string} req.username The username of the user
+ * @param {string} req.password The password of the user
  */
 function authenticateLoggingInUser(req, res) {
   const { username, password } = req;
