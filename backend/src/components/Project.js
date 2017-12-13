@@ -14,10 +14,6 @@ const config = new ConfigurationWrapper('mercury', 'mercury.json');
  */
 class Project extends Database {
   constructor(projectId = null) {
-    if (!_.isNil(projectId) && !_.isInteger(projectId)) {
-      throw new Error('When provided projectId must be a integer');
-    }
-
     super(config.getKey('database'));
     this.doesExist = false;
 

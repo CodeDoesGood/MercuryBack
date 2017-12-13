@@ -31,6 +31,7 @@ const errors = {
   EMAIL_REQUIRED: 'The email is required.',
   RESET_CODE_REQUIRED: 'reset_code must be provided',
   VERIFICATION_CODE_REQUIRED: 'verification must be provided',
+  VOLUNTEER_ID_REQUIRED: 'volunteer id must be provided',
 
   EMAIL_FIELDS_REQUIRED: 'Please, make sure you\'ve filled all of the required fields',
   EMAIL_AND_NAME_LENGTH: 'Please make sure email and name are less than 50 characters each\n',

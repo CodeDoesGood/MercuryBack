@@ -92,7 +92,7 @@ class Email {
    * @param {undefined} html The html to be used instead of the text (defaults to the text)
    */
   send(from, to, subject, text, html = undefined) {
-    const content = [{ name: 'from', type: from }, { name: 'subject', type: subject }, { name: 'text',  type: text }, { name: 'to',  type: to }];
+    const content = [{ name: 'from', type: from }, { name: 'subject', type: subject }, { name: 'text', type: text }, { name: 'to', type: to }];
 
     _.forEach(content, (item) => {
       if (_.isNil(item.type) || !_.isString(item.type)) {
