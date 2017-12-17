@@ -1,8 +1,9 @@
+const { proj } = require('./routing.table');
+const { Router } = require('express');
+
 const authentication = require('../middleware/authentication');
 const database = require('../middleware/database');
 const project = require('../middleware/project');
-
-const { Router } = require('express');
 
 const router = Router();
 
@@ -10,13 +11,13 @@ const router = Router();
  * These routes are for getting and updating single projects by id
  */
 
-router.get('/project/gather/:project_id', [
+router.get(proj.GATHER, [
   database.validateConnectionStatus.bind(this),
   project.validateProjectId.bind(this),
   project.getProjectById.bind(this),
 ]);
 
-router.post('/project/update/:project_id', [
+router.post(proj.UPDATE, [
   authentication.checkAuthenticationToken.bind(this),
   authentication.checkAdminAuthenticationLevel.bind(this),
   project.validateProjectUpdateContent.bind(this),
