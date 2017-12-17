@@ -1,8 +1,11 @@
-const { router } = require('express');
+const { infra } = require('./routing.table');
+const { Router } = require('express');
 
 const infrastructure = require('../middleware/infrastructure');
 
-router.get('/infrastructure/hello', [
+const router = Router();
+
+router.get(infra.HELLO, [
   infrastructure.hello.bind(this),
 ]);
 
