@@ -4,12 +4,13 @@
   "author": "CodeDoesGood",
   "description": "Mercury webapp",
   "scripts": {
-    "test": "node ./node_modules/mocha/bin/mocha --exit ./src/tests/index.test.js",
-    "cover": "nyc ./node_modules/mocha/bin/mocha --exit ./src/tests/index.test.js",
-    "coverfull": "nyc --reporter=html ./node_modules/mocha/bin/mocha --exit ./src/tests/index.test.js",
+    "cover": "nyc ./node_modules/mocha/bin/mocha ./src/tests/index.test.js",
+    "cover:full": "nyc --reporter=html ./node_modules/mocha/bin/mocha ./src/tests/index.test.js",
     "inspect": "node --inspect ./src/index.js",
+    "lint": "eslint -c ../.eslintrc.js --ext .js,.jsx --ignore-path ../.gitignore .",
     "start": "node ./src/index.js",
-    "lint": "eslint -c ../.eslintrc.js --ext .js,.jsx --ignore-path ../.gitignore ."
+    "start:pm2": "pm2 start ./src/index.js --name Mercury:Backend",
+    "test": "node ./node_modules/mocha/bin/mocha ./src/tests/index.test.js"
   },
   "license": "MIT",
   "dependencies": {
@@ -22,7 +23,8 @@
     "knex": "0.14.2",
     "lodash": "4.17.4",
     "mysql": "2.15.0",
-    "nodemailer": "4.4.0",
+    "nodemailer": "4.3.1",
+    "pm2": "^2.9.1",
     "winston": "2.4.0"
   },
   "devDependencies": {

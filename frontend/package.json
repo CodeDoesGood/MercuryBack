@@ -4,9 +4,10 @@
     "author": "CodeDoesGood",
     "description": "Merucry webapp front",
     "scripts": {
-        "builddev": "webpack-dashboard -- webpack-dev-server --content-base ./public -d --hot --history-api-fallback true --config ./webpack.config.development.js",
         "build": "webpack --config ./webpack.config.production.js",
-        "lint": "eslint -c ../.eslintrc.js --ext .js,.jsx --ignore-path ../.gitignore ."
+        "build:dev": "webpack-dashboard -- webpack-dev-server --content-base ./public -d --hot --history-api-fallback true --config ./webpack.config.development.js",
+        "lint": "eslint -c ../.eslintrc.js --ext .js,.jsx --ignore-path ../.gitignore . || true",
+        "start:pm2": "pm2 start ./public/server.js --name Mercury:Frontend"
     },
     "license": "MIT",
     "dependencies": {
@@ -21,6 +22,7 @@
         "less": "^2.7.3",
         "less-loader": "^4.0.5",
         "lodash": "^4.17.4",
+        "pm2": "^2.9.1",
         "prop-types": "^15.6.0",
         "react": "^16.2.0",
         "react-dom": "^16.2.0",
