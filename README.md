@@ -1,18 +1,16 @@
-# Mercury Volunteer WebApplication
+# Mercury Back
 
-Setup
------------------------
-Make sure to have the nodejs installed. 
-```
- npm run install
- npm run test
- npm run start
-```
+The back side of the mercury project, used for management of volunteers, projects and assignment of tasks.
 
-The service will run on port 3000, if you are testing on a phone you will have replace localhost with your machines ip
-of what its running on.
+Install
+-------
+    npm install
+    npm run lint
+    npm run test
+    npm run start or npm run start:pm2
 
-Endpoint
------------------------
+## License
 
-Documentation can be found here: https://github.com/CodeDoesGood/Mercury-Web/wiki/API-Documentation 
+&copy; 2018 CodeDoesGood
+
+This is free software. It is licensed under the [MIT License](http://opensource.org/licenses/MIT). Feel free to use this in your own work. However, if you modify and/or redistribute it, please attribute CodeDoesGood in some way, and distribute your work under this or a similar license.

@@ -1,13 +1,13 @@
 {
-  "name": "mercury-web",
+  "name": "mercuryback",
   "version": "0.0.1",
   "author": "CodeDoesGood",
-  "description": "Mercury webapp",
+  "description": "The supporting backend of the Mercury project",
   "scripts": {
     "cover": "nyc ./node_modules/mocha/bin/mocha ./src/tests/index.test.js",
     "cover:full": "nyc --reporter=html ./node_modules/mocha/bin/mocha ./src/tests/index.test.js",
     "inspect": "node --inspect ./src/index.js",
-    "lint": "eslint -c ../.eslintrc.js --ext .js,.jsx --ignore-path ../.gitignore .",
+    "lint": "eslint -c .eslintrc.js --ext .js,.jsx --ignore-path .gitignore .",
     "start": "node ./src/index.js",
     "start:pm2": "pm2 start ./src/index.js --name Mercury:Backend",
     "test": "node ./node_modules/mocha/bin/mocha ./src/tests/index.test.js"

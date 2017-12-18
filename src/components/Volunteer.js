@@ -365,6 +365,10 @@ class Volunteer extends Database {
       .catch(error => Promise.reject(error));
   }
 
+  canAccessAdminPortal() {
+    return this.adminPortalAccess;
+  }
+
   /**
    * Marks the passed volunteer_announcement id as read in the database, this will no
    * longer be returned once the user requests there notifications again.
