@@ -339,8 +339,8 @@ function createNewVolunteer(req: Request, res: Response, next: NextFunction) {
       req.body.verificationCode = code;
       next();
     })
-    .catch((e: Error) => res.status(500).send({
-      description: constants.VOLUNTEER_CREATE_FAIL(volunteer.username, error),
+    .catch(e => res.status(500).send({
+      description: constants.VOLUNTEER_CREATE_FAIL(volunteer.username, e.message),
       error: e,
     }));
 }
