@@ -1,6 +1,6 @@
 {
   "name": "mercuryback",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "author": "CodeDoesGood",
   "description": "The supporting backend of the Mercury project",
   "scripts": {
