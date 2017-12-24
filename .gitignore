@@ -30,6 +30,10 @@ node_modules
 
 # Webstorm
 .idea
+.vscode
 
 # bundle react
 bundle.js
+
+#typescript
+dist
