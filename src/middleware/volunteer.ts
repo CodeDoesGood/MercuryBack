@@ -21,15 +21,15 @@ function validateVolunteerCreationDetails(req: Request, res: Response, next: Nex
   _.forEach(volunteerRequirements, (requirement: string) => {
     if (!volunteer[requirement] && !res.headersSent) {
       return res.status(400).send({
-        error: 'Invalid Credentials',
         description: constants.VOLUNTEER_REQUIREMENT_NEEDED(requirement),
+        error: 'Invalid Credentials',
       });
     }
 
     if (requirement !== 'data_entry_user_id' && !_.isString(volunteer[requirement]) && !res.headersSent) {
       return res.status(400).send({
-        error: 'Invalid Credentials Formatting',
         description: constants.VOLUNTEER_REQUIREMENT_STRING(requirement),
+        error: 'Invalid Credentials Formatting',
       });
     }
     return 1;
@@ -127,8 +127,8 @@ function createPasswordResetCode(req: Request, res: Response, next: NextFunction
       next();
     })
     .catch(() => res.status(500).send({
-      error: 'Password reset code',
       description: constants.VOLUNTEER_RESET_CODE_FAIL,
+      error: 'Password reset code',
     }));
 }
 
@@ -230,8 +230,8 @@ function validatePasswordResetCodeAuthenticity(req: Request, res: Response, next
         volunteer.removePasswordResetCode()
           .then(() => next())
           .catch((error: Error) => res.status(400).send({
-            error: 'Code removing',
             description: constants.VOLUNTEER_FAILED_REMOVE_RESET_CODE(error),
+            error: 'Code removing',
           }));
       } else {
         res.status(401).send({ error: 'Invalid Code', description: constants.VOLUNTEER_INVALID_VERIFICATION_CODE });
@@ -340,8 +340,8 @@ function createNewVolunteer(req: Request, res: Response, next: NextFunction) {
       next();
     })
     .catch(error => res.status(500).send({
-      error,
       description: constants.VOLUNTEER_CREATE_FAIL(volunteer.username, error),
+      error,
     }));
 }
 
@@ -363,8 +363,8 @@ function gatherActiveNotifications(req: Request, res: Response) {
       message: 'Gathered Notifications',
     }))
     .catch(error => res.status(500).send({
-      error: 'Notifications error',
       description: constants.VOLUNTEER_GET_NOTIFICATION_FAIL(volunteer.username, error),
+      error: 'Notifications error',
     }));
 }
 
@@ -381,8 +381,8 @@ function markNotificationAsRead(req: Request, res: Response) {
     .then(() => volunteer.dismissNotification(notificationId))
     .then(() => res.sendStatus(200))
     .catch(error => res.status(500).send({
-      error: 'Notification dismissing',
       description: constants.VOLUNTEER_DISMISS_NOTIFICATION_FAIL(notificationId, error),
+      error: 'Notification dismissing',
     }));
 }
 

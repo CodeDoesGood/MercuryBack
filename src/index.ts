@@ -11,9 +11,9 @@ const app = express();
 const port = (process.env.PORT === undefined) ? 3000 : process.env.PORT;
 
 const rateLimit = new ratelimit({
-  windowMs: 1000,
-  max: 10,
   delayMs: 0,
+  max: 10,
+  windowMs: 1000,
 });
 
 app.use(cors());
