@@ -1,4 +1,5 @@
 import * as Promise from 'bluebird';
+import * as fs from 'fs';
 import * as _ from 'lodash';
 import * as nodemailer from 'nodemailer';
 
@@ -26,6 +27,12 @@ export interface IBuiltMessage {
   to: string;
 }
 
+interface IStoredEmail {
+  to: string;
+  title: string;
+  content: string;
+}
+
 export default class Email {
   private service: string;
   private username: string;
@@ -51,6 +58,24 @@ export default class Email {
       this.online = true;
     })
     .catch(error => logger.error(`Error creating email connection, error=${error}`));
+  }
+
+ /**
+  * Take any stored emails in sthe email path and send them when the connection system is up
+  * @param jsonPath The path to the json file of the stored emails to be send later
+  */
+  public sendStoredEmails(jsonPath: string) {
+    if (!this.online) {
+      return Promise.reject(new Error(`Service must be online to send stored emails`));
+    }
+
+    const storedEmails: { emails: IStoredEmail[] } = JSON.parse(fs.readFileSync(jsonPath, 'utf8'));
+
+    storedEmails.emails.forEach((element: IStoredEmail) => {
+      this.send(this.username, element.to, element.title, element.content)
+      .then(info => Promise.resolve(info))
+      .catch((error: Error) => Promise.reject(error));
+    });
   }
 
   /**
