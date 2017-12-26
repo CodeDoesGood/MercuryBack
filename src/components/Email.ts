@@ -81,16 +81,29 @@ export default class Email {
     }
 
     const storedEmails: { emails: IStoredEmail[] } = JSON.parse(fs.readFileSync(jsonPath, 'utf8'));
+    const updatedStoredEmails: { emails: IStoredEmail[] } = { emails: storedEmails.emails.slice() };
+    let sentEmails: number = 0;
 
     if (_.isNil(storedEmails.emails[0])) {
       logger.info(`[Email] No late stored emails to send 😊`);
       return Promise.resolve();
     }
 
-    storedEmails.emails.forEach((element: IStoredEmail) => {
-      this.send(this.username, element.to, element.title, element.content)
-      .then((info: nodemailer.SentMessageInfo) => logger.info(`Sent stored email: ${info.messageId}`))
-      .catch((error: Error) => logger.warn(`Failed to send store email ${error.message}`));
+    storedEmails.emails.forEach((email: IStoredEmail) => {
+      this.send(this.username, email.to, email.title, email.content, email.content)
+      .then((info: nodemailer.SentMessageInfo) => {
+        logger.info(`[Email] Sent stored email: ${info.messageId}`);
+        updatedStoredEmails.emails.shift();
+      })
+      .finally(() => {
+        sentEmails += 1;
+
+        if (sentEmails === storedEmails.emails.length) {
+          fs.writeFileSync(jsonPath, JSON.stringify(updatedStoredEmails, null, '\t'));
+          return Promise.resolve();
+        }
+      })
+      .catch((error: Error) => logger.warn(`[Email] Failed to send store email ${error.message}`));
     });
 
     return Promise.resolve();
