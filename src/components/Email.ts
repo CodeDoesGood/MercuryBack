@@ -9,6 +9,7 @@ export interface IEmailOptions {
   service: string;
   email: string;
   password: string;
+  stored: string;
 }
 
 export interface IMessage {
@@ -54,10 +55,11 @@ export default class Email {
 
     this.verify()
     .then(() => {
-      logger.info(`Email Client is ready, service=${this.service}, email=${this.username}`);
       this.online = true;
+      return this.sendStoredEmails(options.stored);
     })
-    .catch(error => logger.error(`Error creating email connection, error=${error}`));
+    .then(() => logger.info(`[Email] Email Client is ready, service=${this.service}, email=${this.username}`))
+    .catch(error => logger.error(`[Email] Error creating email connection, error=${error}`));
   }
 
  /**
@@ -66,16 +68,32 @@ export default class Email {
   */
   public sendStoredEmails(jsonPath: string) {
     if (!this.online) {
-      return Promise.reject(new Error(`Service must be online to send stored emails`));
+      return Promise.reject(new Error(`[Email] Service must be online to send stored emails`));
+    }
+
+    // If the file does not exist already we shall create it but resolve as there is no emails to be sent.
+    if (!fs.existsSync(jsonPath)) {
+      const template: { emails: any } = { emails: [] };
+
+      fs.writeFileSync(jsonPath, JSON.stringify(template, null, '\t'));
+      logger.info(`[Email] Stored json file does not exist to retrieve late email content, creating...`);
+      return Promise.resolve();
     }
 
     const storedEmails: { emails: IStoredEmail[] } = JSON.parse(fs.readFileSync(jsonPath, 'utf8'));
 
+    if (_.isNil(storedEmails.emails[0])) {
+      logger.info(`[Email] No late stored emails to send 😊`);
+      return Promise.resolve();
+    }
+
     storedEmails.emails.forEach((element: IStoredEmail) => {
       this.send(this.username, element.to, element.title, element.content)
-      .then(info => Promise.resolve(info))
-      .catch((error: Error) => Promise.reject(error));
+      .then((info: nodemailer.SentMessageInfo) => logger.info(`Sent stored email: ${info.messageId}`))
+      .catch((error: Error) => logger.warn(`Failed to send store email ${error.message}`));
     });
+
+    return Promise.resolve();
   }
 
   /**

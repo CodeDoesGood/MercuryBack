@@ -37,3 +37,6 @@ bundle.js
 
 #typescript
 dist
+
+# Mercury
+.stored.json
