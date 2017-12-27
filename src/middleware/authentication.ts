@@ -97,8 +97,19 @@ function checkAuthenticationToken(req: Request, res: Response, next: NextFunctio
 /**
  * Check to see if the authenticated user is currently a active admin.
  */
-function checkAdminAuthenticationLevel(req: Request, res: Response, next: NextFunction) {
-  next();
+function checkAdminPortalAccess(req: Request, res: Response, next: NextFunction) {
+  const { username } = req.body.decoded;
+
+  const volunteer = new Volunteer(null, username);
+
+  volunteer.exists('username')
+  .then(() => {
+    if (volunteer.adminPortalAccess) {
+      next();
+    } else if (!res.headersSent) {
+      res.status(401).send({ error: 'Unauthorized Access', description: constants.VOLUNTEER_NOT_AUTH });
+    }
+  });
 }
 
 /**
@@ -137,7 +148,7 @@ function authenticateLoggingInUser(req: Request, res: Response) {
 
 export {
   authenticateLoggingInUser,
-  checkAdminAuthenticationLevel,
+  checkAdminPortalAccess,
   checkAuthenticationToken,
   validateAuthenticationDetails,
   validateUserCredentials,

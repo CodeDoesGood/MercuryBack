@@ -19,6 +19,10 @@ const projects = {
   STATUS:   { link: '/projects/status/:status',     method: 'get' },
 };
 
+const slack = {
+  HEALTH: { link: '/slack/heath', method: 'get' },
+};
+
 const volunteer = {
   CREATE: { link: '/volunteer', method: 'post' },
   REMOVE: { link: '/volunteer', method: 'delete' },
@@ -58,5 +62,6 @@ export {
   infrastructure as infra,
   project as proj,
   projects as projs,
+  slack,
   volunteer as vol,
 };

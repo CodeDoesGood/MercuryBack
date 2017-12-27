@@ -90,6 +90,7 @@ interface IErrors {
 
   VOLUNTEER_EMAIL_MATCH: string;
   VOLUNTEER_EXISTS: string;
+  VOLUNTEER_NOT_AUTH: string;
 
   VOLUNTEER_VERIFICATION_REQUIRED: (username: string) => string;
   VOLUNTEER_RESET_CODE_FAIL: string;
@@ -215,6 +216,7 @@ const errors: IErrors = {
 
   VOLUNTEER_EMAIL_MATCH: 'The email passed does not match the volunteer email',
   VOLUNTEER_EXISTS: 'Volunteer does not exist',
+  VOLUNTEER_NOT_AUTH: 'Volunteer is not authorized',
 
   VOLUNTEER_FAILED_GET_RESET_CODE: error => `Failed to get password reset code, error=${error}`,
   VOLUNTEER_FAILED_REMOVE_RESET_CODE: error => `Failed to remove password reset code, error=${error}`,
