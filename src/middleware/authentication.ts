@@ -105,7 +105,6 @@ function checkAdminPortalAccess(req: Request, res: Response, next: NextFunction)
   volunteer.exists('username')
   .then(() => volunteer.canAccessAdminPortal())
   .then((canAccess: boolean) => {
-    debugger;
     if (canAccess) {
       next();
       req.body.volunteer = volunteer;
