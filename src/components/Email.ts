@@ -12,7 +12,7 @@ export interface IEmailOptions {
   stored: string;
 }
 
-export interface IMessage {
+export interface IEmailContent {
   [index: string]: string;
   to: string;
   subject: string;
@@ -183,10 +183,10 @@ export default class Email {
 
   /**
    * Returns a build object ready to be passed into the transporter for sending a email.
-   * @param {IMessage} content The object containing the message details,
+   * @param {IEmailContent} content The object containing the message details,
    * from, to, subject, text, html.
    */
-  private buildMessage(content: IMessage): IBuiltMessage {
+  private buildMessage(content: IEmailContent): IBuiltMessage {
     if (!_.isObject(content)) {
       throw new Error('Build message must be of type string');
     }

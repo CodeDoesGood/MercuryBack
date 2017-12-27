@@ -4,7 +4,7 @@ import { NextFunction, Request, Response } from 'express';
 
 import Configuration from '../components/Configuration/Configuration';
 import constants from '../components/constants';
-import Email from '../components/Email';
+import Email, { IEmailContent } from '../components/Email';
 import { logger } from '../components/Logger';
 import Volunteer from '../components/Volunteer';
 
@@ -29,6 +29,9 @@ function validateConnectionStatus(req: Request, res: Response, next: NextFunctio
   if (emailClient.getStatus()) {
     next();
   } else {
+    /**
+     * TODO: Store the content in the json file ready for sending later.
+     */
     res.status(503).send({ error: 'Email Service', description: constants.EMAIL_UNAVAILABLE });
   }
 }
@@ -37,7 +40,7 @@ function validateConnectionStatus(req: Request, res: Response, next: NextFunctio
  * Will send a validation email to the new volunteer via there email, allowing them
  * to confirm there current email address.
  */
-function sendVerificationEmail(req: Request, res: Response) {
+function createVerificationEmail(req: Request, res: Response, next: NextFunction) {
   const { volunteer }: { volunteer: Volunteer } = req.body;
   const code: string = req.body.verificationCode;
   let verificationLink: string;
@@ -52,13 +55,38 @@ function sendVerificationEmail(req: Request, res: Response) {
     verificationLink = `http://localhost:8080/verify/${volunteer.username}/${code}`;
   }
 
-  const to: string = req.body.volunteer.email;
-  const from: string = config.getKey('email').email;
-  const subject: string = '[CodeDoesGood] Verification Email';
-  const text: string = verificationLink;
+  const emailToSend: IEmailContent = {
+    to: req.body.volunteer.email,
+    from: config.getKey('email').email,
+    subject: '[CodeDoesGood] Verification Email',
+    text: verificationLink,
+    html: verificationLink,
+  };
+
+  const message: string = `Account ${volunteer.username} created, you will soon get a verification email`;
+
+  req.body.email = emailToSend;
+  req.body.message = message;
+  next();
+}
+
+/**
+ * Used to send a message based on the the email sent.
+ *
+ * @param req.body.email IEmailContent containing to, from, subject, text
+ * @param req.body.message A string containing the message to be sent after the email has been sent
+ */
+function sendEmail(req: Request, res: Response) {
+  const { email, message }: { email: IEmailContent; message: string; } = req.body;
+
+  const to: string = email.to;
+  const from: string = email.from;
+  const subject: string = email.subject;
+  const text: string = email.text;
+  const html: string = email.html;
 
   return emailClient.send(from, to, subject, text, text)
-    .then(() => res.status(200).send({ message: `Account ${volunteer.username} created, you will soon get a verification email` }))
+    .then(() => res.status(200).send({ message }))
     .catch((error: Error) => {
       logger.error(`Error attempting to send a email. to=${to} from=${from}, error=${error}`);
       return res.status(503).send({ error: 'Unavailable Service', description: constants.EMAIL_UNAVAILABLE });
@@ -69,7 +97,7 @@ function sendVerificationEmail(req: Request, res: Response) {
  * Will resend a validation email to the new volunteer via there email, allowing them
  * to confirm there current email address.
  */
-function resendVerificationEmail(req: Request, res: Response) {
+function createResendVerificationEmail(req: Request, res: Response, next: NextFunction) {
   const { volunteer }: { volunteer: Volunteer } = req.body;
   const code: string = req.body.verificationCode;
   let verificationLink: string;
@@ -80,19 +108,19 @@ function resendVerificationEmail(req: Request, res: Response) {
     verificationLink = `http://localhost:8080/verify/${volunteer.username}/${code}`;
   }
 
-  const to: string = req.body.volunteer.email;
-  const from: string = config.getKey('email').email;
-  const subject: string = '[CodeDoesGood] Resend-Verification Email';
-  const text: string = verificationLink;
+  const emailToSend: IEmailContent = {
+    to: req.body.volunteer.email,
+    from: config.getKey('email').email,
+    subject: '[CodeDoesGood] Resend-Verification Email',
+    text: verificationLink,
+    html: verificationLink,
+  };
 
-  if (!res.headersSent) {
-    return emailClient.send(from, to, subject, text, text)
-    .then(() => res.status(200).send({ message: `Resent new verification email for ${volunteer.username}` }))
-    .catch((error: Error) => {
-      logger.error(`Error attempting to send a email. to=${to} from=${from}, error=${error}`);
-      return res.status(503).send({ error: 'Unavailable Service', description: constants.EMAIL_UNAVAILABLE });
-    });
-  }
+  const message: string = `Resent new verification email for ${volunteer.username}`;
+
+  req.body.email = emailToSend;
+  req.body.message = message;
+  next();
 }
 
 /**
@@ -129,7 +157,7 @@ function createResendVerificationCode(req: Request, res: Response, next: NextFun
  * The front end will then route to a functional page that will post back
  * to reset the users password.
  */
-function sendPasswordResetLinkToRequestingEmail(req: Request, res: Response) {
+function createPasswordResetLinkToRequestingEmail(req: Request, res: Response, next: NextFunction) {
   const { volunteer } = req.body;
   const { username, email }: { username: string; email: string; } = volunteer;
 
@@ -148,19 +176,19 @@ function sendPasswordResetLinkToRequestingEmail(req: Request, res: Response) {
 
   logger.info(`Created password reset link for user=${username}, link=${link}`);
 
-  const to: string = email;
-  const from: string = config.getKey('email').email;
-  const subject: string = '[CodeDoesGood] Password Reset Email';
-  const text: string = content;
+  const emailToSend: IEmailContent = {
+    to: email,
+    from: config.getKey('email').email,
+    subject: '[CodeDoesGood] Password Reset Email',
+    text: content,
+    html: content,
+  };
 
-  emailClient.send(from, to, subject, text, text)
-    .then(() => {
-      res.status(200).send({ message: constants.EMAIL_RESET_SENT });
-    })
-    .catch((error: Error) => {
-      logger.error(`Error attempting to send a email. to=${to} from=${from}, error=${error}`);
-      res.status(503).send({ error: 'Unavailable Service', description: constants.EMAIL_UNAVAILABLE });
-    });
+  const message = constants.EMAIL_RESET_SENT;
+
+  req.body.email = emailToSend;
+  req.body.message = message;
+  next();
 }
 
 /**
@@ -240,10 +268,11 @@ export {
   denyInvalidAndBlockedDomains,
   getResendVerifyDetails,
   sendContactUsEmailStatus,
-  resendVerificationEmail,
+  createResendVerificationEmail,
   sendContactUsRequestInbox,
-  sendPasswordResetLinkToRequestingEmail,
-  sendVerificationEmail,
+  createPasswordResetLinkToRequestingEmail,
+  createVerificationEmail,
   validateConnectionStatus,
   validateContactUsRequestInformation,
+  sendEmail,
 };

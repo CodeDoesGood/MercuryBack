@@ -23,8 +23,9 @@ router[vol.CREATE.method](vol.CREATE.link, [
   database.validateUsernameDoesNotExist.bind(this),
   database.validateEmailDoesNotExist.bind(this),
   volunteer.createNewVolunteer.bind(this),
+  email.createVerificationEmail.bind(this),
   email.validateConnectionStatus.bind(this),
-  email.sendVerificationEmail.bind(this),
+  email.sendEmail.bind(this),
 ]);
 
 router[vol.REMOVE.method](vol.REMOVE.link, [infrastructure.unused.bind(this)]);
@@ -37,8 +38,9 @@ router[vol.PASSWORD.REQUEST_RESET.method](vol.PASSWORD.REQUEST_RESET.link, [
   volunteer.validateRequestResetDetails.bind(this),
   database.validateConnectionStatus.bind(this),
   volunteer.createPasswordResetCode.bind(this),
+  email.createPasswordResetLinkToRequestingEmail.bind(this),
   email.validateConnectionStatus.bind(this),
-  email.sendPasswordResetLinkToRequestingEmail.bind(this),
+  email.sendEmail.bind(this),
 ]);
 
 router[vol.PASSWORD.RESET.method](vol.PASSWORD.RESET.link, [
@@ -102,8 +104,9 @@ router[vol.VERIFY.RESEND.method](vol.VERIFY.RESEND.link, [
   email.getResendVerifyDetails.bind(this),
   database.validateUsernameDoesExist.bind(this),
   email.createResendVerificationCode.bind(this),
+  email.createResendVerificationEmail.bind(this),
   email.validateConnectionStatus.bind(this),
-  email.resendVerificationEmail.bind(this),
+  email.sendEmail.bind(this),
 ]);
 
 router[vol.VERIFY.VERIFY.method](vol.VERIFY.VERIFY.link, [
