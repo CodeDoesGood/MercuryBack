@@ -116,11 +116,11 @@ function createResendVerificationEmail(req: Request, res: Response, next: NextFu
   }
 
   const emailToSend: IEmailContent = {
-    to: req.body.volunteer.email,
     from: config.getKey('email').email,
+    html: verificationLink,
     subject: '[CodeDoesGood] Resend-Verification Email',
     text: verificationLink,
-    html: verificationLink,
+    to: req.body.volunteer.email,
   };
 
   const message: string = `Resent new verification email for ${volunteer.username}`;
@@ -184,11 +184,11 @@ function createPasswordResetLinkToRequestingEmail(req: Request, res: Response, n
   logger.info(`Created password reset link for user=${username}, link=${link}`);
 
   const emailToSend: IEmailContent = {
-    to: email,
     from: config.getKey('email').email,
+    html: content,
     subject: '[CodeDoesGood] Password Reset Email',
     text: content,
-    html: content,
+    to: email,
   };
 
   const message = constants.EMAIL_RESET_SENT;
