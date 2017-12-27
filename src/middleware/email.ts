@@ -1,3 +1,4 @@
+import * as fs from 'fs';
 import * as _ from 'lodash';
 
 import { NextFunction, Request, Response } from 'express';
@@ -26,12 +27,18 @@ function getResendVerifyDetails(req: Request, res: Response, next: NextFunction)
  * and a validation email will be sent out as soon as the service is running again.
  */
 function validateConnectionStatus(req: Request, res: Response, next: NextFunction) {
+  const email: IEmailContent = req.body.email;
+
   if (emailClient.getStatus()) {
     next();
   } else {
-    /**
-     * TODO: Store the content in the json file ready for sending later.
-     */
+    const jsonPath: string = config.getKey('email').stored;
+    const storedEmails: { emails: IEmailContent[] } = JSON.parse(fs.readFileSync(jsonPath, 'utf8'));
+
+    storedEmails.emails.push(email);
+
+    fs.writeFileSync(jsonPath, JSON.stringify(storedEmails, null, '\t'));
+
     res.status(503).send({ error: 'Email Service', description: constants.EMAIL_UNAVAILABLE });
   }
 }

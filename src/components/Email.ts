@@ -28,12 +28,6 @@ export interface IBuiltMessage {
   to: string;
 }
 
-interface IStoredEmail {
-  to: string;
-  title: string;
-  content: string;
-}
-
 export default class Email {
   private service: string;
   private username: string;
@@ -80,8 +74,8 @@ export default class Email {
       return Promise.resolve();
     }
 
-    const storedEmails: { emails: IStoredEmail[] } = JSON.parse(fs.readFileSync(jsonPath, 'utf8'));
-    const updatedStoredEmails: { emails: IStoredEmail[] } = { emails: storedEmails.emails.slice() };
+    const storedEmails: { emails: IEmailContent[] } = JSON.parse(fs.readFileSync(jsonPath, 'utf8'));
+    const updatedStoredEmails: { emails: IEmailContent[] } = { emails: storedEmails.emails.slice() };
     let sentEmails: number = 0;
 
     if (_.isNil(storedEmails.emails[0])) {
@@ -89,11 +83,11 @@ export default class Email {
       return Promise.resolve();
     }
 
-    storedEmails.emails.forEach((email: IStoredEmail) => {
-      this.send(this.username, email.to, email.title, email.content, email.content)
+    _.forEach(storedEmails.emails, (email: IEmailContent, index) => {
+      this.send(this.username, email.to, email.subject, email.text, email.html)
       .then((info: nodemailer.SentMessageInfo) => {
         logger.info(`[Email] Sent stored email: ${info.messageId}`);
-        updatedStoredEmails.emails.shift();
+        updatedStoredEmails.emails.splice(index, 1);
       })
       .finally(() => {
         sentEmails += 1;
