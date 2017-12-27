@@ -63,11 +63,11 @@ function createVerificationEmail(req: Request, res: Response, next: NextFunction
   }
 
   const emailToSend: IEmailContent = {
-    to: req.body.volunteer.email,
     from: config.getKey('email').email,
+    html: verificationLink,
     subject: '[CodeDoesGood] Verification Email',
     text: verificationLink,
-    html: verificationLink,
+    to: req.body.volunteer.email,
   };
 
   const message: string = `Account ${volunteer.username} created, you will soon get a verification email`;
