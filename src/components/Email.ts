@@ -29,10 +29,12 @@ export interface IBuiltMessage {
 }
 
 export default class Email {
+  public username: string;
+  public online: boolean;
+
   private service: string;
-  private username: string;
+  private stored: string;
   private transporter: nodemailer.Transporter;
-  private online: boolean;
 
   constructor(options: IEmailOptions) {
     // The type of service used for emailing.
@@ -41,19 +43,13 @@ export default class Email {
     // The email that will be used to make the connection.
     this.username = options.email;
 
+    this.stored = options.stored;
+
     // Transporter that will be sending the emails
     this.transporter = this.build(options.password);
 
     // Status for checking that the email connection is working.
     this.online = false;
-
-    this.verify()
-    .then(() => {
-      this.online = true;
-      return this.sendStoredEmails(options.stored);
-    })
-    .then(() => logger.info(`[Email] Email Client is ready, service=${this.service}, email=${this.username}`))
-    .catch(error => logger.error(`[Email] Error creating email connection, error=${error}`));
   }
 
  /**
@@ -158,6 +154,20 @@ export default class Email {
    */
   public getStatus(): boolean {
     return this.online;
+  }
+
+  /**
+   * returns email service
+   */
+  public getService() {
+    return this.service;
+  }
+
+  /**
+   * returns json path for late emails
+   */
+  public getEmailJsonPath() {
+    return this.stored;
   }
 
   /**

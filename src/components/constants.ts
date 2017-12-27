@@ -113,7 +113,10 @@ interface IErrors {
   VOLUNTEER_IS_VERIFIED: (username: string) => string;
   FAILED_VOLUNTEER_GET: (error: Error) => string;
 
+  SLACK_HOOK_MISSING: string;
+
   UNKNOWN_ERROR: string;
+  SLACK_HEALTH_FAILED: (error: Error) => string;
 }
 
 const constants: IConstants = {
@@ -238,6 +241,9 @@ const errors: IErrors = {
 
   FAILED_VOLUNTEER_GET: error => `Failed to get volunteer, error=${error}`,
   VOLUNTEER_IS_VERIFIED: username => `Volunteer ${username} is already verified`,
+
+  SLACK_HEALTH_FAILED: error => `Health check failed to send to slack, error=${error.message}`,
+  SLACK_HOOK_MISSING: 'Slack webhook url was not provided for hook request.',
 
   UNKNOWN_ERROR: 'Something went wrong',
 };

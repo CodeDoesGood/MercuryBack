@@ -12,6 +12,14 @@ import Volunteer from '../components/Volunteer';
 const config = new Configuration('mercury', 'mercury.json');
 const emailClient = new Email(config.getKey('email'));
 
+emailClient.verify()
+.then(() => {
+  emailClient.online = true;
+  return emailClient.sendStoredEmails(emailClient.getEmailJsonPath());
+})
+.then(() => logger.info(`[Email] Email Client is ready, service=${emailClient.getService()}, email=${emailClient.username}`))
+.catch(error => logger.error(`[Email] Error creating email connection, error=${error}`));
+
 /**
  * Get the resend details from the get params of the request
  */

@@ -20,7 +20,7 @@ const projects = {
 };
 
 const slack = {
-  HEALTH: { link: '/slack/heath', method: 'get' },
+  HEALTH: { link: '/slack/health', method: 'get' },
 };
 
 const volunteer = {

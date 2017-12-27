@@ -23,7 +23,7 @@ router[proj.GATHER.method](proj.GATHER.link, [
 
 router[proj.UPDATE.method](proj.UPDATE.link, [
   authentication.checkAuthenticationToken.bind(this),
-  authentication.checkAdminAuthenticationLevel.bind(this),
+  authentication.checkAdminPortalAccess.bind(this),
   project.validateProjectUpdateContent.bind(this),
   project.validateProjectUpdateContentTypes.bind(this),
   database.validateConnectionStatus.bind(this),

@@ -103,9 +103,12 @@ function checkAdminPortalAccess(req: Request, res: Response, next: NextFunction)
   const volunteer = new Volunteer(null, username);
 
   volunteer.exists('username')
-  .then(() => {
-    if (volunteer.adminPortalAccess) {
+  .then(() => volunteer.canAccessAdminPortal())
+  .then((canAccess: boolean) => {
+    debugger;
+    if (canAccess) {
       next();
+      req.body.volunteer = volunteer;
     } else if (!res.headersSent) {
       res.status(401).send({ error: 'Unauthorized Access', description: constants.VOLUNTEER_NOT_AUTH });
     }

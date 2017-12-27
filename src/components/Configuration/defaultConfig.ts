@@ -12,6 +12,10 @@ export interface IConfig {
     stored: string;
   };
 
+  slack: {
+    mercury: string;
+  };
+
   database: IDatabaseConfig;
 
   secret: string;
@@ -37,6 +41,10 @@ export const defaultConfig: IConfig = {
       user: 'root',
     },
     pool: { min: 0, max: 100 },
+  },
+
+  slack: {
+    mercury: null,
   },
 
   // Secret used to authenticate tokens, this should be updated on the server to the real secret.

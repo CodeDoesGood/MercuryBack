@@ -443,8 +443,16 @@ export default class Volunteer extends Database {
   /**
    * Can the volunteer access the admin panel
    */
-  public canAccessAdminPortal(): boolean {
-    return this.adminPortalAccess;
+  public canAccessAdminPortal(): Promise<boolean | Error> {
+    if (_.isNil(this.adminOverallLevel)) {
+      return this.knex('volunteer').select('admin_portal_access').where('volunteer_id', this.volunteerId).first()
+      .then((res: { admin_portal_access: number }) => {
+        this.adminPortalAccess = (res.admin_portal_access === 1) ? true : false;
+        return Promise.resolve(this.adminPortalAccess);
+      })
+      .catch((error: Error) => Promise.reject(error));
+    }
+    return Promise.resolve(this.adminPortalAccess);
   }
 
   /**

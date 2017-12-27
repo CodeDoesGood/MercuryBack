@@ -23,14 +23,14 @@ router[projs.ACTIVE.method](projs.ACTIVE.link, [
 router[projs.ALL.method](projs.ALL.link, [
   database.validateConnectionStatus.bind(this),
   authentication.checkAuthenticationToken.bind(this),
-  authentication.checkAdminAuthenticationLevel.bind(this),
+  authentication.checkAdminPortalAccess.bind(this),
   projects.getAllProjects.bind(this),
 ]);
 
 router[projs.CATEGORY.method](projs.CATEGORY.link, [
   database.validateConnectionStatus.bind(this),
   authentication.checkAuthenticationToken.bind(this),
-  authentication.checkAdminAuthenticationLevel.bind(this),
+  authentication.checkAdminPortalAccess.bind(this),
   projects.validateProjectCategory.bind(this),
   projects.getAllProjectsByCategory.bind(this),
 ]);
@@ -38,14 +38,14 @@ router[projs.CATEGORY.method](projs.CATEGORY.link, [
 router[projs.HIDDEN.method](projs.HIDDEN.link, [
   database.validateConnectionStatus.bind(this),
   authentication.checkAuthenticationToken.bind(this),
-  authentication.checkAdminAuthenticationLevel.bind(this),
+  authentication.checkAdminPortalAccess.bind(this),
   projects.getAllHiddenProjects.bind(this),
 ]);
 
 router[projs.STATUS.method](projs.STATUS.link, [
   database.validateConnectionStatus.bind(this),
   authentication.checkAuthenticationToken.bind(this),
-  authentication.checkAdminAuthenticationLevel.bind(this),
+  authentication.checkAdminPortalAccess.bind(this),
   projects.validateProjectStatus.bind(this),
   projects.getAllProjectsByStatus.bind(this),
 ]);
