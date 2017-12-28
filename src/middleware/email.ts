@@ -278,6 +278,18 @@ function sendContactUsEmailStatus(req: Request, res: Response) {
   }
 }
 
+/**
+ * Attempt to reverify the service for the email client and bring it back online.
+ */
+function reverifyTheService(req: Request, res: Response) {
+  emailClient.verify()
+  .then(() => {
+    emailClient.online = true;
+    res.status(200).send({ message: 'Email service restarted successfully' });
+  })
+  .catch((error: Error) => res.status(500).send({ error: 'Email Service', description: constants.EMAIL_VERIFY_FAILED }));
+}
+
 export {
   createResendVerificationCode,
   denyInvalidAndBlockedDomains,
@@ -289,5 +301,6 @@ export {
   createVerificationEmail,
   validateConnectionStatus,
   validateContactUsRequestInformation,
+  reverifyTheService,
   sendEmail,
 };

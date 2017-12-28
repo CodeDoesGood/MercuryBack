@@ -28,7 +28,7 @@ router[vol.CREATE.method](vol.CREATE.link, [
   email.sendEmail.bind(this),
 ]);
 
-router[vol.REMOVE.method](vol.REMOVE.link, [infrastructure.unused.bind(this)]);
+router[vol.REMOVE.method](vol.REMOVE.link, [infrastructure.unavailable.bind(this)]);
 
 /******************
       Password
@@ -68,16 +68,16 @@ router[vol.PROFILE.GET.method](vol.PROFILE.GET.link, [
   volunteer.gatherVolunteerProfile.bind(this),
 ]);
 
-router[vol.PROFILE.REMOVE.method](vol.PROFILE.REMOVE.link, [infrastructure.unused.bind(this)]);
-router[vol.PROFILE.UPDATE.method](vol.PROFILE.UPDATE.link, [infrastructure.unused.bind(this)]);
+router[vol.PROFILE.REMOVE.method](vol.PROFILE.REMOVE.link, [infrastructure.unavailable.bind(this)]);
+router[vol.PROFILE.UPDATE.method](vol.PROFILE.UPDATE.link, [infrastructure.unavailable.bind(this)]);
 
 /******************
     Notification
 ******************/
 
-router[vol.NOTIFICATION.GET.method](vol.NOTIFICATION.GET.link, [infrastructure.unused.bind(this)]);
-router[vol.NOTIFICATION.DISMISS.method](vol.NOTIFICATION.DISMISS.link, [infrastructure.unused.bind(this)]);
-router[vol.NOTIFICATION.UPDATE.method](vol.NOTIFICATION.UPDATE.link, [infrastructure.unused.bind(this)]);
+router[vol.NOTIFICATION.GET.method](vol.NOTIFICATION.GET.link, [infrastructure.unavailable.bind(this)]);
+router[vol.NOTIFICATION.DISMISS.method](vol.NOTIFICATION.DISMISS.link, [infrastructure.unavailable.bind(this)]);
+router[vol.NOTIFICATION.UPDATE.method](vol.NOTIFICATION.UPDATE.link, [infrastructure.unavailable.bind(this)]);
 
 /******************
     Notifications
@@ -94,7 +94,7 @@ router[vol.NOTIFICATIONS.DISMISS.method](vol.NOTIFICATIONS.DISMISS.link, [
   volunteer.markNotificationAsRead.bind(this),
 ]);
 
-router[vol.NOTIFICATIONS.UPDATE.method](vol.NOTIFICATIONS.UPDATE.link, [infrastructure.unused.bind(this)]);
+router[vol.NOTIFICATIONS.UPDATE.method](vol.NOTIFICATIONS.UPDATE.link, [infrastructure.unavailable.bind(this)]);
 
 /******************
       Verify

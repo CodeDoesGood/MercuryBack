@@ -19,6 +19,16 @@ const projects = {
   STATUS:   { link: '/projects/status/:status',     method: 'get' },
 };
 
+const email = {
+  SERVICE: {
+    RESTART: {  link: '/email/service/restart', method: 'get' },
+  },
+  STORED: {
+    RETRIEVE: { link: '/email/stored/retrieve', method: 'get' },
+    SEND:     { link: '/email/stored/send',     method: 'get' },
+  },
+};
+
 const slack = {
   HEALTH: { link: '/slack/health', method: 'get' },
 };
@@ -63,5 +73,6 @@ export {
   project as proj,
   projects as projs,
   slack,
+  email,
   volunteer as vol,
 };

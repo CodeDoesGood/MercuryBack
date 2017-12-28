@@ -141,6 +141,7 @@ export default class Email {
     return new Promise((resolve, reject) => {
       this.transporter.verify((error: Error, result: boolean) => {
         if (!_.isNil(error)) {
+          this.online = false;
           reject(error);
         } else {
           resolve(result);

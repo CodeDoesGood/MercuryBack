@@ -53,6 +53,7 @@ interface IErrors {
 
   USERNAME_DOES_NOT_EXIST: (username: string) => string;
   EMAIL_DOES_NOT_EXIST: (email: string) => string;
+  EMAIL_VERIFY_FAILED: (error: Error) => string;
 
   INVALID_PROJECT_ID_FORMAT: (projectId: number) => string;
   PROJECT_MUST_CONTAIN: (contain: string) => string;
@@ -178,6 +179,7 @@ const errors: IErrors = {
   EMAIL_RESET_SENT: 'An email will be sent to that account\'s address shortly',
 
   EMAIL_ALREADY_EXISTS: email => `The email ${email} already exists`,
+  EMAIL_VERIFY_FAILED: error => `Email service failed to restart, error=${error.message}`,
   USERNAME_ALREADY_EXISTS: username => `The username ${username} already exists`,
 
   EMAIL_DOES_NOT_EXIST: email => `The email ${email} does not exist`,
