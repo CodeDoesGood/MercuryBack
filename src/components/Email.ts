@@ -172,6 +172,25 @@ export default class Email {
   }
 
   /**
+   * returns stored late emails that are stored in the json file.
+   */
+  public getStoredEmails() {
+    const jsonPath: string = this.getEmailJsonPath();
+
+    // If the file does not exist already we shall create it but resolve as there is no emails to be sent.
+    if (!fs.existsSync(jsonPath)) {
+      const template: { emails: any } = { emails: [] };
+
+      fs.writeFileSync(jsonPath, JSON.stringify(template, null, '\t'));
+      logger.info(`[Email] Stored json file does not exist to retrieve late email content, creating...`);
+      return { emails: [] };
+    }
+
+    const storedEmails: { emails: IEmailContent[] } = JSON.parse(fs.readFileSync(jsonPath, 'utf8'));
+    return storedEmails;
+  }
+
+  /**
    * Builds the transporter from nodemailer that will be used to send the emails.
    * @param {string} pass The password that is being used to authenticate with the service.
    */

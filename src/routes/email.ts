@@ -29,14 +29,12 @@ router[email.STORED.SEND.method](email.STORED.SEND.link, [
   authentication.checkAuthenticationToken.bind(this),
   authentication.checkAdminPortalAccess.bind(this),
   infrastructure.unavailable.bind(this),
-  // TODO
 ]);
 
 router[email.STORED.RETRIEVE.method](email.STORED.RETRIEVE.link, [
   authentication.checkAuthenticationToken.bind(this),
   authentication.checkAdminPortalAccess.bind(this),
-  infrastructure.unavailable.bind(this),
-  // TODO
+  emailService.sendStoredLateEmails.bind(this),
 ]);
 
 export default router;

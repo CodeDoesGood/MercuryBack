@@ -290,6 +290,14 @@ function reverifyTheService(req: Request, res: Response) {
   .catch((error: Error) => res.status(500).send({ error: 'Email Service', description: constants.EMAIL_VERIFY_FAILED }));
 }
 
+/**
+ * Sends stored emails to requesting client
+ */
+function sendStoredLateEmails(req: Request, res: Response) {
+  const storedEmails: { emails: IEmailContent[] } = emailClient.getStoredEmails();
+  res.status(200).send({ message: 'stored late emails', content: { emails: storedEmails.emails } });
+}
+
 export {
   createResendVerificationCode,
   denyInvalidAndBlockedDomains,
@@ -302,5 +310,6 @@ export {
   validateConnectionStatus,
   validateContactUsRequestInformation,
   reverifyTheService,
+  sendStoredLateEmails,
   sendEmail,
 };
