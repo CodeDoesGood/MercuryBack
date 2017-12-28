@@ -1,3 +1,5 @@
+import * as dotenv from 'dotenv';
+
 import * as bodyParser from 'body-parser';
 import * as cors from 'cors';
 import * as express from 'express';
@@ -6,6 +8,8 @@ import * as ratelimit from 'express-rate-limit';
 import { logger } from './components/Logger';
 import { logErrors } from './middleware/error';
 import routes from './routes';
+
+dotenv.config();
 
 const app = express();
 const port = (process.env.PORT === undefined) ? 3000 : process.env.PORT;

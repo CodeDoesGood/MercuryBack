@@ -14,6 +14,7 @@ export interface IConfig {
 
   slack: {
     mercury: string;
+    debug: string;
   };
 
   database: IDatabaseConfig;
@@ -44,6 +45,7 @@ export const defaultConfig: IConfig = {
   },
 
   slack: {
+    debug: null,
     mercury: null,
   },
 

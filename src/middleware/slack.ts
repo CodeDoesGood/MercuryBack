@@ -11,7 +11,12 @@ import * as slack from '../components/Slack';
 const config = new Configuration('mercury', 'mercury.json');
 
 function sendHeathCheck(req: Request, res: Response) {
-  const webhookUrl: string = config.getKey('slack').mercury;
+  let webhookUrl: string = config.getKey('slack').mercury;
+
+  if (process.env.production === 'false') {
+    webhookUrl = config.getKey('slack').debug;
+  }
+
   const email = new Email(config.getKey('email'));
   const database = new Database(config.getKey('database'));
 
