@@ -287,13 +287,24 @@ function reverifyTheService(req: Request, res: Response) {
     emailClient.online = true;
     res.status(200).send({ message: 'Email service restarted successfully' });
   })
-  .catch((error: Error) => res.status(500).send({ error: 'Email Service', description: constants.EMAIL_VERIFY_FAILED }));
+  .catch((error: Error) => res.status(500).send({ error: 'Email Service', description: constants.EMAIL_VERIFY_FAILED(error) }));
+}
+
+/**
+ * Attempts to send the stored late emails to the volunteer
+ */
+function sendStoredLateEmails(req: Request, res: Response) {
+  emailClient.sendStoredEmails(emailClient.getEmailJsonPath())
+  .then((failedStored: { emails: IEmailContent[] }) => {
+    res.status(200).send({ message: 'Sent stored emails, returned emails that failed to send', content: failedStored });
+  })
+  .catch((error: Error) => res.send(500).send({ error: 'Stored Emails', description: constants.EMAIL_FAILED_SEND_STORED(error) }));
 }
 
 /**
  * Sends stored emails to requesting client
  */
-function sendStoredLateEmails(req: Request, res: Response) {
+function retrieveStoredLateEmails(req: Request, res: Response) {
   const storedEmails: { emails: IEmailContent[] } = emailClient.getStoredEmails();
   res.status(200).send({ message: 'stored late emails', content: { emails: storedEmails.emails } });
 }
@@ -310,6 +321,7 @@ export {
   validateConnectionStatus,
   validateContactUsRequestInformation,
   reverifyTheService,
+  retrieveStoredLateEmails,
   sendStoredLateEmails,
   sendEmail,
 };

@@ -56,7 +56,7 @@ export default class Email {
   * Take any stored emails in sthe email path and send them when the connection system is up
   * @param jsonPath The path to the json file of the stored emails to be send later
   */
-  public sendStoredEmails(jsonPath: string) {
+  public sendStoredEmails(jsonPath: string): Promise<{ emails: IEmailContent[] } | Error> {
     if (!this.online) {
       return Promise.reject(new Error(`[Email] Service must be online to send stored emails`));
     }
@@ -67,7 +67,7 @@ export default class Email {
 
       fs.writeFileSync(jsonPath, JSON.stringify(template, null, '\t'));
       logger.info(`[Email] Stored json file does not exist to retrieve late email content, creating...`);
-      return Promise.resolve();
+      return Promise.resolve(template);
     }
 
     const storedEmails: { emails: IEmailContent[] } = JSON.parse(fs.readFileSync(jsonPath, 'utf8'));
@@ -76,7 +76,7 @@ export default class Email {
 
     if (_.isNil(storedEmails.emails[0])) {
       logger.info(`[Email] No late stored emails to send 😊`);
-      return Promise.resolve();
+      return Promise.resolve(storedEmails);
     }
 
     _.forEach(storedEmails.emails, (email: IEmailContent, index) => {
@@ -90,13 +90,11 @@ export default class Email {
 
         if (sentEmails === storedEmails.emails.length) {
           fs.writeFileSync(jsonPath, JSON.stringify(updatedStoredEmails, null, '\t'));
-          return Promise.resolve();
+          return Promise.resolve(updatedStoredEmails);
         }
       })
       .catch((error: Error) => logger.warn(`[Email] Failed to send store email ${error.message}`));
     });
-
-    return Promise.resolve();
   }
 
   /**

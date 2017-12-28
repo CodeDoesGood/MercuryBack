@@ -50,6 +50,7 @@ interface IErrors {
 
   USERNAME_ALREADY_EXISTS: (username: string) => string;
   EMAIL_ALREADY_EXISTS: (email: string) => string;
+  EMAIL_FAILED_SEND_STORED: (error: Error) => string;
 
   USERNAME_DOES_NOT_EXIST: (username: string) => string;
   EMAIL_DOES_NOT_EXIST: (email: string) => string;
@@ -179,6 +180,7 @@ const errors: IErrors = {
   EMAIL_RESET_SENT: 'An email will be sent to that account\'s address shortly',
 
   EMAIL_ALREADY_EXISTS: email => `The email ${email} already exists`,
+  EMAIL_FAILED_SEND_STORED: error => `Failed to send stored late emails to volunteers, error=${error.message}`,
   EMAIL_VERIFY_FAILED: error => `Email service failed to restart, error=${error.message}`,
   USERNAME_ALREADY_EXISTS: username => `The username ${username} already exists`,
 
