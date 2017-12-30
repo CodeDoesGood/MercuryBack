@@ -255,8 +255,8 @@ const errors: IErrors = {
   SLACK_HOOK_MISSING: 'Slack webhook url was not provided for hook request.',
 
   STORED_EMAIL_MISSING_INDEX: 'Stored email index is required for a stored email to be removed',
-  STORED_EMAIL_UPDATE_REQUIRED: 'Stored email update requires a new email to be passed via the body, { email: [] }',
   STORED_EMAIL_REQUIREMENTS: 'Stored email update object must require the html, subject, text, to',
+  STORED_EMAIL_UPDATE_REQUIRED: 'Stored email update requires a new email to be passed via the body, { email: [] }',
 
   UNKNOWN_ERROR: 'Something went wrong',
 };
