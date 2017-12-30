@@ -189,6 +189,22 @@ export default class Email {
   }
 
   /**
+   * Attempts to rmeove a stored email by its index
+   * @param index email index to remove
+   */
+  public removeStoredEmailByIndex(index: number): Promise<IEmailContent[] | Error> {
+    const storedEmails = this.getStoredEmails();
+    const jsonPath: string = this.getEmailJsonPath();
+
+    if (index > storedEmails.emails.length) {
+      return Promise.reject(new Error('Cannot remove eamil by index as index is out of range'));
+    }
+    const updatedStoredEmails = storedEmails.emails.splice(index, 1);
+    fs.writeFileSync(jsonPath, JSON.stringify({ emails: updatedStoredEmails }, null, '\t'));
+    return Promise.resolve(updatedStoredEmails);
+  }
+
+  /**
    * Builds the transporter from nodemailer that will be used to send the emails.
    * @param {string} pass The password that is being used to authenticate with the service.
    */

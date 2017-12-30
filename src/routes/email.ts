@@ -37,4 +37,10 @@ router[email.STORED.RETRIEVE.method](email.STORED.RETRIEVE.link, [
   emailService.retrieveStoredLateEmails.bind(this),
 ]);
 
+router[email.STORED.REMOVE.method](email.STORED.REMOVE.link, [
+  authentication.checkAuthenticationToken.bind(this),
+  authentication.checkAdminPortalAccess.bind(this),
+  emailService.removeStoredEmailByIndex.bind(this),
+]);
+
 export default router;

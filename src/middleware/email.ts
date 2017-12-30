@@ -309,6 +309,22 @@ function retrieveStoredLateEmails(req: Request, res: Response) {
   res.status(200).send({ message: 'stored late emails', content: { emails: storedEmails.emails } });
 }
 
+/**
+ * Removes a stored late email by the index provided
+ */
+function removeStoredEmailByIndex(req: Request, res: Response) {
+  if (_.isNil(req.params.email_id)) {
+    return res.status(401).send({ error: 'Email Id', description: 'Stored email index is required for a stored email to be removed' });
+  }
+
+  const emailIndex = parseInt(req.params.email_id, 10);
+
+  emailClient.removeStoredEmailByIndex(emailIndex)
+  .then((updatedEmails: IEmailContent[]) => res.status(200)
+  .send({ message: `Removed stored email ${emailIndex}`, content: { email_removed: emailIndex, updated: updatedEmails } }))
+  .catch((error: Error) => res.status(500).send({ error: 'Remove Late Email', description: error.message }));
+}
+
 export {
   createResendVerificationCode,
   denyInvalidAndBlockedDomains,
@@ -322,6 +338,7 @@ export {
   validateContactUsRequestInformation,
   reverifyTheService,
   retrieveStoredLateEmails,
+  removeStoredEmailByIndex,
   sendStoredLateEmails,
   sendEmail,
 };
