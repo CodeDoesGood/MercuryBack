@@ -28,28 +28,32 @@ export interface IBuiltMessage {
   to: string;
 }
 
+export interface IEmailServices {
+  user: string;
+  secure: boolean;
+  service: string;
+}
+
 export default class Email {
   public username: string;
   public online: boolean;
 
+  private secure: boolean;
   private service: string;
   private stored: string;
   private transporter: nodemailer.Transporter;
 
   constructor(options: IEmailOptions) {
-    // The type of service used for emailing.
     this.service = options.service;
-
-    // The email that will be used to make the connection.
     this.username = options.email;
+
+    this.online = false;
+    this.secure = true;
 
     this.stored = options.stored;
 
     // Transporter that will be sending the emails
     this.transporter = this.build(options.password);
-
-    // Status for checking that the email connection is working.
-    this.online = false;
   }
 
  /**
@@ -142,6 +146,7 @@ export default class Email {
           this.online = false;
           reject(error);
         } else {
+          this.online = true;
           resolve(result);
         }
       });
@@ -170,9 +175,45 @@ export default class Email {
   }
 
   /**
+   * Returns the current service configuration that is used to connect and make
+   * the email client.
+   */
+  public getServiceConfig(): IEmailServices {
+    return {
+      user: this.username,
+      service: this.service,
+      secure: this.secure,
+    };
+  }
+
+  /**
+   * Updates the service details for the email client, allowing for live updating without
+   * the need to restart the server
+   * @param details Service details used for the update
+   * @param password The password used for recreating the connection
+   */
+  public updateServiceDetails(details: IEmailServices, password: string): Promise<boolean | Error> {
+    this.secure = details.secure;
+    this.username = details.user;
+    this.service = details.service;
+
+    this.transporter = this.build(password);
+    return this.verify();
+  }
+
+  /**
+   * Replace and update the email service password
+   * @param password The new password
+   */
+  public updateServicePassword(password: string) {
+    this.transporter = this.build(password);
+    return this.verify();
+  }
+
+  /**
    * returns stored late emails that are stored in the json file.
    */
-  public getStoredEmails() {
+  public getStoredEmails(): { emails: IEmailContent[] } {
     const jsonPath: string = this.getEmailJsonPath();
 
     // If the file does not exist already we shall create it but resolve as there is no emails to be sent.
@@ -233,7 +274,7 @@ export default class Email {
         pass,
         user: this.username,
       },
-      secure: true,
+      secure: this.secure,
       service: this.service,
     });
   }

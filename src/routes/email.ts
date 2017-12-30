@@ -12,13 +12,32 @@ const router: Router | any = Router();
 **************************************************************************************************/
 
 /******************
-    Restart
+    Service
 ******************/
 
 router[email.SERVICE.RESTART.method](email.SERVICE.RESTART.link, [
   authentication.checkAuthenticationToken.bind(this),
   authentication.checkAdminPortalAccess.bind(this),
   emailService.reverifyTheService.bind(this),
+]);
+
+router[email.SERVICE.GET.method](email.SERVICE.GET.link, [
+  authentication.checkAuthenticationToken.bind(this),
+  authentication.checkAdminPortalAccess.bind(this),
+  emailService.sendAdminServiceDetails.bind(this),
+]);
+
+router[email.SERVICE.UPDATE.method](email.SERVICE.UPDATE.link, [
+  authentication.checkAuthenticationToken.bind(this),
+  authentication.checkAdminPortalAccess.bind(this),
+  emailService.validateUpdatedServiceDetails.bind(this),
+  emailService.updateServiceDetails.bind(this),
+]);
+
+router[email.SERVICE.UPDATE_PASSWORD.method](email.SERVICE.UPDATE_PASSWORD.link, [
+  authentication.checkAuthenticationToken.bind(this),
+  authentication.checkAdminPortalAccess.bind(this),
+  emailService.updateServicePassword.bind(this),
 ]);
 
 /******************

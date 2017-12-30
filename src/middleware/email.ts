@@ -14,7 +14,6 @@ const emailClient = new Email(config.getKey('email'));
 
 emailClient.verify()
 .then(() => {
-  emailClient.online = true;
   return emailClient.sendStoredEmails(emailClient.getEmailJsonPath());
 })
 .then(() => logger.info(`[Email] Email Client is ready, service=${emailClient.getService()}, email=${emailClient.username}`))
@@ -23,7 +22,7 @@ emailClient.verify()
 /**
  * Get the resend details from the get params of the request
  */
-function getResendVerifyDetails(req: Request, res: Response, next: NextFunction) {
+export function getResendVerifyDetails(req: Request, res: Response, next: NextFunction) {
   const { username }: { username: string; } = req.params;
   req.body.username = username;
   next();
@@ -34,7 +33,7 @@ function getResendVerifyDetails(req: Request, res: Response, next: NextFunction)
  * send a 500 internal server that the service is currently not working but they can still login
  * and a validation email will be sent out as soon as the service is running again.
  */
-function validateConnectionStatus(req: Request, res: Response, next: NextFunction) {
+export function validateConnectionStatus(req: Request, res: Response, next: NextFunction) {
   const email: IEmailContent = req.body.email;
 
   if (emailClient.getStatus()) {
@@ -55,7 +54,7 @@ function validateConnectionStatus(req: Request, res: Response, next: NextFunctio
  * Will send a validation email to the new volunteer via there email, allowing them
  * to confirm there current email address.
  */
-function createVerificationEmail(req: Request, res: Response, next: NextFunction) {
+export function createVerificationEmail(req: Request, res: Response, next: NextFunction) {
   const { volunteer }: { volunteer: Volunteer } = req.body;
   const code: string = req.body.verificationCode;
   let verificationLink: string;
@@ -91,7 +90,7 @@ function createVerificationEmail(req: Request, res: Response, next: NextFunction
  * @param req.body.email IEmailContent containing to, from, subject, text
  * @param req.body.message A string containing the message to be sent after the email has been sent
  */
-function sendEmail(req: Request, res: Response) {
+export function sendEmail(req: Request, res: Response) {
   const { email, message }: { email: IEmailContent; message: string; } = req.body;
 
   const to: string = email.to;
@@ -112,7 +111,7 @@ function sendEmail(req: Request, res: Response) {
  * Will resend a validation email to the new volunteer via there email, allowing them
  * to confirm there current email address.
  */
-function createResendVerificationEmail(req: Request, res: Response, next: NextFunction) {
+export function createResendVerificationEmail(req: Request, res: Response, next: NextFunction) {
   const { volunteer }: { volunteer: Volunteer } = req.body;
   const code: string = req.body.verificationCode;
   let verificationLink: string;
@@ -141,7 +140,7 @@ function createResendVerificationEmail(req: Request, res: Response, next: NextFu
 /**
  * Resend the verification code to user,
  */
-function createResendVerificationCode(req: Request, res: Response, next: NextFunction) {
+export function createResendVerificationCode(req: Request, res: Response, next: NextFunction) {
   const volunteerId: number = req.body.id;
   const volunteer = new Volunteer(volunteerId);
 
@@ -172,7 +171,7 @@ function createResendVerificationCode(req: Request, res: Response, next: NextFun
  * The front end will then route to a functional page that will post back
  * to reset the users password.
  */
-function createPasswordResetLinkToRequestingEmail(req: Request, res: Response, next: NextFunction) {
+export function createPasswordResetLinkToRequestingEmail(req: Request, res: Response, next: NextFunction) {
   const { volunteer } = req.body;
   const { username, email }: { username: string; email: string; } = volunteer;
 
@@ -209,7 +208,7 @@ function createPasswordResetLinkToRequestingEmail(req: Request, res: Response, n
 /**
  * Validates the users name, email and text that as been sent.
  */
-function validateContactUsRequestInformation(req: Request, res: Response, next: NextFunction) {
+export function validateContactUsRequestInformation(req: Request, res: Response, next: NextFunction) {
   const senderName: string = req.body.name;
   const senderEmail: string = req.body.email;
   const senderSubject: string = req.body.subject;
@@ -246,7 +245,7 @@ function validateContactUsRequestInformation(req: Request, res: Response, next: 
 /**
  * Rejects any invalid domain names or banned domain names from being sent.
  */
-function denyInvalidAndBlockedDomains(req: Request, res: Response, next: NextFunction) {
+export function denyInvalidAndBlockedDomains(req: Request, res: Response, next: NextFunction) {
   return next();
 }
 
@@ -254,7 +253,7 @@ function denyInvalidAndBlockedDomains(req: Request, res: Response, next: NextFun
  * After validation of the name, email and senderText then send the email to the
  * email to the default CodeDoesGood inbox.
  */
-function sendContactUsRequestInbox(req: Request, res: Response) {
+export function sendContactUsRequestInbox(req: Request, res: Response) {
   const { sender }: { sender: { name: string; email: string; subject: string; text: string; } } = req.body;
 
   emailClient.send(sender.email, config.getKey('email').email, sender.subject, sender.text, sender.text)
@@ -270,7 +269,7 @@ function sendContactUsRequestInbox(req: Request, res: Response) {
 /**
  * Sends OK or Internal Server Error based on the true / false email status.
  */
-function sendContactUsEmailStatus(req: Request, res: Response) {
+export function sendContactUsEmailStatus(req: Request, res: Response) {
   if (emailClient.getStatus()) {
     res.sendStatus(200);
   } else {
@@ -281,10 +280,9 @@ function sendContactUsEmailStatus(req: Request, res: Response) {
 /**
  * Attempt to reverify the service for the email client and bring it back online.
  */
-function reverifyTheService(req: Request, res: Response) {
+export function reverifyTheService(req: Request, res: Response) {
   emailClient.verify()
   .then(() => {
-    emailClient.online = true;
     res.status(200).send({ message: 'Email service restarted successfully' });
   })
   .catch((error: Error) => res.status(500).send({ error: 'Email Service', description: constants.EMAIL_VERIFY_FAILED(error) }));
@@ -293,7 +291,7 @@ function reverifyTheService(req: Request, res: Response) {
 /**
  * Attempts to send the stored late emails to the volunteer
  */
-function sendStoredLateEmails(req: Request, res: Response) {
+export function sendStoredLateEmails(req: Request, res: Response) {
   emailClient.sendStoredEmails(emailClient.getEmailJsonPath())
   .then((failedStored: { emails: IEmailContent[] }) => {
     res.status(200).send({ message: 'Sent stored emails, returned emails that failed to send', content: failedStored });
@@ -304,7 +302,7 @@ function sendStoredLateEmails(req: Request, res: Response) {
 /**
  * Sends stored emails to requesting client
  */
-function retrieveStoredLateEmails(req: Request, res: Response) {
+export function retrieveStoredLateEmails(req: Request, res: Response) {
   const storedEmails: { emails: IEmailContent[] } = emailClient.getStoredEmails();
   res.status(200).send({ message: 'stored late emails', content: { emails: storedEmails.emails } });
 }
@@ -312,7 +310,7 @@ function retrieveStoredLateEmails(req: Request, res: Response) {
 /**
  * Removes a stored late email by the index provided
  */
-function removeStoredEmailByIndex(req: Request, res: Response) {
+export function removeStoredEmailByIndex(req: Request, res: Response) {
   if (_.isNil(req.params.email_id)) {
     return res.status(401).send({ error: 'Email Id', description: constants.STORED_EMAIL_MISSING_INDEX });
   }
@@ -328,7 +326,7 @@ function removeStoredEmailByIndex(req: Request, res: Response) {
 /**
  * Updates a late stored email by index, requires the full email to be sent down.
  */
-function updateStoredEmailByIndex(req: Request, res: Response) {
+export function updateStoredEmailByIndex(req: Request, res: Response) {
   if (_.isNil(req.params.email_id)) {
     return res.status(401).send({ error: 'Email Id', description: constants.STORED_EMAIL_MISSING_INDEX });
   }
@@ -350,21 +348,67 @@ function updateStoredEmailByIndex(req: Request, res: Response) {
   .catch((error: Error) => res.status(500).send({ error: 'Update Late Email', description: error.message }));
 }
 
-export {
-  createResendVerificationCode,
-  denyInvalidAndBlockedDomains,
-  getResendVerifyDetails,
-  sendContactUsEmailStatus,
-  createResendVerificationEmail,
-  sendContactUsRequestInbox,
-  createPasswordResetLinkToRequestingEmail,
-  createVerificationEmail,
-  validateConnectionStatus,
-  validateContactUsRequestInformation,
-  reverifyTheService,
-  retrieveStoredLateEmails,
-  removeStoredEmailByIndex,
-  updateStoredEmailByIndex,
-  sendStoredLateEmails,
-  sendEmail,
-};
+/**
+ * Sends the emailClient service details to the requesting administrator
+ * with the password redacted.
+ */
+export function sendAdminServiceDetails(req: Request, res: Response) {
+  res.status(200).send({ message: 'Email Service Details', content: emailClient.getServiceConfig() });
+}
+
+export function validateUpdatedServiceDetails(req: Request, res: Response, next: NextFunction) {
+  const requiredObjects: string[] = ['user', 'service', 'secure'];
+
+  if (_.isNil(req.body.service)) {
+    return res.status(500).send({ error: 'Service update', description: 'Email service update requires a service object to be passed' });
+  }
+
+  const service = _.pick(req.body.service, requiredObjects);
+
+  if (_.isNil(service.user) || _.isNil(service.service) || _.isNil(service.secure)) {
+    return res.status(500).send({ error: 'Service update', description: 'Email service requires user, service and secure' });
+  }
+
+  req.body.service = service;
+  next();
+}
+
+/**
+ * Updates the service details on the config file and on the email client
+ * triggering a restart / reverify of the service.
+ */
+export function updateServiceDetails(req: Request, res: Response) {
+  const updatedServiceDetails = req.body.service;
+  emailClient.updateServiceDetails(updatedServiceDetails, config.getKey('email').password)
+  .then(() => {
+    const storedConfig = config.getConfiguration();
+    storedConfig.email.email = updatedServiceDetails.user;
+    storedConfig.email.service = updatedServiceDetails.service;
+    config.update(storedConfig);
+
+    logger.info('[Email] The email service details has been updated and restarted');
+
+    res.status(200).send({ message: 'Updated services and restarted', content: { updated: updatedServiceDetails } });
+  })
+  .catch((error: Error) => res.status(500).send({ error: 'Email Service', description: constants.EMAIL_VERIFY_FAILED(error) }));
+}
+
+export function updateServicePassword(req: Request, res: Response) {
+  const password = req.body.password;
+
+  if (_.isNil(password)) {
+    return res.status(500).send({ error: 'Service password update', description: 'Email password update requires a password' });
+  }
+
+  emailClient.updateServicePassword(password)
+  .then(() => {
+    const storedConfig = config.getConfiguration();
+    storedConfig.email.password = password;
+    config.update(storedConfig);
+
+    logger.info('[Email] The email service password has been updated and restarted');
+
+    res.status(200).send({ message: 'Updated service password' });
+  })
+  .catch((error: Error) => res.status(500).send({ error: 'Email Service', description: constants.EMAIL_VERIFY_FAILED(error) }));
+}
