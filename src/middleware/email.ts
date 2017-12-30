@@ -314,7 +314,7 @@ function retrieveStoredLateEmails(req: Request, res: Response) {
  */
 function removeStoredEmailByIndex(req: Request, res: Response) {
   if (_.isNil(req.params.email_id)) {
-    return res.status(401).send({ error: 'Email Id', description: 'Stored email index is required for a stored email to be removed' });
+    return res.status(401).send({ error: 'Email Id', description: constants.STORED_EMAIL_MISSING_INDEX });
   }
 
   const emailIndex = parseInt(req.params.email_id, 10);
@@ -323,6 +323,31 @@ function removeStoredEmailByIndex(req: Request, res: Response) {
   .then((updatedEmails: IEmailContent[]) => res.status(200)
   .send({ message: `Removed stored email ${emailIndex}`, content: { email_removed: emailIndex, updated: updatedEmails } }))
   .catch((error: Error) => res.status(500).send({ error: 'Remove Late Email', description: error.message }));
+}
+
+/**
+ * Updates a late stored email by index, requires the full email to be sent down.
+ */
+function updateStoredEmailByIndex(req: Request, res: Response) {
+  if (_.isNil(req.params.email_id)) {
+    return res.status(401).send({ error: 'Email Id', description: constants.STORED_EMAIL_MISSING_INDEX });
+  }
+
+  const emailIndex = parseInt(req.params.email_id, 10);
+  const email: IEmailContent = req.body.email;
+
+  if (_.isNil(email)) {
+    return res.status(401).send({ error: 'Email Id', description: constants.STORED_EMAIL_UPDATE_REQUIRED });
+  }
+
+  if (_.isNil(email.html) || _.isNil(email.subject) || _.isNil(email.text) || _.isNil(email.to)) {
+    return res.status(401).send({ error: 'Email Id', description: constants.STORED_EMAIL_REQUIREMENTS });
+  }
+
+  emailClient.replaceStoredEmailByIndex(emailIndex, email)
+  .then((updatedEmails: IEmailContent[]) => res.status(200)
+  .send({ message: `updated stored email ${emailIndex}`, content: { email_updated: emailIndex, updated: updatedEmails } }))
+  .catch((error: Error) => res.status(500).send({ error: 'Update Late Email', description: error.message }));
 }
 
 export {
@@ -339,6 +364,7 @@ export {
   reverifyTheService,
   retrieveStoredLateEmails,
   removeStoredEmailByIndex,
+  updateStoredEmailByIndex,
   sendStoredLateEmails,
   sendEmail,
 };

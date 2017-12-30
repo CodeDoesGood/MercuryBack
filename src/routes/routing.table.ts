@@ -24,10 +24,10 @@ const email = {
     RESTART: {  link: '/email/service/restart', method: 'get' },
   },
   STORED: {
-    REMOVE:   { link: '/email/stored/:email_id', method:   'delete'  },
-    RETRIEVE: { link: '/email/stored',          method:   'get'     },
-    SEND:     { link: '/email/stored/send',     method:   'get'     },
-    UPDATE:   { link: '/email/stored/:email_id', method:   'post'    }, // todo
+    REMOVE:   { link: '/email/stored/:email_id',  method:   'delete'  },
+    RETRIEVE: { link: '/email/stored',            method:   'get'     },
+    SEND:     { link: '/email/stored/send',       method:   'get'     },
+    UPDATE:   { link: '/email/stored/:email_id',  method:   'post'    },
   },
 };
 

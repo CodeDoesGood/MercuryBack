@@ -197,11 +197,30 @@ export default class Email {
     const jsonPath: string = this.getEmailJsonPath();
 
     if (index > storedEmails.emails.length) {
-      return Promise.reject(new Error('Cannot remove eamil by index as index is out of range'));
+      return Promise.reject(new Error('Cannot remove email by index as index is out of range'));
     }
-    const updatedStoredEmails = storedEmails.emails.splice(index, 1);
-    fs.writeFileSync(jsonPath, JSON.stringify({ emails: updatedStoredEmails }, null, '\t'));
-    return Promise.resolve(updatedStoredEmails);
+
+    storedEmails.emails.splice(index, 1);
+    fs.writeFileSync(jsonPath, JSON.stringify({ emails: storedEmails.emails }, null, '\t'));
+    return Promise.resolve(storedEmails.emails);
+  }
+
+  /**
+   * Replace a email index in the stored json
+   * @param index the index of the email to update
+   * @param email IEmailContent email to update
+   */
+  public replaceStoredEmailByIndex(index, email): Promise<IEmailContent[] | Error> {
+    const storedEmails = this.getStoredEmails();
+    const jsonPath: string = this.getEmailJsonPath();
+
+    if (index > storedEmails.emails.length) {
+      return Promise.reject(new Error('Cannot update email by index as index is out of range'));
+    }
+
+    storedEmails.emails[index] = email;
+    fs.writeFileSync(jsonPath, JSON.stringify({ emails: storedEmails.emails }, null, '\t'));
+    return Promise.resolve(storedEmails.emails);
   }
 
   /**

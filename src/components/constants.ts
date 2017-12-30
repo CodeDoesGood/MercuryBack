@@ -117,8 +117,13 @@ interface IErrors {
 
   SLACK_HOOK_MISSING: string;
 
-  UNKNOWN_ERROR: string;
   SLACK_HEALTH_FAILED: (error: Error) => string;
+
+  STORED_EMAIL_MISSING_INDEX: string;
+  STORED_EMAIL_UPDATE_REQUIRED: string;
+  STORED_EMAIL_REQUIREMENTS: string;
+
+  UNKNOWN_ERROR: string;
 }
 
 const constants: IConstants = {
@@ -248,6 +253,10 @@ const errors: IErrors = {
 
   SLACK_HEALTH_FAILED: error => `Health check failed to send to slack, error=${error.message}`,
   SLACK_HOOK_MISSING: 'Slack webhook url was not provided for hook request.',
+
+  STORED_EMAIL_MISSING_INDEX: 'Stored email index is required for a stored email to be removed',
+  STORED_EMAIL_UPDATE_REQUIRED: 'Stored email update requires a new email to be passed via the body, { email: [] }',
+  STORED_EMAIL_REQUIREMENTS: 'Stored email update object must require the html, subject, text, to',
 
   UNKNOWN_ERROR: 'Something went wrong',
 };

@@ -43,4 +43,10 @@ router[email.STORED.REMOVE.method](email.STORED.REMOVE.link, [
   emailService.removeStoredEmailByIndex.bind(this),
 ]);
 
+router[email.STORED.UPDATE.method](email.STORED.UPDATE.link, [
+  authentication.checkAuthenticationToken.bind(this),
+  authentication.checkAdminPortalAccess.bind(this),
+  emailService.updateStoredEmailByIndex.bind(this),
+]);
+
 export default router;
