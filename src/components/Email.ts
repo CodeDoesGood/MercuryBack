@@ -5,6 +5,8 @@ import * as nodemailer from 'nodemailer';
 
 import { logger } from './Logger';
 
+let instance: any = null;
+
 export interface IEmailOptions {
   service: string;
   email: string;
@@ -44,6 +46,10 @@ export default class Email {
   private transporter: nodemailer.Transporter;
 
   constructor(options: IEmailOptions) {
+    if (!_.isNil(instance)) {
+      return instance;
+    }
+
     this.service = options.service;
     this.username = options.email;
 
@@ -54,6 +60,8 @@ export default class Email {
 
     // Transporter that will be sending the emails
     this.transporter = this.build(options.password);
+
+    instance = this;
   }
 
  /**
