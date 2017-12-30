@@ -21,8 +21,8 @@ const projects = {
 
 const email = {
   SERVICE: {
-    RESTART:  { link: '/email/service/restart',         method: 'get' },
     GET:      { link: '/email/service',                 method: 'get' },
+    RESTART:  { link: '/email/service/restart',         method: 'get' },
     UPDATE:   { link: '/email/service',                 method: 'post' },
     UPDATE_PASSWORD: { link: '/email/service/password', method: 'post' },
   },

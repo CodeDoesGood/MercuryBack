@@ -180,9 +180,9 @@ export default class Email {
    */
   public getServiceConfig(): IEmailServices {
     return {
-      user: this.username,
-      service: this.service,
       secure: this.secure,
+      service: this.service,
+      user: this.username,
     };
   }
 
