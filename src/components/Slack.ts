@@ -24,6 +24,29 @@ export function message(url: string, slackMessage: string | {}): Promise<boolean
 }
 
 /**
+ * Sends out a red warning twich message to the provided webhook url
+ * @param url the url for the webhook
+ */
+export function serviceDownMessage(url: string, service: string): Promise<boolean | Error> {
+  const serviceMessage = {
+    text: 'Service Update',
+
+    attachments: [{
+      color: '#FF0032',
+      fallback: 'Offline services',
+      fields: [{
+        short: false,
+        title: `${service} is currently down`,
+        value: `As of ${new Date().toLocaleDateString()} ${new Date().toLocaleTimeString()} the serice ${service} is down`,
+      }],
+    }],
+  };
+
+  return message(url, serviceMessage);
+
+}
+
+/**
  * Generates a simple health check for the system and sends it to slack.
  * @param url slack webhook address
  * @param email online boolean
