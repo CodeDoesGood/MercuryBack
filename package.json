@@ -4,6 +4,8 @@
   "author": "CodeDoesGood",
   "description": "The supporting backend of the Mercury project",
   "scripts": {
+    "cover": "nyc ./node_modules/mocha/bin/mocha --exit ./dist/tests/index.test.js",
+    "cover:full": "nyc --reporter=html ./node_modules/mocha/bin/mocha --exit ./dist/tests/index.test.js",
     "build": "npm run build:ts && npm run tslint",
     "build:ts": "tsc",
     "watch:ts": "tsc -w",
