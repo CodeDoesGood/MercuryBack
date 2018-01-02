@@ -95,7 +95,7 @@ export default class Volunteer extends Database {
       throw new Error('When provided VolunteerId must be a integer');
     }
     if (!_.isNil(username) && !_.isString(username)) {
-      throw new Error('When provided username must be a integer');
+      throw new Error('When provided username must be a string');
     }
 
     super(config.getKey('database'));
@@ -244,10 +244,7 @@ export default class Volunteer extends Database {
       return false;
     }
 
-    if (this.verified) {
-      return true;
-    }
-    return false;
+    return this.verified;
   }
 
   /**
@@ -444,8 +441,9 @@ export default class Volunteer extends Database {
    * Can the volunteer access the admin panel
    */
   public canAccessAdminPortal(): Promise<boolean | Error> {
-    if (_.isNil(this.adminOverallLevel)) {
-      return this.knex('volunteer').select('admin_portal_access').where('volunteer_id', this.volunteerId).first()
+    if (_.isNil(this.adminPortalAccess)) {
+      return this.connect()
+      .then(() => this.knex('volunteer').select('admin_portal_access').where('volunteer_id', this.volunteerId).first())
       .then((res: { admin_portal_access: number }) => {
         this.adminPortalAccess = (res.admin_portal_access === 1) ? true : false;
         return Promise.resolve(this.adminPortalAccess);

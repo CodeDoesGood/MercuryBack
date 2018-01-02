@@ -26,6 +26,49 @@ describe('Volunteer Component', () => {
       assert.equal(_.isUndefined(volunteer.email), false, 'Volunteer class must contain: "email"');
       assert.equal(_.isUndefined(volunteer.salt), false, 'Volunteer class must contain: "salt"');
     });
+
+    it('Should throw a error when a provided volunteerId is not a int', () => {
+      const volunteerId: any = '1';
+
+      try {
+        const volunteer = new Volunteer(volunteerId);
+      } catch (error) {
+        assert.equal(error.message, 'When provided VolunteerId must be a integer', 'When provided VolunteerId must be a integer');
+      }
+    });
+
+    it('Should throw a error when a provided username is not a string', () => {
+      const volunteerString: any = 1;
+
+      try {
+        const volunteer = new Volunteer(null, volunteerString);
+      } catch (error) {
+        assert.equal(error.message, 'When provided username must be a string', 'When provided username must be a string');
+      }
+    });
+  });
+
+  describe('#getVerification', () => {
+    it('Should return true if volunteer verification is set to true', () => {
+      const volunteer = new Volunteer(null, 'username');
+      volunteer.verified = true;
+
+      assert.equal(volunteer.getVerification(), true, 'Volunteer verified should return true if it is set to true');
+    });
+
+    it('Should return false if volunteer verification is set to false', () => {
+      const volunteer = new Volunteer(null, 'username');
+      volunteer.verified = false;
+
+      assert.equal(volunteer.getVerification(), false, 'Volunteer verified should return false if it is set to false');
+    });
+
+    it('Should return false if the username is null or not passed', () => {
+      const volunteer = new Volunteer();
+      volunteer.verified = true;
+
+      assert.equal(volunteer.getVerification(), false, 'Failed to return false when the usernam was null or not passed');
+    });
   });
 
   describe('#compareAuthenticatingPassword', () => {
@@ -119,6 +162,77 @@ describe('Volunteer Component', () => {
   });
 
   if (_.isNil(process.env.TRAVIS)) {
+    describe('#getProfile', () => {
+      it('Should return all profile selections', () => {
+        const volunteer = new Volunteer(null, 'user1');
+
+        volunteer.exists('username')
+          .then(() => {
+            const profile = volunteer.getProfile();
+
+            assert.equal(_.isNil(profile.about), false, 'about should be returned from getProfile');
+            assert.equal(_.isNil(profile.developer_level), false, 'developer_level should be returned from getProfile');
+            assert.equal(_.isNil(profile.email), false, 'email should be returned from getProfile');
+            assert.equal(_.isNil(profile.github_id), false, 'github_id should be returned from getProfile');
+            assert.equal(_.isNil(profile.linked_in_id), false, 'linked_in_id should be returned from getProfile');
+            assert.equal(_.isNil(profile.location), false, 'location should be returned from getProfile');
+            assert.equal(_.isNil(profile.name), false, 'name should be returned from getProfile');
+            assert.equal(_.isNil(profile.phone), false, 'phone should be returned from getProfile');
+            assert.equal(_.isNil(profile.position), false, 'position should be returned from getProfile');
+            assert.equal(_.isNil(profile.slack_id), false, 'slack_id should be returned from getProfile');
+            assert.equal(_.isNil(profile.timezone), false, 'timezone should be returned from getProfile');
+            assert.equal(_.isNil(profile.username), false, 'username should be returned from getProfile');
+            assert.equal(_.isNil(profile.verified), false, 'verified should be returned from getProfile');
+            assert.equal(_.isNil(profile.volunteer_id), false, 'volunteer_id should be returned from getProfile');
+            assert.equal(_.isNil(profile.volunteer_status), false, 'volunteer_status should be returned from getProfile');
+          },    (error: Error) => { throw new Error(error.message); });
+      });
+    });
+
+    describe('#canAccessAdminPortal', () => {
+      it('Should return a the set volunteerAdminPortal if its not null or undefined', () => {
+        const volunteer = new Volunteer(null, 'user1');
+        volunteer.adminPortalAccess = true;
+
+        volunteer.exists('username')
+        .then(() => volunteer.canAccessAdminPortal())
+          .then((canAccessAdminPortal: boolean) => {
+            assert.equal(canAccessAdminPortal, true, 'Should return true if the adminPortalAccess is already defined');
+          },    (error: Error) => { throw new Error(error.message); });
+      });
+
+      it('Should return false if the user is lacking the permission to access the admin portal', () => {
+        const volunteer = new Volunteer(null, 'user1');
+
+        volunteer.exists('username')
+        .then(() => volunteer.canAccessAdminPortal())
+          .then((canAccessAdminPortal: boolean) => {
+            assert.equal(canAccessAdminPortal, false, 'Should return false if the user cannot access the adminPortal');
+          },    (error: Error) => { throw new Error(error.message); });
+      });
+
+      it('Should return true from the database if the user is able able to access the administration panel', () => {
+        const volunteer = new Volunteer(null, 'user1');
+
+        volunteer.exists('username')
+        .then(() => volunteer.knex('volunteer').update('admin_portal_access', true).where('volunteer_id', volunteer.volunteerId))
+        .then(() => volunteer.canAccessAdminPortal())
+        .then((canAccessAdminPortal: boolean) => {
+          assert.equal(canAccessAdminPortal, true, 'Should return true if the user can acess the adminPortal');
+          return volunteer.knex('volunteer').update('admin_portal_access', false).where('volunteer_id', volunteer.volunteerId);
+        },    (error: Error) => { throw new Error(error.message); });
+      });
+
+      it('should reject if the volunteerId is null or not passed', () => {
+        const volunteer = new Volunteer();
+
+        volunteer.canAccessAdminPortal()
+        .then(() => {
+          throw new Error('Shouldn\'t resolve when the volunteer id is not passed');
+        },    () => undefined);
+      });
+    });
+
     describe('#exists', () => {
       it('Should resolve if the volunteer exists', () => {
         const volunteer = new Volunteer(1);
@@ -752,12 +866,11 @@ describe('Volunteer Component', () => {
         const volunteer = new Volunteer(null, 'user1');
 
         return volunteer.exists('username')
+          .then(() => volunteer.knex('volunteer_announcement').update('read', true).where('volunteer_id', volunteer.volunteerId))
           .then(() => volunteer.getActiveNotifications())
           .then((notifications: IAnnouncement[]) => {
-            assert.equal(
-              _.isNil(notifications[0]),
-              true,
-              `Should of returned null if there is no notifications for that user, notifications=${notifications}`);
+            assert.equal(_.isNil(notifications[0]), true, `Should return null if there is no notification, notifications=${notifications}`);
+            volunteer.knex('volunteer_announcement').update('read', false).where('volunteer_id', volunteer.volunteerId);
           },    (error: Error) => {
             throw new Error(error.message);
           });

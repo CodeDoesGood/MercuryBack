@@ -1,7 +1,7 @@
 import * as assert from 'assert';
 import * as _ from 'lodash';
 
-import Project from '../components/Project';
+import Project, { IProject } from '../components/Project';
 
 if (_.isNil(process.env.TRAVIS)) {
   describe('Project Component', () => {
@@ -111,6 +111,33 @@ if (_.isNil(process.env.TRAVIS)) {
             throw new Error(`Updated content when project id is not a valid number, project_id=${project.projectId}`);
           },    (error: Error) => {
             assert.equal(error.message === `Id "${project.projectId}" passed is not a valid number`, true, error.message);
+          });
+      });
+
+      it('Shoould update the content if the project exists and the content is valid', () => {
+        const project = new Project(1);
+
+        return project.exists()
+        .then(() => project.updateContent(project.getContent()))
+        .then((done: boolean) => {
+          assert.equal(done, true, 'Should return boolean of true when the content is updated');
+        },    (error: Error) => { throw new Error(error.message); });
+      });
+
+      it('Should reject if the connection details are wrong', () => {
+        const project = new Project(1);
+        project.doesExist = true;
+
+        const username: string = project.config.connection.user;
+        project.config.connection.user = 'wrongusername';
+        project.volunteerId = 1;
+
+        return project.updateContent(project.getContent())
+          .then((content) => {
+            throw new Error(`updateContent Shouldn't of resolved when the connection details are wrong, ${content}`);
+          },    (error: Error) => {
+            project.config.connection.user = username;
+            assert.equal(error.message.indexOf('ER_ACCESS_DENIED_ERROR') >= 0, true, error.message);
           });
       });
     });
