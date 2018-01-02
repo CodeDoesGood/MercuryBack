@@ -95,7 +95,7 @@ export default class Volunteer extends Database {
       throw new Error('When provided VolunteerId must be a integer');
     }
     if (!_.isNil(username) && !_.isString(username)) {
-      throw new Error('When provided username must be a integer');
+      throw new Error('When provided username must be a string');
     }
 
     super(config.getKey('database'));
@@ -244,10 +244,7 @@ export default class Volunteer extends Database {
       return false;
     }
 
-    if (this.verified) {
-      return true;
-    }
-    return false;
+    return this.verified;
   }
 
   /**
