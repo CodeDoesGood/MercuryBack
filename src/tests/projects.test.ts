@@ -115,6 +115,20 @@ if (_.isNil(process.env.TRAVIS)) {
         projects.getAllProjectsByStatus(id)
           .then(() => { throw new Error('Resolved when no status id was passed'); }, () => undefined);
       });
+
+      it('Should reject if the connection details are wrong', () => {
+        const projects: any = new Projects();
+        const username = projects.config.connection.user;
+        projects.config.connection.user = 'wrongusername';
+
+        return projects.getAllProjectsByStatus(1)
+          .then((content: any) => {
+            throw new Error(`getAllProjectsByCategory Shouldn't have resolved when the connection details are wrong, ${content}`);
+          },    (error: Error) => {
+            projects.config.connection.user = username;
+            assert.equal(error.message.indexOf('ER_ACCESS_DENIED_ERROR') >= 0, true, error.message);
+          });
+      });
     });
 
     describe('#getAllProjectsByCategory', () => {
