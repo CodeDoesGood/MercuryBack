@@ -28,7 +28,7 @@ if (_.isNil(process.env.TRAVIS)) {
             assert.equal(_.isNil(project.status), false, 'status should exist after pulling data from the database');
             assert.equal(_.isNil(project.projectCategory), false, 'projectCategory should exist after pulling data from the database');
             assert.equal(_.isNil(project.hidden), false, 'hidden should exist after pulling data from the database');
-          },    (error: Error) => { throw new Error(error.message); });
+          },    (error: Error) => { throw error; });
       });
 
       it('Should reject if no id is passed', () => {
@@ -121,7 +121,7 @@ if (_.isNil(process.env.TRAVIS)) {
         .then(() => project.updateContent(project.getContent()))
         .then((done: boolean) => {
           assert.equal(done, true, 'Should return boolean of true when the content is updated');
-        },    (error: Error) => { throw new Error(error.message); });
+        },    (error: Error) => { throw error; });
       });
 
       it('Should reject if the connection details are wrong', () => {

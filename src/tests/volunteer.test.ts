@@ -185,7 +185,7 @@ describe('Volunteer Component', () => {
             assert.equal(_.isNil(profile.verified), false, 'verified should be returned from getProfile');
             assert.equal(_.isNil(profile.volunteer_id), false, 'volunteer_id should be returned from getProfile');
             assert.equal(_.isNil(profile.volunteer_status), false, 'volunteer_status should be returned from getProfile');
-          },    (error: Error) => { throw new Error(error.message); });
+          },    (error: Error) => { throw error; });
       });
     });
 
@@ -198,7 +198,7 @@ describe('Volunteer Component', () => {
         .then(() => volunteer.canAccessAdminPortal())
           .then((canAccessAdminPortal: boolean) => {
             assert.equal(canAccessAdminPortal, true, 'Should return true if the adminPortalAccess is already defined');
-          },    (error: Error) => { throw new Error(error.message); });
+          },    (error: Error) => { throw error; });
       });
 
       it('Should return false if the user is lacking the permission to access the admin portal', () => {
@@ -208,7 +208,7 @@ describe('Volunteer Component', () => {
         .then(() => volunteer.canAccessAdminPortal())
           .then((canAccessAdminPortal: boolean) => {
             assert.equal(canAccessAdminPortal, false, 'Should return false if the user cannot access the adminPortal');
-          },    (error: Error) => { throw new Error(error.message); });
+          },    (error: Error) => { throw error; });
       });
 
       it('Should return true from the database if the user is able able to access the administration panel', () => {
@@ -220,7 +220,7 @@ describe('Volunteer Component', () => {
         .then((canAccessAdminPortal: boolean) => {
           assert.equal(canAccessAdminPortal, true, 'Should return true if the user can acess the adminPortal');
           return volunteer.knex('volunteer').update('admin_portal_access', false).where('volunteer_id', volunteer.volunteerId);
-        },    (error: Error) => { throw new Error(error.message); });
+        },    (error: Error) => { throw error; });
       });
 
       it('should reject if the volunteerId is null or not passed', () => {
@@ -238,7 +238,7 @@ describe('Volunteer Component', () => {
         const volunteer = new Volunteer(1);
 
         return volunteer.exists()
-          .then(() => undefined, (error: Error) => { throw new Error(error.message); });
+          .then(() => undefined, (error: Error) => { throw error; });
       });
 
       it('Should reject if the volunteer doesn\'t exists', () => {
@@ -271,7 +271,7 @@ describe('Volunteer Component', () => {
         const volunteer = new Volunteer(null, 'user1');
 
         return volunteer.exists('username')
-          .then(() => undefined,    (error: Error) => { throw new Error(error.message); });
+          .then(() => undefined,    (error: Error) => { throw error; });
       });
 
       it('Should reject if the connection details are wrong', () => {
@@ -296,7 +296,7 @@ describe('Volunteer Component', () => {
 
         return volunteer.exists('username')
           .then(() => volunteer.updatePassword('password'))
-          .then(() => undefined, (error: Error) => { throw new Error(error.message); });
+          .then(() => undefined, (error: Error) => { throw error; });
       });
 
       it('Should reject if no password is given', () => {
@@ -350,7 +350,7 @@ describe('Volunteer Component', () => {
             assert.equal(!_.isNil(code.verification_code_id), true, 'verification_code_id should be contained in the code');
             assert.equal(!_.isNil(code.salt), true, 'salt should be contained in the code');
             assert.equal(!_.isNil(code.created_datetime), true, 'created_datetime should be contained in the code');
-          },    (error: Error) => { throw new Error(error.message); })
+          },    (error: Error) => { throw error; })
           .finally(() => volunteer.removeVerificationCode());
       });
 
@@ -360,7 +360,7 @@ describe('Volunteer Component', () => {
         return volunteer.getVerificationCode()
           .then((code) => {
             assert.equal(_.isNil(code), true, 'Code should be a null object if the volunteer does not exist');
-          },    (error: Error) => { throw new Error(error.message); });
+          },    (error: Error) => { throw error; });
       });
 
       it('Should reject if the volunteerId is null or undefined', () => {
@@ -407,7 +407,7 @@ describe('Volunteer Component', () => {
 
         return volunteer.createVerificationCode()
           .then(() => volunteer.removeVerificationCode())
-          .then(() => undefined, (error: Error) => { throw new Error(error.message); });
+          .then(() => undefined, (error: Error) => { throw error; });
       });
 
       it('Should resolve if a verification code does not exist', () => {
@@ -415,7 +415,7 @@ describe('Volunteer Component', () => {
 
         return volunteer.createVerificationCode()
           .then(() => volunteer.removeVerificationCode())
-          .then(() => undefined, (error: Error) => { throw new Error(error.message); });
+          .then(() => undefined, (error: Error) => { throw error; });
       });
 
       it('Should reject if the connection details are wrong', () => {
@@ -443,7 +443,7 @@ describe('Volunteer Component', () => {
           .then((code) => {
             assert.equal(!_.isNil(code), true, 'Code returned should not be null or undefined');
             assert.equal(_.isNumber(code), true, 'Code should be a valid number');
-          },    (error: Error) => { throw new Error(error.message); })
+          },    (error: Error) => { throw error; })
           .finally(() => volunteer.removeVerificationCode());
       });
 
@@ -472,7 +472,7 @@ describe('Volunteer Component', () => {
           .then((code) => {
             assert.equal(!_.isNil(code), true, 'Code returned should not be null or undefined');
             assert.equal(_.isNumber(code), true, 'Code should be a valid number');
-          },    (error: Error) => { throw new Error(error.message); })
+          },    (error: Error) => { throw error; })
           .finally(() => volunteer.removePasswordResetCode());
       });
 
@@ -504,7 +504,7 @@ describe('Volunteer Component', () => {
             assert.equal(!_.isNil(code.password_reset_code_id), true, 'verification_code_id should be contained in the code');
             assert.equal(!_.isNil(code.salt), true, 'salt should be contained in the code');
             assert.equal(!_.isNil(code.created_datetime), true, 'created_datetime should be contained in the code');
-          },    (error: Error) => { throw new Error(error.message); })
+          },    (error: Error) => { throw error; })
           .finally(() => volunteer.removePasswordResetCode());
       });
 
@@ -514,7 +514,7 @@ describe('Volunteer Component', () => {
         return volunteer.getPasswordResetCode()
           .then((code) => {
             assert.equal(_.isNil(code), true, 'Code should be a null object if the volunteer does not exist');
-          },    (error: Error) => { throw new Error(error.message); });
+          },    (error: Error) => { throw error; });
       });
 
       it('Should reject if the volunteerId is null or undefined', () => {
@@ -561,7 +561,7 @@ describe('Volunteer Component', () => {
 
         return volunteer.createPasswordResetCode()
           .then(() => volunteer.removePasswordResetCode())
-          .then(() => undefined, (error: Error) => { throw new Error(error.message); });
+          .then(() => undefined, (error: Error) => { throw error; });
       });
 
       it('Should resolve if a verification code does not exist', () => {
@@ -569,7 +569,7 @@ describe('Volunteer Component', () => {
 
         volunteer.createPasswordResetCode()
           .then(() => volunteer.removePasswordResetCode())
-          .then(() => undefined, (error: Error) => { throw new Error(error.message); });
+          .then(() => undefined, (error: Error) => { throw error; });
       });
 
       it('Should reject if the connection details are wrong', () => {
@@ -649,7 +649,7 @@ describe('Volunteer Component', () => {
           .then(() => volunteer.exists())
           .then(() => {
             assert.equal(volunteer.verified, true, 'After regathering the acccount, it should be verified');
-          },    (error: Error) => { throw new Error(error.message); });
+          },    (error: Error) => { throw error; });
       });
 
       it('Should reject if the project_id is invalid', () => {
@@ -697,7 +697,7 @@ describe('Volunteer Component', () => {
             return volunteer.removeVerificationCode();
           })
           .then(() => volunteer.knex('volunteer').where('volunteer_id', volunteer.volunteerId).del())
-          .then(() => undefined, (error: Error) => { throw new Error(error.message); });
+          .then(() => undefined, (error: Error) => { throw error; });
       });
 
       it('Should reject if the volunteer name is undefined or null', () => {
@@ -858,7 +858,7 @@ describe('Volunteer Component', () => {
               assert.equal(!_.isNil(notification.modified_datetime), true, 'modified_datetime should not be undefined or null');
             });
           },    (error: Error) => {
-            throw new Error(error.message);
+            throw error;
           });
       });
 
@@ -872,7 +872,7 @@ describe('Volunteer Component', () => {
             assert.equal(_.isNil(notifications[0]), true, `Should return null if there is no notification, notifications=${notifications}`);
             volunteer.knex('volunteer_announcement').update('read', false).where('volunteer_id', volunteer.volunteerId);
           },    (error: Error) => {
-            throw new Error(error.message);
+            throw error;
           });
       });
 
@@ -899,7 +899,7 @@ describe('Volunteer Component', () => {
         return volunteer.exists('username')
           .then(() => volunteer.dismissNotification(1))
           .then(() => undefined,    (error: Error) => {
-            throw new Error(error.message);
+            throw error;
           }).finally(() => volunteer.knex('volunteer_announcement').where({
             volunteer_announcement_id: 1,
           }).update({
@@ -940,7 +940,7 @@ describe('Volunteer Component', () => {
             assert.equal(
               totalNotifications, newNotification.length, 'new Notifications should not change when the volunteerId is not correct');
           },    (error: Error) => {
-            throw new Error(error.message);
+            throw error;
           });
       });
 

@@ -23,7 +23,7 @@ if (_.isNil(process.env.TRAVIS)) {
               assert.equal(!_.isUndefined(project.summary), true, 'summary should not be undefined within a project.');
               assert.equal(!_.isUndefined(project.description), true, 'description should not be undefined within a project.');
             });
-          },    (error: Error) => { throw new Error(error.message); });
+          },    (error: Error) => { throw error; });
       });
 
       it('Should reject if the connection details are wrong', () => {
@@ -50,7 +50,7 @@ if (_.isNil(process.env.TRAVIS)) {
             _.forEach(gotProjects, (project: any) => {
               assert.equal(project.status === '1', true, 'Status should be marked as active for all active projects');
             });
-          },    (error: Error) => { throw new Error(error.message); });
+          },    (error: Error) => { throw error; });
       });
 
       it('Should reject if the connection details are wrong', () => {
@@ -142,7 +142,7 @@ if (_.isNil(process.env.TRAVIS)) {
                 project.project_category === 1,
                 true, 'category should be marked as the passed category id "1" for all projects gathered');
             });
-          },    (error: Error) => { throw new Error(error.message); });
+          },    (error: Error) => { throw error; });
       });
 
       it('Should reject if no id is passed', () => {

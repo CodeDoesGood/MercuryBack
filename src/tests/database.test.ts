@@ -79,7 +79,7 @@ describe('Database Wrapper', () => {
     it('Should resolve if the connection details are correct', () => {
       databaseWrapper.connect()
       .then(() => undefined, (error: Error) => {
-        throw new Error(error.message);
+        throw error;
       });
     });
 
@@ -104,7 +104,7 @@ describe('Database Wrapper', () => {
       },    () => undefined));
 
     it('Should resolve if the email does exist', () => databaseWrapper.doesEmailExist('Alys.DURHA2665@gmail.com')
-      .then(() => undefined, (error: Error) => { throw new Error(error.message); }));
+      .then(() => undefined, (error: Error) => { throw error; }));
 
     it('Should reject if no email is passed at all', () => databaseWrapper.doesEmailExist(null)
       .then(() => {
@@ -119,7 +119,7 @@ describe('Database Wrapper', () => {
       },    () => undefined));
 
     it('Should resolve if the username does exist', () => databaseWrapper.doesUsernameExist('user1')
-      .then(() => undefined, (error: Error) => { throw new Error(error.message); }));
+      .then(() => undefined, (error: Error) => { throw error; }));
 
     it('Should reject if no username is passed at all', () => databaseWrapper.doesUsernameExist(null)
       .then(() => {
