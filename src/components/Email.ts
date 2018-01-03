@@ -201,6 +201,10 @@ export default class Email {
    * @param password The password used for recreating the connection
    */
   public updateServiceDetails(details: IEmailServices, password: string): Promise<boolean | Error> {
+    if (_.isNil(details.secure) && _.isNil(details.user) && _.isNil(details.service)) {
+      throw new Error('Service, secure and user is required whnen updating service details');
+    }
+
     this.secure = details.secure;
     this.username = details.user;
     this.service = details.service;
