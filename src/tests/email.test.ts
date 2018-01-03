@@ -14,7 +14,7 @@ if (_.isNil(process.env.TRAVIS)) {
       it('Should reject if the service is offline', () => { throw new Error('Not Complete'); });
       it('Should resolve a empty array if there is no emails to send', () => { throw new Error('Not Complete'); });
       it('Should resolve a empty array of emails after being sent if emails exist', () => { throw new Error('Not Complete'); });
-      it('Should resolve a array with a email if it couldn\'t send the email', () => { throw new Error('Not Complete'); })
+      it('Should resolve a array with a email if it couldn\'t send the email', () => { throw new Error('Not Complete'); });
     });
 
     describe('#send', () => {
