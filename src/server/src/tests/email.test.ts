@@ -9,20 +9,7 @@ const config = new Configuration('mercury', 'mercury.json');
 const email = new Email(config.getKey('email'));
 
 if (_.isNil(process.env.TRAVIS)) {
-  describe.only('#Email', () => {
-    describe('#sendStoredEmails', () => {
-      it('Should reject if the service is offline', () => { throw new Error('Not Complete'); });
-      it('Should resolve a empty array if there is no emails to send', () => { throw new Error('Not Complete'); });
-      it('Should resolve a empty array of emails after being sent if emails exist', () => { throw new Error('Not Complete'); });
-      it('Should resolve a array with a email if it couldn\'t send the email', () => { throw new Error('Not Complete'); });
-    });
-
-    describe('#send', () => {
-      it('Should send and resolve if the content is correct', () => { throw new Error('Not Complete'); });
-      it('Should reject if any of hte content is missing / null', () => { throw new Error('Not Complete'); });
-      it('Should reject if the service details are  wrong', () => { throw new Error('Not Complete'); });
-    });
-
+  describe('#Email', () => {
     describe('#verify', () => {
       it('Should return true if the service is online', () => { throw new Error('Not Complete'); }); // check this.online as well
       it('Should throw a error when the service is offline', () => { throw new Error('Not Complete'); }); // check this.online as well

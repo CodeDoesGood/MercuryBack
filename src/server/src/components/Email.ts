@@ -117,30 +117,31 @@ export default class Email {
    * @param {undefined} html The html to be used instead of the text (defaults to the text)
    */
   public send(from: string, to: string, subject: string, text: string, html?: string): Promise<nodemailer.SentMessageInfo | Error> {
-    const content = [
-      { name: 'from', type: from },
-      { name: 'subject', type: subject },
-      { name: 'text', type: text },
-      { name: 'to', type: to },
-    ];
-
-    _.forEach(content, (item) => {
-      if (_.isNil(item.type) || !_.isString(item.type)) {
-        throw new Error(`${item.name} has to be specified and of type string`);
-      }
-    });
-
     return new Promise((resolve, reject) => {
-      const message = this.buildMessage({
-        from, html, subject, text, to,
-      });
-      this.transporter.sendMail(message, (error: Error, info: nodemailer.SentMessageInfo) => {
-        if (!_.isNil(error)) {
-          reject(error);
-        } else {
-          resolve(info);
+      const content = [
+        { name: 'from', type: from },
+        { name: 'subject', type: subject },
+        { name: 'text', type: text },
+        { name: 'to', type: to },
+      ];
+
+      _.forEach(content, (item) => {
+        if (_.isNil(item.type) || !_.isString(item.type)) {
+          reject(`${item.name} has to be specified and of type string`);
         }
       });
+
+      this.buildMessage({ from, html, subject, text, to })
+        .then((message: IBuiltMessage) => {
+          this.transporter.sendMail(message, (error: Error, info: nodemailer.SentMessageInfo) => {
+            if (!_.isNil(error)) {
+              reject(error);
+            } else {
+              resolve(info);
+            }
+          });
+        })
+        .catch((error: Error) => reject(error));
     });
   }
 
@@ -296,9 +297,9 @@ export default class Email {
    * @param {IEmailContent} content The object containing the message details,
    * from, to, subject, text, html.
    */
-  private buildMessage(content: IEmailContent): IBuiltMessage {
+  private buildMessage(content: IEmailContent): Promise<IBuiltMessage | Error> {
     if (!_.isObject(content)) {
-      throw new Error('Build message must be of type string');
+      return Promise.reject('Build message must be of type string');
     }
 
     const buildRequirements = ['to', 'subject', 'text', 'html'];
@@ -307,16 +308,16 @@ export default class Email {
 
     _.forEach(buildRequirements, (item) => {
       if (_.isNil(message[item]) || !_.isString(message[item])) {
-        throw new Error(`${item} must be provided and of type string`);
+        return Promise.reject(`${item} must be provided and of type string`);
       }
     });
 
-    return {
+    return Promise.resolve({
       from: this.username,
       html: _.defaultTo(message.html, message.text),
       subject: message.subject,
       text: message.text,
       to: message.to,
-    };
+    });
   }
 }
