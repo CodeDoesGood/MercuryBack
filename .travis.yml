@@ -7,9 +7,8 @@ notifications:
     on_failure: always
     on_success: never
 
-before_install: cd src/project
-
 script:
+  - cd src/server
   - npm install
   - npm run build
   - npm run test
