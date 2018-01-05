@@ -30,10 +30,7 @@ function sendHeathCheck(req: Request, res: Response) {
   return email.verify()
   .then(() => {
     emailStatus = true;
-    return database.connect();
-  })
-  .then((status: boolean) => {
-    databaseStatus = status;
+    databaseStatus = database.getOnlineStatus();
   })
   .finally(() => {
     slack.healthCheck(webhookUrl, emailStatus, databaseStatus)

@@ -53,8 +53,7 @@ export default class Project extends Database {
       return Promise.reject(new Error(`id '${this.projectId}' passed is not a valid number`));
     }
 
-    return this.connect()
-      .then(() => this.knex('project').where('project_id', this.projectId).first())
+    return this.knex('project').where('project_id', this.projectId).first()
       .then((project) => {
         if (_.isNil(project)) {
           return Promise.reject(new Error(`Project ${this.projectId} does not exist`));
@@ -92,16 +91,15 @@ export default class Project extends Database {
     this.summary         = projectContent.summary;
     this.title           = projectContent.title;
 
-    return this.connect()
-      .then(() => this.knex('project').where('project_id', this.projectId).update({
-        description: this.description,
-        hidden: this.hidden,
-        image_directory: this.imageDirectory,
-        project_category: this.projectCategory,
-        status: this.status,
-        summary: this.summary,
-        title: this.title,
-      }))
+    return this.knex('project').where('project_id', this.projectId).update({
+      description: this.description,
+      hidden: this.hidden,
+      image_directory: this.imageDirectory,
+      project_category: this.projectCategory,
+      status: this.status,
+      summary: this.summary,
+      title: this.title,
+    })
       .then(() => Promise.resolve(true))
       .catch((error: Error) => Promise.reject(error));
   }

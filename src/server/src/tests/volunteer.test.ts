@@ -220,7 +220,8 @@ describe('Volunteer Component', () => {
         .then((canAccessAdminPortal: boolean) => {
           assert.equal(canAccessAdminPortal, true, 'Should return true if the user can acess the adminPortal');
           return volunteer.knex('volunteer').update('admin_portal_access', false).where('volunteer_id', volunteer.volunteerId);
-        },    (error: Error) => { throw error; });
+        })
+        .then(() => undefined, (error: Error) => { throw error; });
       });
 
       it('should reject if the volunteerId is null or not passed', () => {
@@ -238,7 +239,9 @@ describe('Volunteer Component', () => {
         const volunteer = new Volunteer(1);
 
         return volunteer.exists()
-          .then(() => undefined, (error: Error) => { throw error; });
+          .then(() => {
+            assert(volunteer.doesExist, 'Volunteer should exist after running existance check');
+          },    (error: Error) => { throw error; });
       });
 
       it('Should reject if the volunteer doesn\'t exists', () => {
@@ -273,21 +276,6 @@ describe('Volunteer Component', () => {
         return volunteer.exists('username')
           .then(() => undefined,    (error: Error) => { throw error; });
       });
-
-      it('Should reject if the connection details are wrong', () => {
-        const volunteer = new Volunteer(null, 'user1');
-        const username: string = volunteer.config.connection.user;
-        volunteer.config.connection.user = 'wrongusername';
-        volunteer.volunteerId = 1;
-
-        return volunteer.exists('username')
-          .then((content) => {
-            throw new Error(`exists shouldn't have resolved when the connection details are wrong, ${content}`);
-          },    (error: Error) => {
-            volunteer.config.connection.user = username;
-            assert.equal(error.message.indexOf('ER_ACCESS_DENIED_ERROR') >= 0, true, error.message);
-          });
-      });
     });
 
     describe('#updatePassword', () => {
@@ -320,21 +308,6 @@ describe('Volunteer Component', () => {
           .then(() => {
             throw new Error('Updated password when the project_id was invalid');
           },    () => undefined);
-      });
-
-      it('Should reject if the connection details are wrong', () => {
-        const volunteer = new Volunteer(null, 'user1');
-        const username: string = volunteer.config.connection.user;
-        volunteer.config.connection.user = 'wrongusername';
-        volunteer.volunteerId = 1;
-
-        return volunteer.updatePassword('username')
-          .then((content) => {
-            throw new Error(`exists shouldn't have resolved when the connection details are wrong, ${content}`);
-          },    (error: Error) => {
-            volunteer.config.connection.user = username;
-            assert.equal(error.message.indexOf('ER_ACCESS_DENIED_ERROR') >= 0, true, error.message);
-          });
       });
     });
 
@@ -373,21 +346,6 @@ describe('Volunteer Component', () => {
             assert.equal(error.message, `volunteerId "${volunteer.volunteerId}" passed is not a valid number`, error.message);
           });
       });
-
-      it('Should reject if the connection details are wrong', () => {
-        const volunteer = new Volunteer(null, 'user1');
-        const username: string = volunteer.config.connection.user;
-        volunteer.config.connection.user = 'wrongusername';
-        volunteer.volunteerId = 1;
-
-        return volunteer.getVerificationCode()
-          .then((content) => {
-            throw new Error(`getVerificationCode Shouldn't have resolved when the connection details are wrong, ${content}`);
-          },    (error: Error) => {
-            volunteer.config.connection.user = username;
-            assert.equal(error.message.indexOf('ER_ACCESS_DENIED_ERROR') >= 0, true, error.message);
-          });
-      });
     });
 
     describe('#removeVerificationCode', () => {
@@ -417,21 +375,6 @@ describe('Volunteer Component', () => {
           .then(() => volunteer.removeVerificationCode())
           .then(() => undefined, (error: Error) => { throw error; });
       });
-
-      it('Should reject if the connection details are wrong', () => {
-        const volunteer = new Volunteer(null, 'user1');
-        const username: string = volunteer.config.connection.user;
-        volunteer.config.connection.user = 'wrongusername';
-        volunteer.volunteerId = 1;
-
-        return volunteer.removeVerificationCode()
-          .then((content) => {
-            throw new Error(`removeVerificationCode Shouldn't have resolved when the connection details are wrong, ${content}`);
-          },    (error: Error) => {
-            volunteer.config.connection.user = username;
-            assert.equal(error.message.indexOf('ER_ACCESS_DENIED_ERROR') >= 0, true, error.message);
-          });
-      });
     });
 
     describe('#createVerificationCode', () => {
@@ -446,21 +389,6 @@ describe('Volunteer Component', () => {
           },    (error: Error) => { throw error; })
           .finally(() => volunteer.removeVerificationCode());
       });
-
-      it('Should reject if the connection details are wrong', () => {
-        const volunteer = new Volunteer(null, 'user1');
-        const username: string = volunteer.config.connection.user;
-        volunteer.config.connection.user = 'wrongusername';
-        volunteer.volunteerId = 1;
-
-        return volunteer.createVerificationCode()
-          .then((content) => {
-            throw new Error(`createVerificationCode Shouldn't have resolved when the connection details are wrong, ${content}`);
-          },    (error: Error) => {
-            volunteer.config.connection.user = username;
-            assert.equal(error.message.indexOf('ER_ACCESS_DENIED_ERROR') >= 0, true, error.message);
-          });
-      });
     });
 
     describe('#createPasswordResetCode', () => {
@@ -474,21 +402,6 @@ describe('Volunteer Component', () => {
             assert.equal(_.isNumber(code), true, 'Code should be a valid number');
           },    (error: Error) => { throw error; })
           .finally(() => volunteer.removePasswordResetCode());
-      });
-
-      it('Should reject if the connection details are wrong', () => {
-        const volunteer = new Volunteer(null, 'user1');
-        const username: string = volunteer.config.connection.user;
-        volunteer.config.connection.user = 'wrongusername';
-        volunteer.volunteerId = 1;
-
-        return volunteer.createPasswordResetCode()
-          .then((content) => {
-            throw new Error(`createPasswordResetCode Shouldn't have resolved when the connection details are wrong, ${content}`);
-          },    (error: Error) => {
-            volunteer.config.connection.user = username;
-            assert.equal(error.message.indexOf('ER_ACCESS_DENIED_ERROR') >= 0, true, error.message);
-          });
       });
     });
 
@@ -527,21 +440,6 @@ describe('Volunteer Component', () => {
             assert.equal(error.message, `volunteerId "${volunteer.volunteerId}" passed is not a valid number`, error.message);
           });
       });
-
-      it('Should reject if the connection details are wrong', () => {
-        const volunteer = new Volunteer(null, 'user1');
-        const username: string = volunteer.config.connection.user;
-        volunteer.config.connection.user = 'wrongusername';
-        volunteer.volunteerId = 1;
-
-        return volunteer.getPasswordResetCode()
-          .then((content) => {
-            throw new Error(`getPasswordResetCode Shouldn't of resolved when the connection details are wrong, ${content}`);
-          },    (error: Error) => {
-            volunteer.config.connection.user = username;
-            assert.equal(error.message.indexOf('ER_ACCESS_DENIED_ERROR') >= 0, true, error.message);
-          });
-      });
     });
 
     describe('#removePasswordResetCode', () => {
@@ -570,21 +468,6 @@ describe('Volunteer Component', () => {
         volunteer.createPasswordResetCode()
           .then(() => volunteer.removePasswordResetCode())
           .then(() => undefined, (error: Error) => { throw error; });
-      });
-
-      it('Should reject if the connection details are wrong', () => {
-        const volunteer = new Volunteer(null, 'user1');
-        const username: string = volunteer.config.connection.user;
-        volunteer.config.connection.user = 'wrongusername';
-        volunteer.volunteerId = 1;
-
-        return volunteer.removePasswordResetCode()
-          .then((content) => {
-            throw new Error(`removeVerificationCode Shouldn't of resolved when the connection details are wrong, ${content}`);
-          },    (error: Error) => {
-            volunteer.config.connection.user = username;
-            assert.equal(error.message.indexOf('ER_ACCESS_DENIED_ERROR') >= 0, true, error.message);
-          });
       });
     });
 
@@ -623,21 +506,6 @@ describe('Volunteer Component', () => {
             assert.equal(error.message, `volunteerId "${volunteer.volunteerId}" passed is not a valid number`, error.message);
           });
       });
-
-      it('Should reject if the connection details are wrong', () => {
-        const volunteer = new Volunteer(null, 'user1');
-        const username: string = volunteer.config.connection.user;
-        volunteer.config.connection.user = 'wrongusername';
-        volunteer.volunteerId = 1;
-
-        return volunteer.doesPasswordResetCodeExist()
-          .then((content) => {
-            throw new Error(`doesPasswordResetCodeExist Shouldn't of resolved when the connection details are wrong, ${content}`);
-          },    (error: Error) => {
-            volunteer.config.connection.user = username;
-            assert.equal(error.message.indexOf('ER_ACCESS_DENIED_ERROR') >= 0, true, error.message);
-          });
-      });
     });
 
     describe('#verify', () => {
@@ -660,21 +528,6 @@ describe('Volunteer Component', () => {
             throw new Error('shouldn\'t resolve when the project_id is invalid');
           },    (error: Error) => {
             assert.equal(error.message, `volunteerId "${volunteer.volunteerId}" passed is not a valid number`, error.message);
-          });
-      });
-
-      it('Should reject if the connection details are wrong', () => {
-        const volunteer = new Volunteer(null, 'user1');
-        const username: string = volunteer.config.connection.user;
-        volunteer.config.connection.user = 'wrongusername';
-        volunteer.volunteerId = 1;
-
-        return volunteer.verify()
-          .then((content) => {
-            throw new Error(`verify Shouldn't of resolved when the connection details are wrong, ${content}`);
-          },    (error: Error) => {
-            volunteer.config.connection.user = username;
-            assert.equal(error.message.indexOf('ER_ACCESS_DENIED_ERROR') >= 0, true, error.message);
           });
       });
     });
@@ -765,24 +618,6 @@ describe('Volunteer Component', () => {
             assert.equal(error.message, `You must provide a password to create the volunteer=${volunteer.username}`, error.message);
           });
       });
-
-      it('Should reject if the connection details are incorrect', () => {
-        const volunteer = new Volunteer(null, 'user1');
-        const username: string = volunteer.config.connection.user;
-        volunteer.config.connection.user = 'wrongusername';
-        volunteer.volunteerId = 1;
-
-        volunteer.name = 'the name';
-        volunteer.email = 'theemail@themail.com';
-
-        return volunteer.create('thepassword')
-          .then((content) => {
-            throw new Error(`create Shouldn't of resolved when the connection details are wrong, ${content}`);
-          },    (error: Error) => {
-            volunteer.config.connection.user = username;
-            assert.equal(error.message.indexOf('ER_ACCESS_DENIED_ERROR') >= 0, true, error.message);
-          });
-      });
     });
 
     describe('#doesVerificationCodeExist', () => {
@@ -819,21 +654,6 @@ describe('Volunteer Component', () => {
             throw new Error('Shouldn\'t resolve when a the project_id is invalid');
           },    (error: Error) => {
             assert.equal(error.message, `volunteerId "${volunteer.volunteerId}" passed is not a valid number`, error.message);
-          });
-      });
-
-      it('Should reject if the connection details are wrong', () => {
-        const volunteer = new Volunteer(null, 'user1');
-        const username: string = volunteer.config.connection.user;
-        volunteer.config.connection.user = 'wrongusername';
-        volunteer.volunteerId = 1;
-
-        return volunteer.doesVerificationCodeExist()
-          .then((content) => {
-            throw new Error(`doesVerificationCodeExist Shouldn't of resolved when the connection details are wrong, ${content}`);
-          },    (error: Error) => {
-            volunteer.config.connection.user = username;
-            assert.equal(error.message.indexOf('ER_ACCESS_DENIED_ERROR') >= 0, true, error.message);
           });
       });
     });
@@ -873,21 +693,6 @@ describe('Volunteer Component', () => {
             volunteer.knex('volunteer_announcement').update('read', false).where('volunteer_id', volunteer.volunteerId);
           },    (error: Error) => {
             throw error;
-          });
-      });
-
-      it('Should reject if the connection details are wrong', () => {
-        const volunteer = new Volunteer(null, 'user1');
-        const username: string = volunteer.config.connection.user;
-        volunteer.config.connection.user = 'wrongusername';
-        volunteer.volunteerId = 1;
-
-        return volunteer.getActiveNotifications()
-          .then((content) => {
-            throw new Error(`getActiveNotifications Shouldn't of resolved when the connection details are wrong, ${content}`);
-          },    (error: Error) => {
-            volunteer.config.connection.user = username;
-            assert.equal(error.message.indexOf('ER_ACCESS_DENIED_ERROR') >= 0, true, error.message);
           });
       });
     });
@@ -952,21 +757,6 @@ describe('Volunteer Component', () => {
             throw new Error('Dismiss should reject if the announcement id is not passed');
           },    (error: Error) => {
             assert.equal(error.message, 'Announcement Id must be passed and also a valid number, announcement id=null', error.message);
-          });
-      });
-
-      it('Should reject if the connection details are wrong', () => {
-        const volunteer = new Volunteer(1, 'user1');
-        const username: string = volunteer.config.connection.user;
-        volunteer.config.connection.user = 'wrongusername';
-        volunteer.volunteerId = 1;
-
-        return volunteer.dismissNotification(1)
-          .then((content) => {
-            throw new Error(`dismissNotification Shouldn't of resolved when the connection details are wrong, ${content}`);
-          },    (error: Error) => {
-            volunteer.config.connection.user = username;
-            assert.equal(error.message.indexOf('ER_ACCESS_DENIED_ERROR') >= 0, true, error.message);
           });
       });
     });

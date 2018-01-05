@@ -33,6 +33,10 @@ export default class Database {
     this.interation = 28000;
 
     this.showMessage = false;
+
+    this.connect()
+      .then(() => undefined)
+      .catch((error: Error) => { throw error; });
   }
 
   /**
@@ -45,12 +49,15 @@ export default class Database {
 
     this.knex = knex(this.config);
 
-    return this.knex.raw('select 1+1 AS answer')
-    .then(() => {
-      this.online = true;
-      return Promise.resolve(this.online);
-    })
-    .catch((error: Error) => Promise.reject(error));
+    return this.knex.raw('select 1+1 as answer')
+      .then(() => {
+        this.online = true;
+        return Promise.resolve(true);
+      })
+      .catch((error: Error) => {
+        this.online = false;
+        return Promise.reject(error);
+      });
   }
 
   /**
@@ -84,8 +91,7 @@ export default class Database {
       return Promise.reject(new Error(`volunteerId "${username}" passed is not a valid string`));
     }
 
-    return this.connect()
-      .then(() => this.knex('volunteer').select('volunteer_id').where('username', username).first())
+    return this.knex('volunteer').select('volunteer_id').where('username', username).first()
       .then((result: IVolunteer) => Promise.resolve(result.volunteer_id))
       .catch((error: Error) => Promise.reject(error));
   }
@@ -99,8 +105,7 @@ export default class Database {
       return Promise.reject(new Error(`email "${email}" passed is not a valid string`));
     }
 
-    return this.connect()
-      .then(() => this.knex('volunteer').select('volunteer_id').where('email', email).first())
+    return this.knex('volunteer').select('volunteer_id').where('email', email).first()
       .then((result: IVolunteer) => {
         if (!_.isNil(result)) {
           return Promise.resolve(result.volunteer_id);

@@ -8,7 +8,6 @@ import Database from '../components/Database';
 
 const config = new Configuration('mercury', 'mercury.json');
 const databaseWrapper = new Database(config.getKey('database'));
-databaseWrapper.connect();
 
 /**
  * Gets the current online status of the database wrapper, if online calls next otherwise sends

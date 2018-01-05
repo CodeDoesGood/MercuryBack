@@ -123,23 +123,6 @@ if (_.isNil(process.env.TRAVIS)) {
           assert.equal(done, true, 'Should return boolean of true when the content is updated');
         },    (error: Error) => { throw error; });
       });
-
-      it('Should reject if the connection details are wrong', () => {
-        const project = new Project(1);
-        project.doesExist = true;
-
-        const username: string = project.config.connection.user;
-        project.config.connection.user = 'wrongusername';
-        project.volunteerId = 1;
-
-        return project.updateContent(project.getContent())
-          .then((content) => {
-            throw new Error(`updateContent Shouldn't of resolved when the connection details are wrong, ${content}`);
-          },    (error: Error) => {
-            project.config.connection.user = username;
-            assert.equal(error.message.indexOf('ER_ACCESS_DENIED_ERROR') >= 0, true, error.message);
-          });
-      });
     });
 
     describe('#getContent', () => {

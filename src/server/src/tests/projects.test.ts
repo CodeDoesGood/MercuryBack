@@ -25,20 +25,6 @@ if (_.isNil(process.env.TRAVIS)) {
             });
           },    (error: Error) => { throw error; });
       });
-
-      it('Should reject if the connection details are wrong', () => {
-        const projects: any = new Projects();
-        const username = projects.config.connection.user;
-        projects.config.connection.user = 'wrongusername';
-
-        return projects.getAllProjects()
-          .then((content: any) => {
-            throw new Error(`getAllProjects Shouldn't have resolved when the connection details are wrong, ${content}`);
-          },    (error: Error) => {
-            projects.config.connection.user = username;
-            assert.equal(error.message.indexOf('ER_ACCESS_DENIED_ERROR') >= 0, true, error.message);
-          });
-      });
     });
 
     describe('#getAllActiveProjects', () => {
@@ -52,20 +38,6 @@ if (_.isNil(process.env.TRAVIS)) {
             });
           },    (error: Error) => { throw error; });
       });
-
-      it('Should reject if the connection details are wrong', () => {
-        const projects: any = new Projects();
-        const username = projects.config.connection.user;
-        projects.config.connection.user = 'wrongusername';
-
-        return projects.getAllActiveProjects()
-          .then((content: any) => {
-            throw new Error(`getAllActiveProjects Shouldn't have resolved when the connection details are wrong, ${content}`);
-          },    (error: Error) => {
-            projects.config.connection.user = username;
-            assert.equal(error.message.indexOf('ER_ACCESS_DENIED_ERROR') >= 0, true, error.message);
-          });
-      });
     });
 
     describe('#getAllHiddenProjects', () => {
@@ -78,20 +50,6 @@ if (_.isNil(process.env.TRAVIS)) {
               assert.equal(project.hidden, true, 'Hidden should be marked as true for all projects');
             });
           },    (error) => { throw new Error(error); });
-      });
-
-      it('Should reject if the connection details are wrong', () => {
-        const projects: any = new Projects();
-        const username = projects.config.connection.user;
-        projects.config.connection.user = 'wrongusername';
-
-        return projects.getAllHiddenProjects()
-          .then((content: any) => {
-            throw new Error(`getAllHiddenProjects Shouldn't have resolved when the connection details are wrong, ${content}`);
-          },    (error: Error) => {
-            projects.config.connection.user = username;
-            assert.equal(error.message.indexOf('ER_ACCESS_DENIED_ERROR') >= 0, true, error.message);
-          });
       });
     });
 
@@ -115,20 +73,6 @@ if (_.isNil(process.env.TRAVIS)) {
         projects.getAllProjectsByStatus(id)
           .then(() => { throw new Error('Resolved when no status id was passed'); }, () => undefined);
       });
-
-      it('Should reject if the connection details are wrong', () => {
-        const projects: any = new Projects();
-        const username = projects.config.connection.user;
-        projects.config.connection.user = 'wrongusername';
-
-        return projects.getAllProjectsByStatus(1)
-          .then((content: any) => {
-            throw new Error(`getAllProjectsByCategory Shouldn't have resolved when the connection details are wrong, ${content}`);
-          },    (error: Error) => {
-            projects.config.connection.user = username;
-            assert.equal(error.message.indexOf('ER_ACCESS_DENIED_ERROR') >= 0, true, error.message);
-          });
-      });
     });
 
     describe('#getAllProjectsByCategory', () => {
@@ -150,20 +94,6 @@ if (_.isNil(process.env.TRAVIS)) {
 
         return projects.getAllProjectsByCategory(undefined)
           .then(() => { throw new Error('Resolved when no category id was passed'); }, () => undefined);
-      });
-
-      it('Should reject if the connection details are wrong', () => {
-        const projects: any = new Projects();
-        const username = projects.config.connection.user;
-        projects.config.connection.user = 'wrongusername';
-
-        return projects.getAllProjectsByCategory(1)
-          .then((content: any) => {
-            throw new Error(`getAllProjectsByCategory Shouldn't have resolved when the connection details are wrong, ${content}`);
-          },    (error: Error) => {
-            projects.config.connection.user = username;
-            assert.equal(error.message.indexOf('ER_ACCESS_DENIED_ERROR') >= 0, true, error.message);
-          });
       });
     });
   });

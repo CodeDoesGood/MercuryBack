@@ -17,8 +17,7 @@ export default class Projects extends Database {
    * Returns all projects
    */
   public getAllProjects(): Promise<IProject[] | Error> {
-    return this.connect()
-      .then(() => this.knex.select().from('project'))
+    return this.knex.select().from('project')
       .then(projects => Promise.resolve(projects))
       .catch((error: Error) => Promise.reject(error));
   }
@@ -27,8 +26,7 @@ export default class Projects extends Database {
    * Returns all active projects
    */
   public getAllActiveProjects(): Promise<IProject[] | Error> {
-    return this.connect()
-      .then(() => this.knex('project').where('status', 1).andWhere('hidden', false))
+    return this.knex('project').where('status', 1).andWhere('hidden', false)
       .then(projects => Promise.resolve(projects))
       .catch((error: Error) => Promise.reject(error));
   }
@@ -42,8 +40,7 @@ export default class Projects extends Database {
       return Promise.reject(new Error(`volunteerId "${status}" passed is not a valid string or number`));
     }
 
-    return this.connect()
-      .then(() => this.knex('project').where('status', status))
+    return this.knex('project').where('status', status)
       .then(projects => Promise.resolve(projects))
       .catch((error: Error) => Promise.reject(error));
   }
@@ -57,8 +54,7 @@ export default class Projects extends Database {
       return Promise.reject(new Error(`volunteerId "${category}" passed is not a valid string or number`));
     }
 
-    return this.connect()
-      .then(() => this.knex('project').where('project_category', category))
+    return this.knex('project').where('project_category', category)
       .then(projects => Promise.resolve(projects))
       .catch((error: Error) => Promise.reject(error));
   }
@@ -67,8 +63,7 @@ export default class Projects extends Database {
    * Returns all projects marked as hidden
    */
   public getAllHiddenProjects(): Promise<IProject[] | Error> {
-    return this.connect()
-      .then(() => this.knex('project').where('hidden', true))
+    return this.knex('project').where('hidden', true)
       .then(projects => Promise.resolve(projects))
       .catch((error: Error) => Promise.reject(error));
   }
