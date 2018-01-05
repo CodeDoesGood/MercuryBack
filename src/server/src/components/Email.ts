@@ -201,9 +201,11 @@ export default class Email {
    * @param details Service details used for the update
    * @param password The password used for recreating the connection
    */
-  public updateServiceDetails(details: IEmailServices, password: string): Promise<boolean | Error> {
-    if (_.isNil(details.secure) && _.isNil(details.user) && _.isNil(details.service)) {
-      throw new Error('Service, secure and user is required whnen updating service details');
+  public updateServiceDetails(serviceContent: IEmailServices, password: string): Promise<boolean | Error> {
+    const details = _.pick(serviceContent, ['secure', 'service', 'user']);
+
+    if (_.isNil(details.secure) || _.isNil(details.user) || _.isNil(details.service)) {
+      return Promise.reject('Service, secure and user is required whnen updating service details');
     }
 
     this.secure = details.secure;
@@ -246,16 +248,26 @@ export default class Email {
    * Attempts to rmeove a stored email by its index
    * @param index email index to remove
    */
-  public removeStoredEmailByIndex(index: number): Promise<IEmailContent[] | Error> {
-    const storedEmails = this.getStoredEmails();
+  public removeStoredEmailByIndex(index: number, passedEmails?: { emails: IEmailContent[] }): Promise<IEmailContent[] | Error> {
     const jsonPath: string = this.getEmailJsonPath();
+    let storedEmails: { emails: IEmailContent[] };
+
+    if (!_.isNil(passedEmails)) {
+      storedEmails = passedEmails;
+    } else {
+      storedEmails = this.getStoredEmails();
+    }
 
     if (index > storedEmails.emails.length) {
       return Promise.reject(new Error('Cannot remove email by index as index is out of range'));
     }
 
     storedEmails.emails.splice(index, 1);
-    fs.writeFileSync(jsonPath, JSON.stringify({ emails: storedEmails.emails }, null, '\t'));
+
+    if (_.isNil(passedEmails)) {
+      fs.writeFileSync(jsonPath, JSON.stringify({ emails: storedEmails.emails }, null, '\t'));
+    }
+
     return Promise.resolve(storedEmails.emails);
   }
 
@@ -264,16 +276,26 @@ export default class Email {
    * @param index the index of the email to update
    * @param email IEmailContent email to update
    */
-  public replaceStoredEmailByIndex(index, email): Promise<IEmailContent[] | Error> {
-    const storedEmails = this.getStoredEmails();
+  public replaceStoredEmailByIndex(index, email, passedEmails?: { emails: IEmailContent[] }): Promise<IEmailContent[] | Error> {
     const jsonPath: string = this.getEmailJsonPath();
+    let storedEmails: { emails: IEmailContent[] };
+
+    if (!_.isNil(passedEmails)) {
+      storedEmails = passedEmails;
+    } else {
+      storedEmails = this.getStoredEmails();
+    }
 
     if (index > storedEmails.emails.length) {
       return Promise.reject(new Error('Cannot update email by index as index is out of range'));
     }
 
     storedEmails.emails[index] = email;
-    fs.writeFileSync(jsonPath, JSON.stringify({ emails: storedEmails.emails }, null, '\t'));
+
+    if (_.isNil(passedEmails)) {
+      fs.writeFileSync(jsonPath, JSON.stringify({ emails: storedEmails.emails }, null, '\t'));
+    }
+
     return Promise.resolve(storedEmails.emails);
   }
 

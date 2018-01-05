@@ -71,7 +71,7 @@ if (_.isNil(process.env.TRAVIS)) {
         const projects = new Projects();
 
         projects.getAllProjectsByStatus(id)
-          .then(() => { throw new Error('Resolved when no status id was passed'); }, () => undefined);
+          .then(() => { throw new Error('Resolved when no status id was passed'); }, () => assert(true));
       });
     });
 
@@ -93,7 +93,7 @@ if (_.isNil(process.env.TRAVIS)) {
         const projects = new Projects();
 
         return projects.getAllProjectsByCategory(undefined)
-          .then(() => { throw new Error('Resolved when no category id was passed'); }, () => undefined);
+          .then(() => { throw new Error('Resolved when no category id was passed'); }, () => assert(true));
       });
     });
   });

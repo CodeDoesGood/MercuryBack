@@ -166,7 +166,7 @@ describe('Volunteer Component', () => {
       it('Should return all profile selections', () => {
         const volunteer = new Volunteer(null, 'user1');
 
-        volunteer.exists('username')
+        return volunteer.exists('username')
           .then(() => {
             const profile = volunteer.getProfile();
 
@@ -194,7 +194,7 @@ describe('Volunteer Component', () => {
         const volunteer = new Volunteer(null, 'user1');
         volunteer.adminPortalAccess = true;
 
-        volunteer.exists('username')
+        return volunteer.exists('username')
         .then(() => volunteer.canAccessAdminPortal())
           .then((canAccessAdminPortal: boolean) => {
             assert.equal(canAccessAdminPortal, true, 'Should return true if the adminPortalAccess is already defined');
@@ -204,7 +204,7 @@ describe('Volunteer Component', () => {
       it('Should return false if the user is lacking the permission to access the admin portal', () => {
         const volunteer = new Volunteer(null, 'user1');
 
-        volunteer.exists('username')
+        return volunteer.exists('username')
         .then(() => volunteer.canAccessAdminPortal())
           .then((canAccessAdminPortal: boolean) => {
             assert.equal(canAccessAdminPortal, false, 'Should return false if the user cannot access the adminPortal');
@@ -214,14 +214,14 @@ describe('Volunteer Component', () => {
       it('Should return true from the database if the user is able able to access the administration panel', () => {
         const volunteer = new Volunteer(null, 'user1');
 
-        volunteer.exists('username')
+        return volunteer.exists('username')
         .then(() => volunteer.knex('volunteer').update('admin_portal_access', true).where('volunteer_id', volunteer.volunteerId))
         .then(() => volunteer.canAccessAdminPortal())
         .then((canAccessAdminPortal: boolean) => {
           assert.equal(canAccessAdminPortal, true, 'Should return true if the user can acess the adminPortal');
           return volunteer.knex('volunteer').update('admin_portal_access', false).where('volunteer_id', volunteer.volunteerId);
         })
-        .then(() => undefined, (error: Error) => { throw error; });
+        .then(() => assert(true), (error: Error) => { throw error; });
       });
 
       it('should reject if the volunteerId is null or not passed', () => {
@@ -230,7 +230,7 @@ describe('Volunteer Component', () => {
         volunteer.canAccessAdminPortal()
         .then(() => {
           throw new Error('Shouldn\'t resolve when the volunteer id is not passed');
-        },    () => undefined);
+        },    () => assert(true));
       });
     });
 
@@ -274,7 +274,7 @@ describe('Volunteer Component', () => {
         const volunteer = new Volunteer(null, 'user1');
 
         return volunteer.exists('username')
-          .then(() => undefined,    (error: Error) => { throw error; });
+          .then(() => assert(true),    (error: Error) => { throw error; });
       });
     });
 
@@ -284,7 +284,7 @@ describe('Volunteer Component', () => {
 
         return volunteer.exists('username')
           .then(() => volunteer.updatePassword('password'))
-          .then(() => undefined, (error: Error) => { throw error; });
+          .then(() => assert(true), (error: Error) => { throw error; });
       });
 
       it('Should reject if no password is given', () => {
@@ -294,7 +294,7 @@ describe('Volunteer Component', () => {
           .then(() => volunteer.updatePassword(undefined))
           .then(() => {
             throw new Error('Should not resolve if no password is given');
-          },    () => undefined);
+          },    () => assert(true));
       });
 
       it('Should reject if the project_id is not a valid string or number', () => {
@@ -307,7 +307,7 @@ describe('Volunteer Component', () => {
           })
           .then(() => {
             throw new Error('Updated password when the project_id was invalid');
-          },    () => undefined);
+          },    () => assert(true));
       });
     });
 
@@ -365,7 +365,7 @@ describe('Volunteer Component', () => {
 
         return volunteer.createVerificationCode()
           .then(() => volunteer.removeVerificationCode())
-          .then(() => undefined, (error: Error) => { throw error; });
+          .then(() => assert(true), (error: Error) => { throw error; });
       });
 
       it('Should resolve if a verification code does not exist', () => {
@@ -373,7 +373,7 @@ describe('Volunteer Component', () => {
 
         return volunteer.createVerificationCode()
           .then(() => volunteer.removeVerificationCode())
-          .then(() => undefined, (error: Error) => { throw error; });
+          .then(() => assert(true), (error: Error) => { throw error; });
       });
     });
 
@@ -433,7 +433,7 @@ describe('Volunteer Component', () => {
       it('Should reject if the volunteerId is null or undefined', () => {
         const volunteer = new Volunteer(null);
 
-        volunteer.getPasswordResetCode()
+        return volunteer.getPasswordResetCode()
           .then(() => {
             throw new Error('Shoudln\'t resolve with a invalid volunteerId');
           },    (error: Error) => {
@@ -459,7 +459,7 @@ describe('Volunteer Component', () => {
 
         return volunteer.createPasswordResetCode()
           .then(() => volunteer.removePasswordResetCode())
-          .then(() => undefined, (error: Error) => { throw error; });
+          .then(() => assert(true), (error: Error) => { throw error; });
       });
 
       it('Should resolve if a verification code does not exist', () => {
@@ -467,7 +467,7 @@ describe('Volunteer Component', () => {
 
         volunteer.createPasswordResetCode()
           .then(() => volunteer.removePasswordResetCode())
-          .then(() => undefined, (error: Error) => { throw error; });
+          .then(() => assert(true), (error: Error) => { throw error; });
       });
     });
 
@@ -491,7 +491,7 @@ describe('Volunteer Component', () => {
         return volunteer.exists('username')
           .then(() => volunteer.createPasswordResetCode())
           .then(() => volunteer.doesPasswordResetCodeExist())
-          .then(() => undefined,
+          .then(() => assert(true),
                 (error: Error) => { throw new Error(`Shouldn't reject when a password reset code exists, error=${error}`); })
           .finally(() => volunteer.removePasswordResetCode());
       });
@@ -550,7 +550,7 @@ describe('Volunteer Component', () => {
             return volunteer.removeVerificationCode();
           })
           .then(() => volunteer.knex('volunteer').where('volunteer_id', volunteer.volunteerId).del())
-          .then(() => undefined, (error: Error) => { throw error; });
+          .then(() => assert(true), (error: Error) => { throw error; });
       });
 
       it('Should reject if the volunteer name is undefined or null', () => {
@@ -640,7 +640,7 @@ describe('Volunteer Component', () => {
         return volunteer.exists('username')
           .then(() => volunteer.createVerificationCode())
           .then(() => volunteer.doesVerificationCodeExist())
-          .then(() => undefined,    (error: Error) => {
+          .then(() => assert(true),    (error: Error) => {
             throw new Error(`Shouldn't reject when a password reset code exists, error=${error}`);
           })
           .finally(() => volunteer.removeVerificationCode());
@@ -703,7 +703,7 @@ describe('Volunteer Component', () => {
 
         return volunteer.exists('username')
           .then(() => volunteer.dismissNotification(1))
-          .then(() => undefined,    (error: Error) => {
+          .then(() => assert(true),    (error: Error) => {
             throw error;
           }).finally(() => volunteer.knex('volunteer_announcement').where({
             volunteer_announcement_id: 1,

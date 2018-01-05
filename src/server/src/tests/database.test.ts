@@ -78,7 +78,7 @@ describe('Database Wrapper', () => {
   describe('#connect', () => {
     it('Should resolve if the connection details are correct', () => {
       databaseWrapper.connect()
-      .then(() => undefined, (error: Error) => {
+      .then(() => assert(true), (error: Error) => {
         throw error;
       });
     });
@@ -90,7 +90,7 @@ describe('Database Wrapper', () => {
       return databaseNull.connect()
         .then(() => {
           throw new Error('Shouldn\'t resolve if the connection details are wrong');
-        },    () => undefined)
+        },    () => assert(true))
         .finally(() => {
           databaseNull.setDatabasePassword('password');
         });
@@ -101,29 +101,29 @@ describe('Database Wrapper', () => {
     it('Should reject if the email does not exist', () => databaseWrapper.doesEmailExist('Emaildoesnotexist@exist.com')
       .then(() => {
         throw new Error('Shouldn\'t resolve if the email does not exist');
-      },    () => undefined));
+      },    () => assert(true)));
 
     it('Should resolve if the email does exist', () => databaseWrapper.doesEmailExist('Alys.DURHA2665@gmail.com')
-      .then(() => undefined, (error: Error) => { throw error; }));
+      .then(() => assert(true), (error: Error) => { throw error; }));
 
     it('Should reject if no email is passed at all', () => databaseWrapper.doesEmailExist(null)
       .then(() => {
         throw new Error('Shouldn\'t resolve if the email is not passed');
-      },    () => undefined));
+      },    () => assert(true)));
   });
 
   describe('#doesUsernameExist', () => {
     it('Should reject if the username does not exist', () => databaseWrapper.doesUsernameExist('')
       .then(() => {
         throw new Error('Shouldn\'t resolve if the email does not exist');
-      },    () => undefined));
+      },    () => assert(true)));
 
     it('Should resolve if the username does exist', () => databaseWrapper.doesUsernameExist('user1')
-      .then(() => undefined, (error: Error) => { throw error; }));
+      .then(() => assert(true), (error: Error) => { throw error; }));
 
     it('Should reject if no username is passed at all', () => databaseWrapper.doesUsernameExist(null)
       .then(() => {
         throw new Error('Shouldn\'t resolve if no username is passed');
-      },    () => undefined));
+      },    () => assert(true)));
   });
 });
