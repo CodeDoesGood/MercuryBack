@@ -5,8 +5,6 @@ import * as nodemailer from 'nodemailer';
 
 import { logger } from './Logger';
 
-let instance: any = null;
-
 export interface IEmailOptions {
   service: string;
   email: string;
@@ -46,10 +44,6 @@ export default class Email {
   private transporter: nodemailer.Transporter;
 
   constructor(options: IEmailOptions) {
-    if (!_.isNil(instance)) {
-      return instance;
-    }
-
     this.service = options.service;
     this.username = options.email;
 
@@ -60,15 +54,13 @@ export default class Email {
 
     // Transporter that will be sending the emails
     this.transporter = this.build(options.password);
-
-    instance = this;
   }
 
  /**
   * Take any stored emails in sthe email path and send them when the connection system is up
   * @param jsonPath The path to the json file of the stored emails to be send later
   */
-  public sendStoredEmails(jsonPath: string): Promise<{ emails: IEmailContent[] } | Error> {
+  public sendStoredEmails(jsonPath: string, passedEmails?: IEmailContent[]): Promise<{ emails: IEmailContent[] } | Error> {
     if (!this.online) {
       return Promise.reject(new Error(`[Email] Service must be online to send stored emails`));
     }
@@ -82,8 +74,16 @@ export default class Email {
       return Promise.resolve(template);
     }
 
-    const storedEmails: { emails: IEmailContent[] } = JSON.parse(fs.readFileSync(jsonPath, 'utf8'));
+    let storedEmails: { emails: IEmailContent[] } = null;
+
+    if (_.isNil(passedEmails)) {
+      storedEmails = JSON.parse(fs.readFileSync(jsonPath, 'utf8'));
+    } else {
+      storedEmails = { emails: passedEmails };
+    }
+
     const updatedStoredEmails: { emails: IEmailContent[] } = { emails: storedEmails.emails.slice() };
+
     let sentEmails: number = 0;
 
     if (_.isNil(storedEmails.emails[0])) {
@@ -91,21 +91,26 @@ export default class Email {
       return Promise.resolve(storedEmails);
     }
 
-    _.forEach(storedEmails.emails, (email: IEmailContent, index) => {
-      this.send(this.username, email.to, email.subject, email.text, email.html)
-      .then((info: nodemailer.SentMessageInfo) => {
-        logger.info(`[Email] Sent stored email: ${info.messageId}`);
-        updatedStoredEmails.emails.splice(index, 1);
-      })
-      .finally(() => {
-        sentEmails += 1;
+    return new Promise((resolve, reject) => {
+      _.forEach(storedEmails.emails, (email: IEmailContent, index) => {
+        this.send(this.username, email.to, email.subject, email.text, email.html)
+        .then((info: nodemailer.SentMessageInfo) => {
+          logger.info(`[Email] Sent stored email: ${info.messageId}`);
+          updatedStoredEmails.emails.splice(index, 1);
+        })
+        .finally(() => {
+          sentEmails += 1;
 
-        if (sentEmails === storedEmails.emails.length) {
-          fs.writeFileSync(jsonPath, JSON.stringify(updatedStoredEmails, null, '\t'));
-          return Promise.resolve(updatedStoredEmails);
-        }
-      })
-      .catch((error: Error) => logger.warn(`[Email] Failed to send store email ${error.message}`));
+          if (sentEmails === storedEmails.emails.length) {
+            if (_.isNil(passedEmails)) {
+              fs.writeFileSync(jsonPath, JSON.stringify(updatedStoredEmails, null, '\t'));
+            }
+
+            resolve(updatedStoredEmails);
+          }
+        })
+        .catch((error: Error) => logger.warn(`[Email] Failed to send store email ${error.message}`));
+      });
     });
   }
 
@@ -117,25 +122,19 @@ export default class Email {
    * @param {undefined} html The html to be used instead of the text (defaults to the text)
    */
   public send(from: string, to: string, subject: string, text: string, html?: string): Promise<nodemailer.SentMessageInfo | Error> {
+    const content = [
+      { name: 'from', type: from },
+      { name: 'subject', type: subject },
+      { name: 'text', type: text },
+      { name: 'to', type: to },
+    ];
+
     return new Promise((resolve, reject) => {
-      const content = [
-        { name: 'from', type: from },
-        { name: 'subject', type: subject },
-        { name: 'text', type: text },
-        { name: 'to', type: to },
-      ];
-
-      _.forEach(content, (item) => {
-        if (_.isNil(item.type) || !_.isString(item.type)) {
-          reject(`${item.name} has to be specified and of type string`);
-        }
-      });
-
-      this.buildMessage({ from, html, subject, text, to })
+      return this.buildMessage({ from, html, subject, text, to })
         .then((message: IBuiltMessage) => {
           this.transporter.sendMail(message, (error: Error, info: nodemailer.SentMessageInfo) => {
             if (!_.isNil(error)) {
-              reject(error);
+              Promise.reject(error);
             } else {
               resolve(info);
             }
@@ -150,7 +149,7 @@ export default class Email {
    */
   public verify(): Promise<boolean | Error> {
     return new Promise((resolve, reject) => {
-      this.transporter.verify((error: Error, result: boolean) => {
+      return this.transporter.verify((error: Error, result: boolean) => {
         if (!_.isNil(error)) {
           this.online = false;
           reject(error);
@@ -328,11 +327,21 @@ export default class Email {
 
     const message = _.pick(content, buildRequirements);
 
-    _.forEach(buildRequirements, (item) => {
-      if (_.isNil(message[item]) || !_.isString(message[item])) {
-        return Promise.reject(`${item} must be provided and of type string`);
-      }
-    });
+    if (_.isNil(message.to) || !_.isString(message.to)) {
+      return Promise.reject('to must be provided and of type string');
+    }
+
+    if (_.isNil(message.subject) || !_.isString(message.subject)) {
+      return Promise.reject('subject must be provided and of type string');
+    }
+
+    if (_.isNil(message.text) || !_.isString(message.text)) {
+      return Promise.reject('text must be provided and of type string');
+    }
+
+    if (_.isNil(message.html) || !_.isString(message.html)) {
+      return Promise.reject('html must be provided and of type string');
+    }
 
     return Promise.resolve({
       from: this.username,
