@@ -6,12 +6,13 @@
   "scripts": {
     "cover": "nyc ./node_modules/mocha/bin/mocha --exit ./dist/tests/index.test.js",
     "cover:full": "nyc --reporter=html ./node_modules/mocha/bin/mocha --exit ./dist/tests/index.test.js",
-    "build": "npm run build:ts && npm run tslint",
+    "build": "npm run build:ts && npm run lint",
     "build:ts": "tsc",
-    "watch:ts": "tsc -w",
-    "tslint": "tslint -c tslint.json -p tsconfig.json",
+    "build:watch": "tsc -w",
+    "lint": "tslint -c tslint.json -p tsconfig.json",
     "start": "npm run build && node ./dist/index.js",
     "start:debug": "node --inspect ./dist/index.js",
+    "start:pm2": "pm2 ./dist/index.js",
     "test": "node ./node_modules/mocha/bin/mocha --exit ./dist/tests/index.test.js",
     "test:travis": "SET TRAVIS=true && node ./node_modules/mocha/bin/mocha --exit ./dist/tests/index.test.js"
   },
