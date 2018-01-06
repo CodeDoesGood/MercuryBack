@@ -6,7 +6,7 @@ import { NextFunction, Request, Response } from 'express';
 import Configuration from '../components/Configuration/Configuration';
 import constants from '../components/constants';
 import Email, { IEmailContent } from '../components/Email';
-import { logger } from '../components/Logger';
+import logger from '../components/logger';
 import Volunteer from '../components/Volunteer';
 
 const config = new Configuration('mercury', 'mercury.json');

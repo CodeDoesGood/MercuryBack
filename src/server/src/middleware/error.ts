@@ -1,5 +1,5 @@
 import { NextFunction, Request, RequestHandler, Response } from 'express';
-import { logger } from '../components/Logger';
+import logger from '../components/logger';
 
 /**
  * Middleware that will catch all express routing and error calls, logging them and passing them

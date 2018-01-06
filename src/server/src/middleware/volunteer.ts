@@ -3,7 +3,7 @@ import * as _ from 'lodash';
 import { NextFunction, Request, Response } from 'express';
 
 import constants from '../components/constants';
-import { logger } from '../components/Logger';
+import logger from '../components/logger';
 import Volunteer, { IAnnouncement, IPasswordResetCode, IToken, IVerificationCode } from '../components/Volunteer';
 
 /**
