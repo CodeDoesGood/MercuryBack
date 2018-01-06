@@ -4,6 +4,51 @@ import * as fs from 'fs';
 import Configuration from '../components/Configuration/Configuration';
 
 describe('#configurationWrapper', () => {
+  describe('#constructor', () => {
+    it('should throw if folder is not passed', () => {
+      const folder: any = undefined;
+
+      try {
+        const config = new Configuration(folder, 'mercury.json');
+        assert(false, 'Should throw a error if folder is not passed');
+      } catch (error) {
+        assert(true, error);
+      }
+    });
+
+    it('should throw if the name is not passed', () => {
+      const name: any = undefined;
+
+      try {
+        const config = new Configuration('mercury', name);
+        assert(false, 'Should throw a error if name is not passed');
+      } catch (error) {
+        assert(true, error);
+      }
+    });
+
+    it('should throw if folder is not a string', () => {
+      const folder: any = 1;
+
+      try {
+        const config = new Configuration(folder, 'mercury.json');
+        assert(false, 'Should throw a error if folder is not a string');
+      } catch (error) {
+        assert(true, error);
+      }
+    });
+    it('should throw if the name is not a string', () => {
+      const name: any = 1;
+
+      try {
+        const config = new Configuration('mercury', name);
+        assert(false, 'Should throw a error if name is not a string');
+      } catch (error) {
+        assert(true, error);
+      }
+    });
+  });
+
   describe('#load', () => {
     it('Should return the default configuration if it does not exist', () => {
       let config = new Configuration('foldername', 'file.json');
