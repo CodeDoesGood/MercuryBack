@@ -14,18 +14,17 @@ const logger = new winston.Logger({
   exitOnError: false,
   levels: logLevels.levels,
   transports: [
-    new winston.transports.File({ filename: '../../docs/error.log', level: 'error' }),
-    new winston.transports.File({ filename: '../../docs/all.log' }),
+    new winston.transports.Console({
+      colorize: true,
+      handleExceptions: false,
+      json: false,
+      level: 'debug',
+    }),
   ],
 });
 
-if (process.env.NODE_ENV !== 'production') {
-  logger.add(new winston.transports.Console({
-    colorize: true,
-    handleExceptions: false,
-    json: false,
-    level: 'debug',
-  }));
-}
+export {
+  logger,
+};
 
 export default logger;
