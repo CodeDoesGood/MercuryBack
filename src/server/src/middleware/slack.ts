@@ -13,7 +13,7 @@ const config = new Configuration('mercury', 'mercury.json');
 function sendHeathCheck(req: Request, res: Response) {
   let webhookUrl: string = config.getKey('slack').mercury;
 
-  if (process.env.production === 'false') {
+  if (process.env.NODE_ENV === 'production') {
     webhookUrl = config.getKey('slack').debug;
   }
 

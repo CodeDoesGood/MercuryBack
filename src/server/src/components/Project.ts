@@ -48,6 +48,10 @@ export default class Project extends Database {
     this.description = null;
   }
 
+  /**
+   * Checks to see if the project exists by the projectId, updating the content and resolving true
+   * if it exists, otherwise rejects with the error message
+   */
   public exists(): Promise<boolean | Error> {
     if (_.isNil(this.projectId) || !_.isNumber(this.projectId)) {
       return Promise.reject(new Error(`id '${this.projectId}' passed is not a valid number`));

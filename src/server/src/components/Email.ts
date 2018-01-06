@@ -50,16 +50,19 @@ export default class Email {
     this.online = false;
     this.secure = true;
 
+    // Stored is the path to the stored json file that is curerntly used for the storing of emails
+    // couldn't be sent, these would be seen and resent or adjusted by the administrators.
     this.stored = options.stored;
 
     // Transporter that will be sending the emails
     this.transporter = this.build(options.password);
   }
 
- /**
-  * Take any stored emails in sthe email path and send them when the connection system is up
-  * @param jsonPath The path to the json file of the stored emails to be send later
-  */
+  /**
+   * Attempt to send emails again that failed.
+   * @param jsonPath The path to the json file
+   * @param passedEmails Overhaul of json stored emails, if this is passed then the stored emails would not be retrieved
+   */
   public sendStoredEmails(jsonPath: string, passedEmails?: IEmailContent[]): Promise<{ emails: IEmailContent[] } | Error> {
     if (!this.online) {
       return Promise.reject(new Error(`[Email] Service must be online to send stored emails`));
@@ -246,6 +249,7 @@ export default class Email {
   /**
    * Attempts to rmeove a stored email by its index
    * @param index email index to remove
+   * @param passedEmails Overhaul of json stored emails, if this is passed then the stored emails would not be retrieved
    */
   public removeStoredEmailByIndex(index: number, passedEmails?: { emails: IEmailContent[] }): Promise<IEmailContent[] | Error> {
     const jsonPath: string = this.getEmailJsonPath();

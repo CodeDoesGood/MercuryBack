@@ -21,7 +21,6 @@ export interface IDatabaseConfig {
 
 export default class Database {
   public knex: knex;
-  public showMessage: boolean;
   public online: boolean;
   public config: IDatabaseConfig;
 
@@ -31,8 +30,6 @@ export default class Database {
     this.config = config;
     this.online = false;
     this.interation = 28000;
-
-    this.showMessage = false;
 
     this.connect()
       .then(() => undefined)

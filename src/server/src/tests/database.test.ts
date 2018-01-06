@@ -8,8 +8,6 @@ import Database from '../components/Database';
 const config = new Configuration('mercury', 'mercury.json');
 const databaseWrapper = new Database(config.getKey('database'));
 
-databaseWrapper.showMessage = false;
-
 describe('Database Wrapper', () => {
   describe('#getOnlineStatus', () => {
     it('Should return true if online', () => {
