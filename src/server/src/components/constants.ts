@@ -123,6 +123,11 @@ interface IErrors {
   STORED_EMAIL_UPDATE_REQUIRED: string;
   STORED_EMAIL_REQUIREMENTS: string;
 
+  EMAIL_SERVICE_OBJECT_REQUIRED: string;
+  EMAIL_SERVICE_REQUIRES_USER: string;
+
+  EMAIL_UPDATE_PASSWORD_REQUIRES_PASSWORD: string;
+
   UNKNOWN_ERROR: string;
 }
 
@@ -257,6 +262,11 @@ const errors: IErrors = {
   STORED_EMAIL_MISSING_INDEX: 'Stored email index is required for a stored email to be removed',
   STORED_EMAIL_REQUIREMENTS: 'Stored email update object must require the html, subject, text, to',
   STORED_EMAIL_UPDATE_REQUIRED: 'Stored email update requires a new email to be passed via the body, { email: [] }',
+
+  EMAIL_SERVICE_OBJECT_REQUIRED: 'Email service update requires a service object to be passed',
+  EMAIL_SERVICE_REQUIRES_USER: 'Email service requires user, service and secure',
+
+  EMAIL_UPDATE_PASSWORD_REQUIRES_PASSWORD: 'Email password update requires a password',
 
   UNKNOWN_ERROR: 'Something went wrong',
 };

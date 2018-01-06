@@ -360,13 +360,13 @@ export function validateUpdatedServiceDetails(req: Request, res: Response, next:
   const requiredObjects: string[] = ['user', 'service', 'secure'];
 
   if (_.isNil(req.body.service)) {
-    return res.status(500).send({ error: 'Service update', description: 'Email service update requires a service object to be passed' });
+    return res.status(500).send({ error: 'Service update', description: constants.EMAIL_SERVICE_OBJECT_REQUIRED  });
   }
 
   const service = _.pick(req.body.service, requiredObjects);
 
   if (_.isNil(service.user) || _.isNil(service.service) || _.isNil(service.secure)) {
-    return res.status(500).send({ error: 'Service update', description: 'Email service requires user, service and secure' });
+    return res.status(500).send({ error: 'Service update', description: constants.EMAIL_SERVICE_REQUIRES_USER });
   }
 
   req.body.service = service;
@@ -397,7 +397,7 @@ export function updateServicePassword(req: Request, res: Response) {
   const password = req.body.password;
 
   if (_.isNil(password)) {
-    return res.status(500).send({ error: 'Service password update', description: 'Email password update requires a password' });
+    return res.status(500).send({ error: 'Service password update', description: constants.EMAIL_UPDATE_PASSWORD_REQUIRES_PASSWORD });
   }
 
   emailClient.updateServicePassword(password)
