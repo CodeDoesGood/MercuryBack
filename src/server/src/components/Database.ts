@@ -31,7 +31,7 @@ export default class Database {
     this.online = false;
     this.interation = 28000;
 
-    if (!_.isNil(process.env.TRAVIS)) {
+    if (_.isNil(process.env.TRAVIS)) {
       this.connect()
       .then(() => undefined)
       .catch((error: Error) => { throw error; });
