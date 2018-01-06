@@ -5,7 +5,7 @@ import * as cors from 'cors';
 import * as express from 'express';
 import * as ratelimit from 'express-rate-limit';
 
-import logger from './components/logger';
+import { logger } from './components/Logger';
 import { logErrors } from './middleware/error';
 import routes from './routes';
 

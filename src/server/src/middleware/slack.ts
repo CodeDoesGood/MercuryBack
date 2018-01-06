@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import * as _ from 'lodash';
 
-import logger from '../components/logger';
+import { logger } from '../components/Logger';
 
 import Configuration from '../components/Configuration/Configuration';
 import constants from '../components/constants';

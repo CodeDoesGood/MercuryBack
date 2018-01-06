@@ -3,7 +3,7 @@ import * as fs from 'fs';
 import * as _ from 'lodash';
 import * as nodemailer from 'nodemailer';
 
-import logger from './logger';
+import { logger } from './Logger';
 
 export interface IEmailOptions {
   service: string;
