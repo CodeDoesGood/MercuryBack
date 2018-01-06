@@ -14,7 +14,7 @@
 </p>
 
 ## Install
-    npm install --save-dev
+    npm install
     npm run build
     npm run test:travis
     npm run start
