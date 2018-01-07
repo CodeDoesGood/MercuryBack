@@ -1,3 +1,4 @@
+import * as crypto from 'crypto';
 import * as fs from 'fs';
 import * as _ from 'lodash';
 
@@ -120,6 +121,7 @@ export default class Configuration {
     }
 
     if (!exists.file) {
+      this.default.secret = crypto.randomBytes(128).toString('base64');
       fs.writeFileSync(this.path, JSON.stringify(this.default, null, '\t'));
     }
   }
