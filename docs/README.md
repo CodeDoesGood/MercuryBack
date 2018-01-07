@@ -6,7 +6,6 @@
 </div>
 
 
-
 [CodeDoesGood](http://codedoesgood.org/) uses a system to manage, accesss and help volunteers be involved in volunteering within the CodeDoesGood community, its mission is to harness the cognitive surplus of the tech community towards building solutions to real problems in the world.
 
 <p align="center">
@@ -18,6 +17,10 @@
     npm run build
     npm run test:travis
     npm run start
+
+The use of npm test can be used when the follow installation and infrastructure is inplace with the built configuration. Without intergration with the database and configured config file 90% plus of the tests will fail due to the limited infrastructure. 
+
+    npm test
 
 ## Contributing
 
