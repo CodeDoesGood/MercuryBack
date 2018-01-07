@@ -1,4 +1,3 @@
-import * as Promise from 'bluebird';
 import * as _ from 'lodash';
 
 import Configuration from './Configuration/Configuration';
@@ -52,7 +51,7 @@ export default class Project extends Database {
    * Checks to see if the project exists by the projectId, updating the content and resolving true
    * if it exists, otherwise rejects with the error message
    */
-  public exists(): Promise<boolean | Error> {
+  public async exists(): Promise<boolean | Error> {
     if (_.isNil(this.projectId) || !_.isNumber(this.projectId)) {
       return Promise.reject(new Error(`id '${this.projectId}' passed is not a valid number`));
     }
@@ -78,7 +77,7 @@ export default class Project extends Database {
   /**
    * Updates a project by id with the provided content
    */
-  public updateContent(projectContent: IProject): Promise<boolean | Error> {
+  public async updateContent(projectContent: IProject): Promise<boolean | Error> {
     if (_.isNil(this.projectId) || !_.isNumber(this.projectId)) {
       return Promise.reject(new Error(`Id "${this.projectId}" passed is not a valid number`));
     }

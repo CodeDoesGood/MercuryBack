@@ -26,15 +26,18 @@ function validateConnectionStatus(req: Request, res: Response, next: NextFunctio
  * calls next.
  * @param {string} req.volunteer.username The username of the volunteer
  */
-function validateUsernameDoesNotExist(req: Request, res: Response, next: NextFunction) {
+async function validateUsernameDoesNotExist(req: Request, res: Response, next: NextFunction) {
   const { username }: { username: string; } = req.body.volunteer;
 
-  if (_.isNil(username)) {
-    res.status(403).send({ error: 'Username required', description: constants.USERNAME_REQUIRED });
-  } else {
-    databaseWrapper.doesUsernameExist(username)
-      .then(() => res.status(403).send({ error: 'Username exists', description: constants.USERNAME_ALREADY_EXISTS(username) }))
-      .catch(() => next());
+  try {
+    if (_.isNil(username)) {
+      res.status(403).send({ error: 'Username required', description: constants.USERNAME_REQUIRED });
+    } else {
+      await databaseWrapper.doesUsernameExist(username);
+      res.status(403).send({ error: 'Username exists', description: constants.USERNAME_ALREADY_EXISTS(username) });
+    }
+  } catch (error) {
+    next();
   }
 }
 
@@ -42,31 +45,39 @@ function validateUsernameDoesNotExist(req: Request, res: Response, next: NextFun
  * Checks with the database to see if the email already exists and throws a bad request otherwise
  * calls next.
  */
-function validateEmailDoesNotExist(req: Request, res: Response, next: NextFunction) {
+async function validateEmailDoesNotExist(req: Request, res: Response, next: NextFunction) {
   const { email }: { email: string } = req.body.volunteer;
 
-  databaseWrapper.doesEmailExist(email)
-    .then(() => res.status(403).send({ error: 'Email exists', description: constants.EMAIL_ALREADY_EXISTS(email) }))
-    .catch(() => next());
+  try {
+    if (_.isNil(email)) {
+      res.status(403).send({ error: 'Email required', description: constants.EMAIL_REQUIRED });
+    } else {
+      await databaseWrapper.doesEmailExist(email);
+      res.status(403).send({ error: 'Email exists', description: constants.EMAIL_ALREADY_EXISTS(email) });
+    }
+  } catch (error) {
+    next();
+  }
 }
 
 /**
  * Checks with the database to see if the username already exists and calls next otherwise
  * throws a bad request otherwise.
  */
-function validateUsernameDoesExist(req: Request, res: Response, next: NextFunction) {
+async function validateUsernameDoesExist(req: Request, res: Response, next: NextFunction) {
   const { username }: { username: string } = req.body;
   if (_.isNil(username)) {
     res.status(400).send({ error: 'Username validation', description: constants.USERNAME_REQUIRED });
   }
 
-  if (!res.headersSent) {
-    databaseWrapper.doesUsernameExist(username)
-      .then((id: number) => {
-        req.body.id = id;
-        next();
-      })
-      .catch(() => res.status(400).send({ error: 'Username does not exists', description: constants.USERNAME_DOES_NOT_EXIST(username) }));
+  try {
+    if (!res.headersSent) {
+      const usernameExists: number | Error = await databaseWrapper.doesUsernameExist(username);
+      req.body.id = usernameExists;
+      next();
+    }
+  } catch (error) {
+    res.status(400).send({ error: 'username', description: constants.USERNAME_DOES_NOT_EXIST(username) });
   }
 }
 
@@ -74,7 +85,7 @@ function validateUsernameDoesExist(req: Request, res: Response, next: NextFuncti
  * Checks with the database to see if the email already exists and calls next otherwise
  * throws a bad request.
  */
-function validateEmailDoesExist(req: Request, res: Response, next: NextFunction) {
+async function validateEmailDoesExist(req: Request, res: Response, next: NextFunction) {
   const { email: email1 }: { email: string; } = req.params;
   const { email: email2 }: { email: string; } = req.body;
 
@@ -90,10 +101,14 @@ function validateEmailDoesExist(req: Request, res: Response, next: NextFunction)
 
   req.body.email = email;
 
-  if (!res.headersSent) {
-    databaseWrapper.doesEmailExist(email)
-      .then(() => next())
-      .catch(() => res.status(400).send({ error: 'Email Does not exists', description: constants.EMAIL_DOES_NOT_EXIST(email) }));
+  try {
+    if (!res.headersSent) {
+      const emailExists: number | Error = await databaseWrapper.doesEmailExist(email);
+      req.body.id = emailExists;
+      next();
+    }
+  } catch (error) {
+    res.status(400).send({ error: 'Email existance', description: constants.EMAIL_DOES_NOT_EXIST(email) });
   }
 }
 

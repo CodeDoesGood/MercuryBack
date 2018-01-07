@@ -91,37 +91,42 @@ function validateProjectUpdateContentTypes(req: Request, res: Response, next: Ne
  * id is required in the req and so is the project object, bith are validated by the
  * validateProjectUpdateContent middleware.
  */
-function updateProjectById(req: Request, res: Response) {
+async function updateProjectById(req: Request, res: Response) {
   const content: IProject = req.body.project;
   const { projectId }: { projectId: number } = req.body;
 
   const project = new Project(projectId);
 
-  project.exists()
-    .then(() => project.updateContent(content))
-    .then(() => res.status(200).send({ message: `Project updated id ${projectId}` }))
-    .catch((error: Error) => res.status(500).send({
+  try {
+    const exists: boolean | Error = await project.exists();
+    const updated = await project.updateContent(content);
+    res.status(200).send({ message: `Project updated id ${projectId}` });
+  } catch (error) {
+    res.status(500).send({
       description: constants.UNABLE_TO_UPDATE_PROJECT(projectId),
       error: `${JSON.stringify(error)}`,
-    }));
+    });
+  }
 }
+
 /**
  * Gets and sends the project requested by id.
  * @return a object containing all the project data.
  */
-function getProjectById(req: Request, res: Response) {
+async function getProjectById(req: Request, res: Response) {
   const projectId: number = parseInt(req.body.projectId, 11);
   const project = new Project(projectId);
 
-  project.exists()
-    .then(() => {
-      const content = project.getContent();
-      res.status(200).send({ message: `Project By id ${projectId}`, content: { project: content } });
-    })
-    .catch((error: Error) => res.status(500).send({
+  try {
+    const exists = await project.exists();
+    const content: IProject | Error = project.getContent();
+    res.status(200).send({ message: '', content: { project: content } });
+  } catch (error) {
+    res.status(500).send({
       description: constants.UNABLE_TO_GATHER_PROJECT(projectId),
       error: error.message,
-    }));
+    });
+  }
 }
 
 export {

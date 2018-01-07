@@ -1,4 +1,3 @@
-import * as Promise from 'bluebird';
 import * as _ from 'lodash';
 
 import { IProject } from './Project';
@@ -16,7 +15,7 @@ export default class Projects extends Database {
   /**
    * Returns all projects
    */
-  public getAllProjects(): Promise<IProject[] | Error> {
+  public async getAllProjects(): Promise<IProject[] | Error> {
     return this.knex.select().from('project')
       .then(projects => Promise.resolve(projects))
       .catch((error: Error) => Promise.reject(error));
@@ -25,7 +24,7 @@ export default class Projects extends Database {
   /**
    * Returns all active projects
    */
-  public getAllActiveProjects(): Promise<IProject[] | Error> {
+  public async getAllActiveProjects(): Promise<IProject[] | Error> {
     return this.knex('project').where('status', 1).andWhere('hidden', false)
       .then(projects => Promise.resolve(projects))
       .catch((error: Error) => Promise.reject(error));
@@ -35,7 +34,7 @@ export default class Projects extends Database {
    * Returns all projects marked by the status
    * @param status
    */
-  public getAllProjectsByStatus(status: number): Promise<IProject[] | Error> {
+  public async getAllProjectsByStatus(status: number): Promise<IProject[] | Error> {
     if (!_.isString(status) && !_.isNumber(status)) {
       return Promise.reject(new Error(`volunteerId "${status}" passed is not a valid string or number`));
     }
@@ -49,7 +48,7 @@ export default class Projects extends Database {
    * Returns all projects marked by the category
    * @param category
    */
-  public getAllProjectsByCategory(category: number): Promise<IProject[] | Error> {
+  public async getAllProjectsByCategory(category: number): Promise<IProject[] | Error> {
     if (!_.isString(category) && !_.isNumber(category)) {
       return Promise.reject(new Error(`volunteerId "${category}" passed is not a valid string or number`));
     }
@@ -62,7 +61,7 @@ export default class Projects extends Database {
   /**
    * Returns all projects marked as hidden
    */
-  public getAllHiddenProjects(): Promise<IProject[] | Error> {
+  public async getAllHiddenProjects(): Promise<IProject[] | Error> {
     return this.knex('project').where('hidden', true)
       .then(projects => Promise.resolve(projects))
       .catch((error: Error) => Promise.reject(error));

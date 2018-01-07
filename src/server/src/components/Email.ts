@@ -1,4 +1,4 @@
-import * as Promise from 'bluebird';
+import * as PromiseB from 'bluebird';
 import * as fs from 'fs';
 import * as _ from 'lodash';
 import * as nodemailer from 'nodemailer';
@@ -63,7 +63,7 @@ export default class Email {
    * @param jsonPath The path to the json file
    * @param passedEmails Overhaul of json stored emails, if this is passed then the stored emails would not be retrieved
    */
-  public sendStoredEmails(jsonPath: string, passedEmails?: IEmailContent[]): Promise<{ emails: IEmailContent[] } | Error> {
+  public async sendStoredEmails(jsonPath: string, passedEmails?: IEmailContent[]) {
     if (!this.online) {
       return Promise.reject(new Error(`[Email] Service must be online to send stored emails`));
     }
@@ -94,7 +94,7 @@ export default class Email {
       return Promise.resolve(storedEmails);
     }
 
-    return new Promise((resolve, reject) => {
+    return new PromiseB((resolve, reject) => {
       _.forEach(storedEmails.emails, (email: IEmailContent, index) => {
         this.send(this.username, email.to, email.subject, email.text, email.html)
         .then((info: nodemailer.SentMessageInfo) => {
@@ -124,7 +124,7 @@ export default class Email {
    * @param {string} text  The content text for the email.
    * @param {undefined} html The html to be used instead of the text (defaults to the text)
    */
-  public send(from: string, to: string, subject: string, text: string, html?: string): Promise<nodemailer.SentMessageInfo | Error> {
+  public async send(from: string, to: string, subject: string, text: string, html?: string): Promise<any> {
     const content = [
       { name: 'from', type: from },
       { name: 'subject', type: subject },
@@ -137,7 +137,7 @@ export default class Email {
         .then((message: IBuiltMessage) => {
           this.transporter.sendMail(message, (error: Error, info: nodemailer.SentMessageInfo) => {
             if (!_.isNil(error)) {
-              Promise.reject(error);
+              reject(error);
             } else {
               resolve(info);
             }
@@ -150,7 +150,7 @@ export default class Email {
   /**
    * Verifies the connection the service.
    */
-  public verify(): Promise<boolean | Error> {
+  public async verify(): Promise<boolean | Error> {
     return new Promise((resolve, reject) => {
       return this.transporter.verify((error: Error, result: boolean) => {
         if (!_.isNil(error)) {
@@ -203,7 +203,7 @@ export default class Email {
    * @param details Service details used for the update
    * @param password The password used for recreating the connection
    */
-  public updateServiceDetails(serviceContent: IEmailServices, password: string): Promise<boolean | Error> {
+  public async updateServiceDetails(serviceContent: IEmailServices, password: string): Promise<boolean | Error> {
     const details = _.pick(serviceContent, ['secure', 'service', 'user']);
 
     if (_.isNil(details.secure) || _.isNil(details.user) || _.isNil(details.service)) {
@@ -222,7 +222,7 @@ export default class Email {
    * Replace and update the email service password
    * @param password The new password
    */
-  public updateServicePassword(password: string) {
+  public async updateServicePassword(password: string) {
     this.transporter = this.build(password);
     return this.verify();
   }
@@ -251,7 +251,7 @@ export default class Email {
    * @param index email index to remove
    * @param passedEmails Overhaul of json stored emails, if this is passed then the stored emails would not be retrieved
    */
-  public removeStoredEmailByIndex(index: number, passedEmails?: { emails: IEmailContent[] }): Promise<IEmailContent[] | Error> {
+  public async removeStoredEmailByIndex(index: number, passedEmails?: { emails: IEmailContent[] }): Promise<IEmailContent[] | Error> {
     const jsonPath: string = this.getEmailJsonPath();
     let storedEmails: { emails: IEmailContent[] };
 
@@ -279,7 +279,7 @@ export default class Email {
    * @param index the index of the email to update
    * @param email IEmailContent email to update
    */
-  public replaceStoredEmailByIndex(index, email, passedEmails?: { emails: IEmailContent[] }): Promise<IEmailContent[] | Error> {
+  public async replaceStoredEmailByIndex(index, email, passedEmails?: { emails: IEmailContent[] }): Promise<IEmailContent[] | Error> {
     const jsonPath: string = this.getEmailJsonPath();
     let storedEmails: { emails: IEmailContent[] };
 

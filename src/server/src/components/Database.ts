@@ -1,4 +1,3 @@
-import * as Promise from 'bluebird';
 import * as crypto from 'crypto';
 import * as knex from 'knex';
 import * as _ from 'lodash';
@@ -41,7 +40,7 @@ export default class Database {
   /**
    * Makes a connection to the sql database
    */
-  public connect(): Promise<boolean | Error> {
+  public async connect(): Promise<boolean | Error> {
     if (this.online) {
       return Promise.resolve(this.online);
     }
@@ -85,7 +84,7 @@ export default class Database {
    * Resolves the volunteers id if the username exists otherwise rejects.
    * @param username The username being checked
    */
-  public doesUsernameExist(username: string): Promise<number | Error> {
+  public async doesUsernameExist(username: string): Promise<number | Error> {
     if (!_.isString(username)) {
       return Promise.reject(new Error(`volunteerId "${username}" passed is not a valid string`));
     }
@@ -99,7 +98,7 @@ export default class Database {
    * Resolves the volunteers id if the email exists otherwise rejects.
    * @param email The email being checked
    */
-  public doesEmailExist(email: string): Promise<number | Error> {
+  public async doesEmailExist(email: string): Promise<number | Error> {
     if (!_.isString(email)) {
       return Promise.reject(new Error(`email "${email}" passed is not a valid string`));
     }

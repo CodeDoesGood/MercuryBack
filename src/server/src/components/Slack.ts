@@ -1,6 +1,5 @@
 import { IncomingWebhook } from '@slack/client';
 
-import * as Promise from 'bluebird';
 import * as _ from 'lodash';
 import * as os from 'os';
 

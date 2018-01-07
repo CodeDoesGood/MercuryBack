@@ -1,4 +1,3 @@
-import * as Promise from 'bluebird';
 import * as _ from 'lodash';
 
 import Configuration from './Configuration/Configuration';
@@ -128,7 +127,7 @@ export default class Volunteer extends Database {
    * of id, if the volunteer does already exist then it will update the username, email, password,
    * and salt that is being used in the class.
    */
-  public exists(type: string = 'volunteerId'): Promise<boolean | Error> {
+  public async exists(type: string = 'volunteerId'): Promise<boolean | Error> {
     if (_.isNil(this[type])) {
       return Promise.reject(new Error(`Type must be defined or valid, type=${this[type]}`));
     }
@@ -177,7 +176,7 @@ export default class Volunteer extends Database {
    * @param password
    * @param dataEntryUserId
    */
-  public create(password: string, dataEntryUserId: number = 1): Promise<number | Error> {
+  public async create(password: string, dataEntryUserId: number = 1): Promise<number | Error> {
     if (_.isNil(this.name) || _.isNil(this.username) || _.isNil(this.email)) {
       return Promise.reject(
         new Error(`name, username, email and password are required, name=${this.name}, username=${this.username}, email=${this.email}`),
@@ -219,7 +218,7 @@ export default class Volunteer extends Database {
   /**
    * Marks the provided usersId as verified in the database
    */
-  public verify(): Promise<boolean | Error> {
+  public async verify(): Promise<boolean | Error> {
     if (!_.isNumber(this.volunteerId)) {
       return Promise.reject(new Error(`volunteerId "${this.volunteerId}" passed is not a valid number`));
     }
@@ -270,7 +269,7 @@ export default class Volunteer extends Database {
   /**
    * Removes the verification code by id for user
    */
-  public removeVerificationCode(): Promise<boolean | Error> {
+  public async removeVerificationCode(): Promise<boolean | Error> {
     if (!_.isNumber(this.volunteerId)) {
       return Promise.reject(new Error(`volunteerId "${this.volunteerId}" passed is not a valid number`));
     }
@@ -283,7 +282,7 @@ export default class Volunteer extends Database {
   /**
    * removes the existing (if any) password reset codes for the user)
    */
-  public removePasswordResetCode(): Promise<boolean | Error> {
+  public async removePasswordResetCode(): Promise<boolean | Error> {
     if (!_.isNumber(this.volunteerId)) {
       return Promise.reject(new Error(`volunteerId "${this.volunteerId}" passed is not a valid number`));
     }
@@ -296,7 +295,7 @@ export default class Volunteer extends Database {
   /**
    * Gets and returns all details for the volunteer in the verification codes table.
    */
-  public getVerificationCode(): Promise<IVerificationCode | Error> {
+  public async getVerificationCode(): Promise<IVerificationCode | Error> {
     if (!_.isNumber(this.volunteerId)) {
       return Promise.reject(new Error(`volunteerId "${this.volunteerId}" passed is not a valid number`));
     }
@@ -309,7 +308,7 @@ export default class Volunteer extends Database {
   /**
    * Gets the password reset code from the password_reset_code table if it exists
    */
-  public getPasswordResetCode(): Promise<IPasswordResetCode | Error> {
+  public async getPasswordResetCode(): Promise<IPasswordResetCode | Error> {
     if (!_.isNumber(this.volunteerId)) {
       return Promise.reject(new Error(`volunteerId "${this.volunteerId}" passed is not a valid number`));
     }
@@ -322,7 +321,7 @@ export default class Volunteer extends Database {
   /**
    * Resolves the volunteers id if the verification code exists exists otherwise rejects.
    */
-  public doesVerificationCodeExist(): Promise<number | Error> {
+  public async doesVerificationCodeExist(): Promise<number | Error> {
     if (!_.isNumber(this.volunteerId)) {
       return Promise.reject(new Error(`volunteerId "${this.volunteerId}" passed is not a valid number`));
     }
@@ -340,7 +339,7 @@ export default class Volunteer extends Database {
   /**
    * Resolves the volunteers id if the password code exists exists otherwise rejects.
    */
-  public doesPasswordResetCodeExist(): Promise<number | Error> {
+  public async doesPasswordResetCodeExist(): Promise<number | Error> {
     if (!_.isNumber(this.volunteerId)) {
       return Promise.reject(new Error(`volunteerId "${this.volunteerId}" passed is not a valid number`));
     }
@@ -363,7 +362,7 @@ export default class Volunteer extends Database {
    * hashing of the password, storing the new salt and new hashed password.
    * @param password
    */
-  public updatePassword(password: string): Promise<boolean | Error> {
+  public async updatePassword(password: string): Promise<boolean | Error> {
     if (!_.isNumber(this.volunteerId) || !_.isString(password)) {
       return Promise.reject(new Error('password or id passed was not a valid number or string'));
     }
@@ -383,7 +382,7 @@ export default class Volunteer extends Database {
    * uses them ids to get all the announcements from the announcement table.
    * TODO: try this out and then write tests to cover the usages.
    */
-  public getActiveNotifications(): Promise<IAnnouncement[] | Error> {
+  public async getActiveNotifications(): Promise<IAnnouncement[] | Error> {
     return this.knex('volunteer_announcement')
       .where('volunteer_id', this.volunteerId)
       .andWhere('read', false)
@@ -405,7 +404,7 @@ export default class Volunteer extends Database {
    * @param announcementId The id of the notification to be marked as read.
    * TODO: this needs to be tried and tests written to cover usages.
    */
-  public dismissNotification(announcementId: number): Promise<boolean | Error> {
+  public async dismissNotification(announcementId: number): Promise<boolean | Error> {
     if (_.isNil(announcementId) || !_.isNumber(announcementId)) {
       return Promise.reject(new Error(`Announcement Id must be passed and also a valid number, announcement id=${announcementId}`));
     }
@@ -428,7 +427,7 @@ export default class Volunteer extends Database {
   /**
    * Can the volunteer access the admin panel
    */
-  public canAccessAdminPortal(): Promise<boolean | Error> {
+  public async canAccessAdminPortal(): Promise<boolean | Error> {
     if (_.isNil(this.adminPortalAccess)) {
       return this.knex('volunteer').select('admin_portal_access').where('volunteer_id', this.volunteerId).first()
       .then((res: { admin_portal_access: number }) => {
@@ -448,7 +447,7 @@ export default class Volunteer extends Database {
    * username, then salt the given code with the stored salt. Compare the newly salted code with
    * the stored already salted code, if they match we then mark the account as verified.
    */
-  public createVerificationCode(): Promise<number | Error> {
+  public async createVerificationCode(): Promise<number | Error> {
     const maxNumber: number = 9999999999999;
     const minNumber: number = 1000000000000;
 
@@ -475,7 +474,7 @@ export default class Volunteer extends Database {
    * the code matches the code in the database with the username nad email, then the new
    * password will be set (code is hashed and salted)
    */
-  public createPasswordResetCode(): Promise<number | Error> {
+  public async createPasswordResetCode(): Promise<number | Error> {
     const maxNumber: number = 9999999999999;
     const minNumber: number = 1000000000000;
 

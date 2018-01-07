@@ -11,7 +11,7 @@ import * as slack from '../components/Slack';
 
 const config = new Configuration('mercury', 'mercury.json');
 
-function sendHeathCheck(req: Request, res: Response) {
+async function sendHeathCheck(req: Request, res: Response) {
   let webhookUrl: string = config.getKey('slack').mercury;
 
   if (process.env.NODE_ENV === 'production') {
@@ -21,23 +21,23 @@ function sendHeathCheck(req: Request, res: Response) {
   const email = new Email(config.getKey('email'));
   const database = new Database(config.getKey('database'));
 
-  let emailStatus: boolean = false;
+  let emailStatus: boolean | Error = false;
   let databaseStatus: boolean = false;
 
   if (_.isNil(webhookUrl)) {
     return res.status(500).send({ error: 'slack hook', description: constants.SLACK_HOOK_MISSING });
   }
 
-  return email.verify()
-  .then(() => {
-    emailStatus = true;
+  try {
+    await email.verify();
     databaseStatus = database.getOnlineStatus();
-  })
-  .finally(() => {
-    slack.healthCheck(webhookUrl, emailStatus, databaseStatus)
-    .then(() =>  res.status(200).send({ message: 'Health check delivered to slack' }))
-    .catch((error: Error) => res.status(500).send({ error: 'Slack', description: constants.SLACK_HEALTH_FAILED(error) }));
-  });
+    emailStatus = true;
+
+    await slack.healthCheck(webhookUrl, emailStatus, databaseStatus);
+    res.status(200).send({ message: 'Health check sent to slack' });
+  } catch (error) {
+    res.status(500).send({ error: 'Slack', description: constants.SLACK_HEALTH_FAILED(error) });
+  }
 }
 
 export {
