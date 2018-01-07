@@ -55,7 +55,7 @@ export default class Configuration {
    * @param {object} content The configuration that will be set
    */
   public update(content: IConfig) {
-    if (this.exists()) {
+    if (this.exists().file) {
       this.bind(content);
       fs.writeFileSync(this.path, JSON.stringify(content, null, '\t'));
     }
@@ -89,8 +89,9 @@ export default class Configuration {
    */
   private load(): IConfig {
     let configuration: IConfig = this.getDefault();
+    const exists = this.exists();
 
-    if (this.exists()) {
+    if (exists.folder && exists.file) {
       configuration = JSON.parse(fs.readFileSync(this.path, 'utf8'));
       return configuration;
     }
@@ -100,19 +101,25 @@ export default class Configuration {
   }
 
   /**
-   * Returns true with the file exists.
+   * returns true for both the folder and the file
    */
-  private exists(): boolean {
-    const exists: boolean = fs.existsSync(this.path);
-    return exists;
+  private exists(): { folder: boolean; file: boolean; } {
+    return {
+      folder: fs.existsSync(this.folderDir),
+      file: fs.existsSync(this.path),
+    };
   }
 
   /**
    * Creates the configuration file and folder with the class details.
    */
-  private create() {
-    if (!this.exists()) {
+  private create(): void {
+    const exists: { folder: boolean; file: boolean; } = this.exists();
+    if (!exists.folder) {
       fs.mkdirSync(this.folderDir);
+    }
+
+    if (!exists.file) {
       fs.writeFileSync(this.path, JSON.stringify(this.default, null, '\t'));
     }
   }
