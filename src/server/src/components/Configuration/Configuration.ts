@@ -105,8 +105,8 @@ export default class Configuration {
    */
   private exists(): { folder: boolean; file: boolean; } {
     return {
-      folder: fs.existsSync(this.folderDir),
       file: fs.existsSync(this.path),
+      folder: fs.existsSync(this.folderDir),
     };
   }
 
