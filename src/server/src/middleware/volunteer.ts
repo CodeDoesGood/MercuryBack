@@ -315,12 +315,11 @@ export async function validateResetCodeExists(req: Request, res: Response, next:
   const { username }: { username: string; } = req.body;
 
   const volunteer = new Volunteer(null, username);
-
   req.body.volunteer = volunteer;
 
   try {
-    const exists = volunteer.exists('username');
-    await volunteer.doesPasswordResetCodeExist();
+    const exists = await volunteer.exists('username');
+    const codeExists = await volunteer.doesPasswordResetCodeExist();
     next();
   } catch (error) {
     res.status(400).send({ error: 'Code existence', description: constants.VOLUNTEER_VERIFICATION_CODE_DOES_NOT_EXIST });
