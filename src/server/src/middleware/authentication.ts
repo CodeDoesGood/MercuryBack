@@ -136,8 +136,11 @@ async function authenticateLoggingInUser(req: Request, res: Response) {
         error: 'Failed verification check',
         failed_verify: true });
     } else {
-      const token: string = jwt.sign({ username, id: userId }, config.getKey('secret'), { expiresIn: '1h' });
-      res.status(200).send({ message: `Volunteer ${username} authenticated`, content: { token, username, id: userId } });
+      if (volunteer.compareAuthenticatingPassword(password)) {
+        const token: string = jwt.sign({ username, id: userId }, config.getKey('secret'), { expiresIn: '1h' });
+        return res.status(200).send({ message: `Volunteer ${username} authenticated`, content: { token, username, id: userId } });
+      }
+      return res.status(401).send({ error: 'Validate user credentials', description: constants.INCORRECT_PASSWORD });
     }
   } catch (error) {
     logger.error(`Failed to get Volunteer login details, error=${JSON.stringify(error)}`);
