@@ -1,4 +1,3 @@
-import * as PromiseB from 'bluebird';
 import * as fs from 'fs';
 import * as _ from 'lodash';
 import * as nodemailer from 'nodemailer';
