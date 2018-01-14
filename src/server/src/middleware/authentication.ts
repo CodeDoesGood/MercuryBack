@@ -50,25 +50,25 @@ function validateAuthenticationDetails(req: Request, res: Response, next: NextFu
  * @param {string} req.username The users username to be validate
  * @param {string} req.oldPassword  The old password of the user to validate
  */
-function validateUserCredentials(req: Request, res: Response, next: NextFunction) {
+async function validateUserCredentials(req: Request, res: Response, next: NextFunction) {
   const { username }: { username: string } = req.body;
   const password: string = req.body.oldPassword;
 
   const volunteer = new Volunteer(null, username);
 
-  volunteer.exists('username')
-    .then(() => {
-      if (volunteer.compareAuthenticatingPassword(password)) {
-        req.body.volunteer = volunteer;
-        next();
-      } else {
-        res.status(401).send({ error: 'Validate user credentials', description: constants.INCORRECT_PASSWORD });
-      }
-    })
-    .catch((error: Error) => {
-      logger.error(`Failed to gather volunteer login details by username while validating user credentials, error=${error}`);
-      res.status(500).send({ error: 'Validate user credentials', description: constants.FAILED_VALIDATION });
-    });
+  try {
+    const exits = await volunteer.exists('username');
+
+    if (volunteer.compareAuthenticatingPassword(password)) {
+      req.body.volunteer = volunteer;
+      next();
+    } else {
+      res.status(401).send({ error: 'Validate user credentials', description: constants.INCORRECT_PASSWORD });
+    }
+  } catch (error) {
+    logger.error(`Failed to gather volunteer login details by username while validating user credentials, error=${error}`);
+    res.status(500).send({ error: 'Validate user credentials', description: constants.FAILED_VALIDATION });
+  }
 }
 
 /**
@@ -97,21 +97,22 @@ function checkAuthenticationToken(req: Request, res: Response, next: NextFunctio
 /**
  * Check to see if the authenticated user is currently a active admin.
  */
-function checkAdminPortalAccess(req: Request, res: Response, next: NextFunction) {
+async function checkAdminPortalAccess(req: Request, res: Response, next: NextFunction) {
   const { username } = req.body.decoded;
-
   const volunteer = new Volunteer(null, username);
 
-  volunteer.exists('username')
-  .then(() => volunteer.canAccessAdminPortal())
-  .then((canAccess: boolean) => {
-    if (canAccess) {
-      next();
+  try {
+    const exists = await volunteer.exists('username');
+    const canAccessAdminPortal: boolean | Error =  await volunteer.canAccessAdminPortal();
+
+    if (canAccessAdminPortal) {
       req.body.volunteer = volunteer;
-    } else if (!res.headersSent) {
-      res.status(401).send({ error: 'Unauthorized Access', description: constants.VOLUNTEER_NOT_AUTH });
+      return next();
     }
-  });
+    res.status(401).send({ error: 'Unauthorized Access', description: constants.VOLUNTEER_NOT_AUTH });
+  } catch (error) {
+    res.status(401).send({ error: 'Unauthorized Access', description: constants.VOLUNTEER_NOT_AUTH });
+  }
 }
 
 /**
@@ -121,31 +122,30 @@ function checkAdminPortalAccess(req: Request, res: Response, next: NextFunction)
  * @param {string} req.username The username of the user
  * @param {string} req.password The password of the user
  */
-function authenticateLoggingInUser(req: Request, res: Response) {
+async function authenticateLoggingInUser(req: Request, res: Response) {
   const { username, password }: { username: string; password: string } = req.body;
   const userId: number = req.body.id;
   const volunteer = new Volunteer(userId, username);
 
-  volunteer.exists()
-    .then(() => {
+  try {
+    const exists = await volunteer.exists();
+
+    if (!volunteer.getVerification()) {
+      res.status(403).send({
+        description: constants.VOLUNTEER_VERIFICATION_REQUIRED(volunteer.username),
+        error: 'Failed verification check',
+        failed_verify: true });
+    } else {
       if (volunteer.compareAuthenticatingPassword(password)) {
-        if (!volunteer.getVerification()) {
-          res.status(403).send({
-            description: constants.VOLUNTEER_VERIFICATION_REQUIRED(volunteer.username),
-            error: 'Failed verification check',
-            failed_verify: true });
-        } else {
-          const token: string = jwt.sign({ username, id: userId }, config.getKey('secret'), { expiresIn: '1h' });
-          res.status(200).send({ message: `Volunteer ${username} authenticated`, content: { token, username, id: userId } });
-        }
-      } else {
-        res.status(401).send({ error: 'Volunteer authentication', description: constants.INCORRECT_PASSWORD });
+        const token: string = jwt.sign({ username, id: userId }, config.getKey('secret'), { expiresIn: '1h' });
+        return res.status(200).send({ message: `Volunteer ${username} authenticated`, content: { token, username, id: userId } });
       }
-    })
-    .catch((error: Error) => {
-      logger.error(`Failed to get Volunteer login details, error=${JSON.stringify(error)}`);
-      res.status(500).send({ error: 'Authentication', description: constants.FAILED_VOLUNTEER_GET(error) });
-    });
+      return res.status(401).send({ error: 'Validate user credentials', description: constants.INCORRECT_PASSWORD });
+    }
+  } catch (error) {
+    logger.error(`Failed to get Volunteer login details, error=${JSON.stringify(error)}`);
+    res.status(500).send({ error: 'Authentication', description: constants.FAILED_VOLUNTEER_GET(error) });
+  }
 }
 
 export {

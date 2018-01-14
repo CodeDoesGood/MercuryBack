@@ -323,8 +323,11 @@ describe('Volunteer Component', () => {
             assert.equal(!_.isNil(code.verification_code_id), true, 'verification_code_id should be contained in the code');
             assert.equal(!_.isNil(code.salt), true, 'salt should be contained in the code');
             assert.equal(!_.isNil(code.created_datetime), true, 'created_datetime should be contained in the code');
-          },    (error: Error) => { throw error; })
-          .finally(() => volunteer.removeVerificationCode());
+            volunteer.removeVerificationCode();
+          },    (error: Error) => {
+            volunteer.removeVerificationCode();
+            throw error;
+          });
       });
 
       it('Should resolve a null object if the volunteer does not exist', () => {
@@ -384,10 +387,13 @@ describe('Volunteer Component', () => {
         return volunteer.removeVerificationCode()
           .then(() => volunteer.createVerificationCode())
           .then((code) => {
+            volunteer.removeVerificationCode();
             assert.equal(!_.isNil(code), true, 'Code returned should not be null or undefined');
             assert.equal(_.isNumber(code), true, 'Code should be a valid number');
-          },    (error: Error) => { throw error; })
-          .finally(() => volunteer.removeVerificationCode());
+          },    (error: Error) => {
+            volunteer.removeVerificationCode();
+            throw error;
+          });
       });
     });
 
@@ -398,10 +404,13 @@ describe('Volunteer Component', () => {
         return volunteer.removePasswordResetCode()
           .then(() => volunteer.createPasswordResetCode())
           .then((code) => {
+            volunteer.removePasswordResetCode();
             assert.equal(!_.isNil(code), true, 'Code returned should not be null or undefined');
             assert.equal(_.isNumber(code), true, 'Code should be a valid number');
-          },    (error: Error) => { throw error; })
-          .finally(() => volunteer.removePasswordResetCode());
+          },    (error: Error) => {
+            volunteer.removePasswordResetCode();
+            throw error;
+          });
       });
     });
 
@@ -413,12 +422,15 @@ describe('Volunteer Component', () => {
           .then(() => volunteer.createPasswordResetCode())
           .then(() => volunteer.getPasswordResetCode())
           .then((code: IPasswordResetCode) => {
+            volunteer.removePasswordResetCode();
             assert.equal(!_.isNil(code.code), true, 'Content should contain a code');
             assert.equal(!_.isNil(code.password_reset_code_id), true, 'verification_code_id should be contained in the code');
             assert.equal(!_.isNil(code.salt), true, 'salt should be contained in the code');
             assert.equal(!_.isNil(code.created_datetime), true, 'created_datetime should be contained in the code');
-          },    (error: Error) => { throw error; })
-          .finally(() => volunteer.removePasswordResetCode());
+          },    (error: Error) => {
+            volunteer.removePasswordResetCode();
+            throw error;
+          });
       });
 
       it('Should resolve a null object if the volunteer does not exist', () => {
@@ -491,9 +503,14 @@ describe('Volunteer Component', () => {
         return volunteer.exists('username')
           .then(() => volunteer.createPasswordResetCode())
           .then(() => volunteer.doesPasswordResetCodeExist())
-          .then(() => assert(true),
-                (error: Error) => { throw new Error(`Shouldn't reject when a password reset code exists, error=${error}`); })
-          .finally(() => volunteer.removePasswordResetCode());
+          .then(() => {
+            assert(true);
+            volunteer.removePasswordResetCode();
+          },
+                (error: Error) => {
+                  volunteer.removePasswordResetCode();
+                  throw new Error(`Shouldn't reject when a password reset code exists, error=${error}`);
+                });
       });
 
       it('Should reject if the project_id is invalid', () => {
@@ -640,10 +657,13 @@ describe('Volunteer Component', () => {
         return volunteer.exists('username')
           .then(() => volunteer.createVerificationCode())
           .then(() => volunteer.doesVerificationCodeExist())
-          .then(() => assert(true),    (error: Error) => {
+          .then(() => {
+            assert(true);
+            volunteer.removeVerificationCode();
+          },    (error: Error) => {
+            volunteer.removeVerificationCode();
             throw new Error(`Shouldn't reject when a password reset code exists, error=${error}`);
-          })
-          .finally(() => volunteer.removeVerificationCode());
+          });
       });
 
       it('Should reject if the project_id is invalid', () => {
@@ -701,16 +721,22 @@ describe('Volunteer Component', () => {
       it('Should return 200 if its marked it as read', () => {
         const volunteer = new Volunteer(null, 'user1');
 
+        const update = () => volunteer.knex('volunteer_announcement').where({
+          volunteer_announcement_id: 1,
+        }).update({
+          read: false,
+          read_date: null,
+        });
+
         return volunteer.exists('username')
           .then(() => volunteer.dismissNotification(1))
-          .then(() => assert(true),    (error: Error) => {
+          .then(() => {
+            assert(true);
+            update();
+          },    (error: Error) => {
+            update();
             throw error;
-          }).finally(() => volunteer.knex('volunteer_announcement').where({
-            volunteer_announcement_id: 1,
-          }).update({
-            read: false,
-            read_date: null,
-          }));
+          });
       });
 
       it('Should reject if the volunteer id does not exist', () => {

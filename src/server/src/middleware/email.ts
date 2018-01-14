@@ -90,7 +90,7 @@ export function createVerificationEmail(req: Request, res: Response, next: NextF
  * @param req.body.email IEmailContent containing to, from, subject, text
  * @param req.body.message A string containing the message to be sent after the email has been sent
  */
-export function sendEmail(req: Request, res: Response) {
+export async function sendEmail(req: Request, res: Response) {
   const { email, message }: { email: IEmailContent; message: string; } = req.body;
 
   const to: string = email.to;
@@ -99,12 +99,13 @@ export function sendEmail(req: Request, res: Response) {
   const text: string = email.text;
   const html: string = email.html;
 
-  return emailClient.send(from, to, subject, text, text)
-    .then(() => res.status(200).send({ message }))
-    .catch((error: Error) => {
-      logger.error(`Error attempting to send a email. to=${to} from=${from}, error=${error}`);
-      return res.status(503).send({ error: 'Unavailable Service', description: constants.EMAIL_UNAVAILABLE });
-    });
+  try {
+    const sentEmail = await emailClient.send(from, to, subject, text, text);
+    res.status(200).send({ message });
+  } catch (error) {
+    logger.error(`Error attempting to send a email. to=${to} from=${from}, error=${error}`);
+    return res.status(503).send({ error: 'Unavailable Service', description: constants.EMAIL_UNAVAILABLE });
+  }
 }
 
 /**
@@ -140,29 +141,27 @@ export function createResendVerificationEmail(req: Request, res: Response, next:
 /**
  * Resend the verification code to user,
  */
-export function createResendVerificationCode(req: Request, res: Response, next: NextFunction) {
+export async function createResendVerificationCode(req: Request, res: Response, next: NextFunction) {
   const volunteerId: number = req.body.id;
   const volunteer = new Volunteer(volunteerId);
 
   if (_.isNil(volunteerId)) {
-    res.status(403).send({ error: 'Volunteer Id', description: constants.VOLUNTEER_ID_REQUIRED });
-  } else {
-    volunteer.exists()
-    .then(() => {
-      if (!volunteer.getVerification()) {
-        return volunteer.createVerificationCode();
-      }
-      res.status(400).send({ error: 'verification exists', description: constants.VOLUNTEER_IS_VERIFIED(volunteer.username) });
-    })
-    .then((code: number) => {
+    return res.status(403).send({ error: 'Volunteer Id', description: constants.VOLUNTEER_ID_REQUIRED });
+  }
+
+  try {
+    const exists = volunteer.exists();
+
+    if (!volunteer.getVerification()) {
+      const code: number | Error = await volunteer.createVerificationCode();
       req.body.volunteer = volunteer;
       req.body.verificationCode = code;
       next();
-    })
-    .catch((error: Error) => res.status(500).send({
-      description: constants.FAILED_VOLUNTEER_GET(error),
-      error:'Authentication',
-    }));
+    } else {
+      res.status(400).send({ error: 'verification exists', description: constants.VOLUNTEER_IS_VERIFIED(volunteer.username) });
+    }
+  } catch (error) {
+    res.status(500).send({ error:'Authentication', description: constants.FAILED_VOLUNTEER_GET(error) });
   }
 }
 
@@ -253,17 +252,16 @@ export function denyInvalidAndBlockedDomains(req: Request, res: Response, next: 
  * After validation of the name, email and senderText then send the email to the
  * email to the default CodeDoesGood inbox.
  */
-export function sendContactUsRequestInbox(req: Request, res: Response) {
+export async function sendContactUsRequestInbox(req: Request, res: Response) {
   const { sender }: { sender: { name: string; email: string; subject: string; text: string; } } = req.body;
 
-  emailClient.send(sender.email, config.getKey('email').email, sender.subject, sender.text, sender.text)
-    .then(() => {
-      res.sendStatus(200);
-    })
-    .catch((error: Error) => {
-      logger.error(`Error attempting to send a email. to=${config.getKey('email').email} from=${sender.email}, error=${error}`);
-      res.status(503).send({ error: 'Unavailable Service', description: constants.EMAIL_UNAVAILABLE });
-    });
+  try {
+    const sentEmail = await emailClient.send(sender.email, config.getKey('email').email, sender.subject, sender.text, sender.text);
+    res.sendStatus(200);
+  } catch (error) {
+    logger.error(`Error attempting to send a email. to=${config.getKey('email').email} from=${sender.email}, error=${error}`);
+    res.status(503).send({ error: 'Unavailable Service', description: constants.EMAIL_UNAVAILABLE });
+  }
 }
 
 /**
@@ -280,23 +278,26 @@ export function sendContactUsEmailStatus(req: Request, res: Response) {
 /**
  * Attempt to reverify the service for the email client and bring it back online.
  */
-export function reverifyTheService(req: Request, res: Response) {
-  emailClient.verify()
-  .then(() => {
-    res.status(200).send({ message: 'Email service restarted successfully' });
-  })
-  .catch((error: Error) => res.status(500).send({ error: 'Email Service', description: constants.EMAIL_VERIFY_FAILED(error) }));
+export async function reverifyTheService(req: Request, res: Response) {
+  try {
+    const serviceVerified: boolean | Error = await emailClient.verify();
+    res.status(200).send({ message: 'Email service restartede successfully' });
+  } catch (error) {
+    res.status(500).send({ error: 'Email service', description: constants.EMAIL_VERIFY_FAILED(error) });
+  }
 }
 
 /**
  * Attempts to send the stored late emails to the volunteer
  */
-export function sendStoredLateEmails(req: Request, res: Response) {
-  emailClient.sendStoredEmails(emailClient.getEmailJsonPath())
-  .then((failedStored: { emails: IEmailContent[] }) => {
+export async function sendStoredLateEmails(req: Request, res: Response) {
+  try {
+    const storedJsonPath = emailClient.getEmailJsonPath();
+    const failedStored = await emailClient.sendStoredEmails(storedJsonPath);
     res.status(200).send({ message: 'Sent stored emails, returned emails that failed to send', content: failedStored });
-  })
-  .catch((error: Error) => res.send(500).send({ error: 'Stored Emails', description: constants.EMAIL_FAILED_SEND_STORED(error) }));
+  } catch (error) {
+    res.send(500).send({ error: 'Stored Emails', description: constants.EMAIL_FAILED_SEND_STORED(error) });
+  }
 }
 
 /**
@@ -310,23 +311,27 @@ export function retrieveStoredLateEmails(req: Request, res: Response) {
 /**
  * Removes a stored late email by the index provided
  */
-export function removeStoredEmailByIndex(req: Request, res: Response) {
+export async function removeStoredEmailByIndex(req: Request, res: Response) {
   if (_.isNil(req.params.email_id)) {
     return res.status(401).send({ error: 'Email Id', description: constants.STORED_EMAIL_MISSING_INDEX });
   }
 
   const emailIndex = parseInt(req.params.email_id, 10);
 
-  emailClient.removeStoredEmailByIndex(emailIndex)
-  .then((updatedEmails: IEmailContent[]) => res.status(200)
-  .send({ message: `Removed stored email ${emailIndex}`, content: { email_removed: emailIndex, updated: updatedEmails } }))
-  .catch((error: Error) => res.status(500).send({ error: 'Remove Late Email', description: error.message }));
+  try {
+    const updatedEmails: IEmailContent[] | Error = await emailClient.removeStoredEmailByIndex(emailIndex);
+    const message = `Removed stored email ${emailIndex}`;
+
+    res.status(200).send({ message, content: { email_removed: emailIndex, updated:updatedEmails } });
+  } catch (error) {
+    res.status(500).send({ error: 'Remove late Email', description: error.message });
+  }
 }
 
 /**
  * Updates a late stored email by index, requires the full email to be sent down.
  */
-export function updateStoredEmailByIndex(req: Request, res: Response) {
+export async function updateStoredEmailByIndex(req: Request, res: Response) {
   if (_.isNil(req.params.email_id)) {
     return res.status(401).send({ error: 'Email Id', description: constants.STORED_EMAIL_MISSING_INDEX });
   }
@@ -342,10 +347,14 @@ export function updateStoredEmailByIndex(req: Request, res: Response) {
     return res.status(401).send({ error: 'Email Id', description: constants.STORED_EMAIL_REQUIREMENTS });
   }
 
-  emailClient.replaceStoredEmailByIndex(emailIndex, email)
-  .then((updatedEmails: IEmailContent[]) => res.status(200)
-  .send({ message: `updated stored email ${emailIndex}`, content: { email_updated: emailIndex, updated: updatedEmails } }))
-  .catch((error: Error) => res.status(500).send({ error: 'Update Late Email', description: error.message }));
+  try {
+    const updatedEmails: IEmailContent[] | Error = await emailClient.replaceStoredEmailByIndex(emailIndex, email);
+    const message: string = `Updated stored email ${emailIndex}`;
+
+    res.status(200).send({ message, content: { email_updated: emailIndex, updated: updatedEmails } });
+  } catch (error) {
+    res.status(500).send({ error: 'Update late email', description: error.message });
+  }
 }
 
 /**
@@ -377,38 +386,40 @@ export function validateUpdatedServiceDetails(req: Request, res: Response, next:
  * Updates the service details on the config file and on the email client
  * triggering a restart / reverify of the service.
  */
-export function updateServiceDetails(req: Request, res: Response) {
-  const updatedServiceDetails = req.body.service;
-  emailClient.updateServiceDetails(updatedServiceDetails, config.getKey('email').password)
-  .then(() => {
+export async function updateServiceDetails(req: Request, res: Response) {
+  try {
+    const updatedServices = req.body.service;
+    await emailClient.updateServiceDetails(updatedServices, config.getKey('email').password);
+
     const storedConfig = config.getConfiguration();
-    storedConfig.email.email = updatedServiceDetails.user;
-    storedConfig.email.service = updatedServiceDetails.service;
+    storedConfig.email.email = updatedServices.user;
+    storedConfig.email.service = updatedServices.service;
     config.update(storedConfig);
 
-    logger.info('[Email] The email service details has been updated and restarted');
+    logger.info('[Email] the email service deatils have been updated and restarted');
 
-    res.status(200).send({ message: 'Updated services and restarted', content: { updated: updatedServiceDetails } });
-  })
-  .catch((error: Error) => res.status(500).send({ error: 'Email Service', description: constants.EMAIL_VERIFY_FAILED(error) }));
+    res.status(200).send({ message: 'Updated services and restarted', content: { updated: updatedServices } });
+  } catch (error) {
+    res.status(500).send({ error: 'Email Service', description: constants.EMAIL_VERIFY_FAILED(error) });
+  }
 }
 
-export function updateServicePassword(req: Request, res: Response) {
+export async function updateServicePassword(req: Request, res: Response) {
   const password = req.body.password;
 
   if (_.isNil(password)) {
     return res.status(500).send({ error: 'Service password update', description: constants.EMAIL_UPDATE_PASSWORD_REQUIRES_PASSWORD });
   }
 
-  emailClient.updateServicePassword(password)
-  .then(() => {
+  try {
+    await emailClient.updateServicePassword(password);
     const storedConfig = config.getConfiguration();
     storedConfig.email.password = password;
     config.update(storedConfig);
 
     logger.info('[Email] The email service password has been updated and restarted');
-
     res.status(200).send({ message: 'Updated service password' });
-  })
-  .catch((error: Error) => res.status(500).send({ error: 'Email Service', description: constants.EMAIL_VERIFY_FAILED(error) }));
+  } catch (error) {
+    res.status(500).send({ error: 'Email Service', description: constants.EMAIL_VERIFY_FAILED(error) });
+  }
 }

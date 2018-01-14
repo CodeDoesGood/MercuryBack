@@ -14,10 +14,13 @@ const projectsWrapper = new Projects();
  * @returns A array of objects containing all project details for
  * every single project.
  */
-function getAllProjects(req: Request, res: Response) {
-  projectsWrapper.getAllProjects()
-    .then((projects: IProject[]) => res.status(200).send({ message: 'All Projects', content: { projects } }))
-    .catch(() => res.send(500).send({ error: 'Project Gathering', description: constants.UNABLE_TO_GATHER_PROJECTS }));
+async function getAllProjects(req: Request, res: Response) {
+  try {
+    const projects: IProject[] | Error = await projectsWrapper.getAllProjects();
+    res.status(200).send({ message: 'All projects', content: { projects } });
+  } catch (error) {
+    res.send(500).send({ error: 'Project Gathering', description: constants.UNABLE_TO_GATHER_PROJECTS });
+  }
 }
 
 /**
@@ -25,13 +28,13 @@ function getAllProjects(req: Request, res: Response) {
  * @returns A array of objects containing all
  * details on active projects.
  */
-function getAllActiveProjects(req: Request, res: Response) {
-  projectsWrapper.getAllActiveProjects()
-    .then((projects: IProject[]) => res.status(200).send({ message: 'All Active Projects', content: { projects } }))
-    .catch((error: Error) => res.status(500).send({
-      description: constants.UNABLE_TO_GATHER_ACTIVE_PROJECTS,
-      error: `${JSON.stringify(error)}`,
-    }));
+async function getAllActiveProjects(req: Request, res: Response) {
+  try {
+    const projects: IProject[] | Error = await projectsWrapper.getAllActiveProjects();
+    res.status(200).send({ message: 'All active projects', content: { projects } });
+  } catch (error) {
+    res.send(500).send({ error: 'Projects Gathering', description: constants.UNABLE_TO_GATHER_ACTIVE_PROJECTS });
+  }
 }
 
 /**
@@ -72,15 +75,15 @@ function validateProjectCategory(req: Request, res: Response, next: NextFunction
  * @returns A array of objects containing all project details of projects that match the requested
  * status.
  */
-function getAllProjectsByStatus(req: Request, res: Response) {
+async function getAllProjectsByStatus(req: Request, res: Response) {
   const { status }: { status: number } = req.body;
 
-  projectsWrapper.getAllProjectsByStatus(status)
-    .then((projects: IProject[]) => res.status(200).send({ message: 'All projects by status', content: { projects } }))
-    .catch((error: Error) => res.status(500).send({
-      description: constants.UNABLE_TO_GATHER_BY_STATUS(status),
-      error: `${JSON.stringify(error)}`,
-    }));
+  try {
+    const projects: IProject[] | Error = await projectsWrapper.getAllProjectsByStatus(status);
+    res.status(200).send({ message: 'All projects by status', content: { projects } });
+  } catch (error) {
+    res.send(500).send({ error: 'Projects Gathering', description: constants.UNABLE_TO_GATHER_BY_STATUS });
+  }
 }
 
 /**
@@ -88,28 +91,28 @@ function getAllProjectsByStatus(req: Request, res: Response) {
  * @returns A array of objects containing all project details of projects that match the requested
  * category.
  */
-function getAllProjectsByCategory(req: Request, res: Response) {
+async function getAllProjectsByCategory(req: Request, res: Response) {
   const { category }: { category: number } = req.body;
 
-  projectsWrapper.getAllProjectsByCategory(category)
-    .then((projects: IProject[]) => res.status(200).send({ message: 'All projects by category', content: { projects } }))
-    .catch((error: Error) => res.status(500).send({
-      description: constants.UNABLE_TO_GATHER_BY_CATEGORY(category),
-      error: `${JSON.stringify(error)}`,
-    }));
+  try {
+    const projects: IProject[] | Error = await projectsWrapper.getAllProjectsByCategory(category);
+    res.status(200).send({ message: 'All projects by category', content: { projects } });
+  } catch (error) {
+    res.send(500).send({ error: 'Projects Gathering', description: constants.UNABLE_TO_GATHER_BY_CATEGORY });
+  }
 }
 
 /**
  * Gets and sends all hidden projects.
  * @returns A array of objects containing all project details of projects that are hidden
  */
-function getAllHiddenProjects(req: Request, res: Response) {
-  projectsWrapper.getAllHiddenProjects()
-    .then((projects: IProject[]) => res.status(200).send({ message: 'All hidden projects', content: { projects } }))
-    .catch((error: Error) => res.status(500).send({
-      description: constants.UNABLE_TO_GATHER_ALL_HIDDEN,
-      error: `${JSON.stringify(error)}`,
-    }));
+async function getAllHiddenProjects(req: Request, res: Response) {
+  try {
+    const projects: IProject[] | Error = await projectsWrapper.getAllHiddenProjects();
+    res.status(200).send({ message: 'All hidden projects', content: { projects } });
+  } catch (error) {
+    res.send(500).send({ error: 'Projects Gathering', description: constants.UNABLE_TO_GATHER_ALL_HIDDEN });
+  }
 }
 
 export {
