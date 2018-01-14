@@ -94,25 +94,22 @@ export default class Email {
       return Promise.resolve(storedEmails);
     }
 
-    return new PromiseB((resolve, reject) => {
-      _.forEach(storedEmails.emails, (email: IEmailContent, index) => {
+    return new Promise((resolve, reject) => {
+      _.forEach(storedEmails.emails, (email: IEmailContent, index: number) => {
         this.send(this.username, email.to, email.subject, email.text, email.html)
-        .then((info: nodemailer.SentMessageInfo) => {
-          logger.info(`[Email] Sent stored email: ${info.messageId}`);
-          updatedStoredEmails.emails.splice(index, 1);
-        })
-        .finally(() => {
-          sentEmails += 1;
+          .then((info: nodemailer.SentMessageInfo) => {
+            logger.info(`[Email] Sent stored email: ${info.messageId}`);
+            updatedStoredEmails.emails.slice(index, 1);
+            sentEmails += 1;
 
-          if (sentEmails === storedEmails.emails.length) {
-            if (_.isNil(passedEmails)) {
-              fs.writeFileSync(jsonPath, JSON.stringify(updatedStoredEmails, null, '\t'));
+            if (sentEmails === storedEmails.emails.length) {
+              if (_.isNil(passedEmails)) {
+                fs.writeFileSync(jsonPath, JSON.stringify(updatedStoredEmails, null, '\t'));
+              }
+              resolve(updatedStoredEmails);
             }
-
-            resolve(updatedStoredEmails);
-          }
-        })
-        .catch((error: Error) => logger.warn(`[Email] Failed to send store email ${error.message}`));
+          })
+          .catch((error: Error) => logger.warn(`[Email] Failed to send store email ${error.message}`));
       });
     });
   }
@@ -150,7 +147,7 @@ export default class Email {
   /**
    * Verifies the connection the service.
    */
-  public async verify(): Promise<boolean | Error> {
+  public async verify(): Promise<any> {
     return new Promise((resolve, reject) => {
       return this.transporter.verify((error: Error, result: boolean) => {
         if (!_.isNil(error)) {

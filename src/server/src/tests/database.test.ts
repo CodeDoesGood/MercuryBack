@@ -88,8 +88,8 @@ describe('Database Wrapper', () => {
       return databaseNull.connect()
         .then(() => {
           throw new Error('Shouldn\'t resolve if the connection details are wrong');
-        },    () => assert(true))
-        .finally(() => {
+        },    () => {
+          assert(true);
           databaseNull.setDatabasePassword('password');
         });
     });

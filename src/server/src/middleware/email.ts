@@ -293,7 +293,7 @@ export async function reverifyTheService(req: Request, res: Response) {
 export async function sendStoredLateEmails(req: Request, res: Response) {
   try {
     const storedJsonPath = emailClient.getEmailJsonPath();
-    const failedStored: { emails: IEmailContent[] } | Error = await emailClient.sendStoredEmails(storedJsonPath);
+    const failedStored = await emailClient.sendStoredEmails(storedJsonPath);
     res.status(200).send({ message: 'Sent stored emails, returned emails that failed to send', content: failedStored });
   } catch (error) {
     res.send(500).send({ error: 'Stored Emails', description: constants.EMAIL_FAILED_SEND_STORED(error) });
