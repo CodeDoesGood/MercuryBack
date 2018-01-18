@@ -8,7 +8,6 @@ notifications:
     on_success: never
 
 script:
-  - cd src/server
   - npm install
   - npm run build
-  - npm run test
+  - npm run test:unit
