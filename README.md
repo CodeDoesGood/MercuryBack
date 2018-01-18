@@ -20,7 +20,7 @@
 
 The use of npm test can be used when the follow installation and infrastructure is inplace with the built configuration. Without intergration with the database and configured config file 90% plus of the tests will fail due to the limited infrastructure. 
 
-    npm test
+    npm test:unit
 
 ## Contributing
 
