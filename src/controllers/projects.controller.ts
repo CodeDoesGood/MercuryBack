@@ -3,9 +3,9 @@ import * as _ from 'lodash';
 import { NextFunction, Request, Response } from 'express';
 
 import constants from '../constants';
-import { Projects } from '../Projects';
+import { Projects } from '../projects';
 
-import { IProject } from '../Project';
+import { IProject } from '../project';
 
 const projectsWrapper = new Projects();
 

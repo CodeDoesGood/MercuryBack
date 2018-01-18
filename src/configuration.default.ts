@@ -1,4 +1,4 @@
-import { IDatabaseConfig } from './Database';
+import { IDatabaseConfig } from './database';
 
 export interface IConfig {
   [index: string]: any;
