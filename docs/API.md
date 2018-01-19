@@ -35,7 +35,8 @@ Type: ```Post-Request```
   - `/volunteer/notification/{{notification_id}}`
   - `/volunteer/notifications`
   - `/volunteer/verify`
-
+  - `/project`
+  
 Type: ```Delete-Request```
   - `/email/stored/:email_id`
   - `/volunteer`

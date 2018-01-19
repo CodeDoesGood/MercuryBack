@@ -58,6 +58,46 @@ function validateProjectUpdateContent(req: Request, res: Response, next: NextFun
 }
 
 /**
+ * middleware for validation of creation content, if the content is not valid then the request will not pass
+ */
+export function validateProjectCreationContent(req: Request, res: Response, next: NextFunction) {
+  const { project }: { project: IProject } = req.body;
+  const projectCreationRequirements: string[] = ['title', 'status', 'project_category'];
+
+  if (_.isNil(project) || !_.isObject(project)) {
+    return res.status(400).send({ error: 'Project Creation', description: constants.INVALID_PROJECT_FORMAT });
+  }
+
+  _.forEach(projectCreationRequirements, (requirement: string) => {
+    if (!project[requirement]  && !res.headersSent) {
+      return res.status(400).send({ error: 'Project Validation', description: constants.PROJECT_MUST_CONTAIN(requirement) });
+    }
+  });
+
+  if (!_.isBoolean(project.hidden) && !res.headersSent) {
+    return res.status(400).send({ error: 'Project Validation', description: constants.PROJECT_MUST_CONTAIN_HIDDEN });
+  }
+
+  if (!res.headersSent) {
+    next();
+  }
+}
+
+/**
+ * Creates a new project based on the passed project content and responses to the user with the project id and title
+ */
+export function createNewProject(req: Request, res: Response) {
+  const projectContent: IProject = req.body.project;
+
+  const project = new Project();
+
+  project.setContent(projectContent)
+    .then(() => project.createNewProject())
+    .then((id: number) => res.status(200).send({ message: `new project ${project.title}`, content: { id, title: project.title } }))
+    .catch((error: Error) => res.status(500).send({ error: 'Project Creation', description: `error=${error.message}` }));
+}
+
+/**
  * Validates that all provided values are the correct type.
  */
 function validateProjectUpdateContentTypes(req: Request, res: Response, next: NextFunction) {
