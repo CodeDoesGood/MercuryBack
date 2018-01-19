@@ -43,6 +43,10 @@ export class Database {
       .catch((error: Error) => Promise.reject(error));
   }
 
+  /**
+   * Checks to see if the email is already marked as used
+   * @param email the email address to check to see if it exists for a already existing user
+   */
   public async doesEmailExist(email: string): Promise<number> {
     if (!_.isString(email)) {
       return Promise.reject(new Error(`email "${email}" passed is not a valid string`));
@@ -53,6 +57,10 @@ export class Database {
       .catch((error: Error) => Promise.reject(error));
   }
 
+  /**
+   * Checks to see if the username is already marked as used
+   * @param username the username in string form
+   */
   public async doesUsernameExist(username: string): Promise<number> {
     if (!_.isString(username)) {
       return Promise.reject(new Error(`userId "${username}" passed is not a valid string`));
@@ -63,6 +71,12 @@ export class Database {
       .catch((error: Error) => Promise.reject(error));
   }
 
+  // return the current online stauts of the database
   public getOnlineStatus = (): boolean => this.online;
+
+  /**
+   * Updates the database password used for communication with the sql server
+   * @param password the password that will be used for updating the content
+   */
   public setDatabasePassword = (password: string): string => this.config.connection.password = password;
 }

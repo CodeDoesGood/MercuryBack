@@ -8,6 +8,11 @@ export class Volunteer extends User {
     super(userId, username);
   }
 
+  /**
+   * Creates a new volunteer in the volunteer table with the email, name, password, salt and
+   * username
+   * @param password the volunteer password
+   */
   public async createVolunteer(password: string): Promise<number> {
     if (_.isNil(this.name) || _.isNil(this.username) || _.isNil(this.email)) {
       return Promise.reject(
@@ -46,6 +51,9 @@ export class Volunteer extends User {
       }).catch((error: Error) => Promise.reject(error));
   }
 
+  /**
+   * Marks the current volunter as verified in the database
+   */
   public async verifyVolunteer(): Promise<boolean> {
     if (_.isNil(this.userId)) {
       return Promise.reject(new Error(`Cannot verify when userId is null or undefined, userId=${this.userId}`));
@@ -58,6 +66,10 @@ export class Volunteer extends User {
       .catch((error: Error) => Promise.reject(error));
   }
 
+  /**
+   * Creates a new verification code used for validation of the users email address, this is stored
+   * in the database for checking when they click the validation email
+   */
   public async createVerificationCode(): Promise<number> {
     const maxNumber: number = 9999999999999;
     const minNumber: number = 1000000000000;
@@ -79,6 +91,9 @@ export class Volunteer extends User {
       .catch((error: Error) => Promise.reject(error));
   }
 
+  /**
+   * Does the same as createVerificationCode but for when a user requests a password reset code.
+   */
   public async createPasswordResetCode(): Promise<number> {
     const maxNumber: number = 9999999999999;
     const minNumber: number = 1000000000000;
@@ -100,6 +115,10 @@ export class Volunteer extends User {
       .catch((error: Error) => Promise.reject(error));
   }
 
+  /**
+   * Validates a verification code if a code exists in the database otherwise does a promise
+   * rejection
+   */
   public async doesVerificationCodeExist(): Promise<number> {
     if (!_.isNumber(this.userId)) {
       return Promise.reject(new Error(`userId "${this.userId}" passed is not a valid number`));
@@ -115,6 +134,9 @@ export class Volunteer extends User {
       .catch((error: Error) => Promise.reject(error));
   }
 
+  /**
+   * Checks to see if the password reset code exists in the database.
+   */
   public async doesPasswordResetCodeExist(): Promise<number> {
     if (!_.isNumber(this.userId)) {
       return Promise.reject(new Error(`userId "${this.userId}" passed is not a valid number`));
@@ -133,6 +155,10 @@ export class Volunteer extends User {
       .catch((error: Error) => Promise.reject(error));
   }
 
+  /**
+   * updates the volunteer password with the new password given, salts and hashes and stores
+   * @param password the new password to salt and hash / update
+   */
   public async updatePassword(password: string): Promise<boolean> {
     if (!_.isNumber(this.userId) || !_.isString(password)) {
       return Promise.reject(new Error('password or id passed was not a valid number or string'));
@@ -148,6 +174,9 @@ export class Volunteer extends User {
       .catch((error: Error) => Promise.reject(error));
   }
 
+  /**
+   * Resolves all active notifications for the current volunteer
+   */
   public async getActiveNotifications(): Promise<IAnnouncement[]> {
     return this.knex('volunteer_announcement')
       .where('volunteer_id', this.userId)
@@ -164,6 +193,10 @@ export class Volunteer extends User {
       .catch((error: Error) => Promise.reject(error));
   }
 
+  /**
+   * marks the passed notification id as read in the databasej
+   * @param announcementId The announcementId to remove
+   */
   public async dismissNotification(announcementId: number): Promise<boolean> {
     if (_.isNil(announcementId) || !_.isNumber(announcementId)) {
       return Promise.reject(new Error(`Announcement Id must be passed and also a valid number, announcement id=${announcementId}`));
@@ -184,6 +217,9 @@ export class Volunteer extends User {
       .catch((error: Error) => Promise.reject(error));
   }
 
+  /**
+   * Removes any existing password reset code from the database
+   */
   public async removePasswordResetCode(): Promise<boolean> {
     if (!_.isNumber(this.userId)) {
       return Promise.reject(new Error(`userId "${this.userId}" passed is not a valid number`));
@@ -194,6 +230,9 @@ export class Volunteer extends User {
       .catch((error: Error) => Promise.reject(error));
   }
 
+  /**
+   * Removes any existing verification code from the database for that user
+   */
   public async removeVerificationCode(): Promise<boolean> {
     if (!_.isNumber(this.userId)) {
       return Promise.reject(new Error(`userId "${this.userId}" passed is not a valid number`));
@@ -204,6 +243,9 @@ export class Volunteer extends User {
       .catch((error: Error) => Promise.reject(error));
   }
 
+  /**
+   * Gets the current verification code for the current volunteer
+   */
   public async getVerificationCode(): Promise<IVerificationCode> {
     if (!_.isNumber(this.userId)) {
       return Promise.reject(new Error(`userId "${this.userId}" passed is not a valid number`));
@@ -214,6 +256,9 @@ export class Volunteer extends User {
     .catch((error: Error) => Promise.reject(error));
   }
 
+  /**
+   * getrs the current password reset code for the volunteer
+   */
   public async getPasswordResetCode(): Promise<IPasswordResetCode> {
     if (!_.isNumber(this.userId)) {
       return Promise.reject(new Error(`userId "${this.userId}" passed is not a valid number`));

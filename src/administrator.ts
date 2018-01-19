@@ -6,6 +6,9 @@ export class Administrator extends User {
     super(administratorId, username);
   }
 
+  /**
+   * checkes to see if the administrator has a valid admin_portal_access within the database
+   */
   public async canAccessAdminPortal(): Promise<boolean | Error> {
     if (_.isNil(this.adminPortalAccess)) {
       return this.knex('volunteer').select('admin_portal_access').where('volunteer_id', this.userId).first()
