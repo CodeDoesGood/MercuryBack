@@ -30,4 +30,11 @@ router[proj.UPDATE.method](proj.UPDATE.link, [
   project.updateProjectById.bind(this),
 ]);
 
+router[proj.CREATE.method](proj.CREATE.link, [
+  authentication.checkAuthenticationToken.bind(this),
+  authentication.checkAdminPortalAccess.bind(this),
+  project.validateProjectCreationContent.bind(this),
+  project.createNewProject.bind(this),
+]);
+
 export default router;

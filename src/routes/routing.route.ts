@@ -7,6 +7,7 @@ const infrastructure = {
 };
 
 const project = {
+  CREATE: { link: '/project',             method: 'post' },
   GATHER: { link: '/project/:project_id', method: 'get' },
   UPDATE: { link: '/project/:project_id', method: 'post' },
 };

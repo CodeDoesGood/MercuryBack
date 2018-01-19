@@ -28,7 +28,7 @@ export class Volunteer extends User {
     const date: Date = new Date();
 
     const volunteer = {
-      created_datetime: `${date.getFullYear()}-${date.getMonth()}-${date.getDay()}`,
+      created_datetime: date,
       data_entry_user_id: 1,
       email: this.email,
       name: this.name,

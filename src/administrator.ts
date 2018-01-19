@@ -1,6 +1,8 @@
 import * as _ from 'lodash';
 import { User } from './user';
 
+import { IProject, Project } from './project';
+
 export class Administrator extends User {
   constructor(administratorId?: number, username?: string) {
     super(administratorId, username);
@@ -19,5 +21,17 @@ export class Administrator extends User {
       .catch((error: Error) => Promise.reject(error));
     }
     return Promise.resolve(this.adminPortalAccess);
+  }
+
+  /**
+   * Creates a new project in the database
+   * @param project a project containing all requirements, a IProject interface
+   */
+  public async createNewProject(project: IProject): Promise<boolean> {
+    if (_.isNil(this.adminPortalAccess)) {
+      return Promise.reject(`User is not authorsised for calling this request, admin_protal_acces=${this.adminPortalAccess}`)
+    }
+
+    return this.knex('project').insert(project)
   }
 }
