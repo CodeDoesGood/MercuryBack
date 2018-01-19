@@ -29,9 +29,9 @@ export class Administrator extends User {
    */
   public async createNewProject(project: IProject): Promise<boolean> {
     if (_.isNil(this.adminPortalAccess)) {
-      return Promise.reject(`User is not authorsised for calling this request, admin_protal_acces=${this.adminPortalAccess}`)
+      return Promise.reject(`User is not authorsised for calling this request, admin_protal_acces=${this.adminPortalAccess}`);
     }
 
-    return this.knex('project').insert(project)
+    return this.knex('project').insert(project);
   }
 }

@@ -25,7 +25,7 @@ export class Project extends Database {
   public hidden: boolean;
   public doesExist: boolean;
   public projectId: number;
-  public createdDateTime: string;
+  public createdDateTime: Date;
   public title: string;
   public status: number;
   public projectCategory: number;
