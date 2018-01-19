@@ -114,6 +114,10 @@ export class User extends Database {
     this.salt = null;
   }
 
+  /**
+   * Used the userId to check to see if it exists and returns the volunteer details, which are
+   * volunteer_id, username, email, password, salt and verified
+   */
   public async existsById(): Promise<boolean> {
     if (_.isNil(this.userId)) {
       return Promise.reject(new Error(`userId is null or undefined while attempt to check existence`));
@@ -133,6 +137,9 @@ export class User extends Database {
       .catch((error: Error) => Promise.reject(error));
   }
 
+  /**
+   * Repeats the same as existsById but by using this.username instead
+   */
   public async existsByUsername(): Promise<boolean> {
     if (_.isNil(this.username)) {
       return Promise.reject(new Error(`username is null or undefined while attempt to check existence`));
@@ -147,6 +154,10 @@ export class User extends Database {
       .catch((error: Error) => Promise.reject(error));
   }
 
+  /**
+   * Sets the content for the volunteer object of a IVounteer content
+   * @param volunteer IVolunteer object containing the basic volunteer content
+   */
   public async setVolunteerContent(volunteer: IVolunteer): Promise<void> {
     this.userId = volunteer.volunteer_id;
     this.username = volunteer.username;
@@ -158,9 +169,11 @@ export class User extends Database {
     return Promise.resolve();
   }
 
+  // Setters
   public setName = (name: string) => this.name = name;
   public setEmail = (email: string) => this.email = email;
 
+  // Getters
   public getProfile() {
     return {
       about: _.defaultTo(this.about, ''),

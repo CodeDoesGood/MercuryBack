@@ -41,19 +41,21 @@ export function compareAuthenticatingPassword(password: string, salt: string, co
   return hashedPassword.hashedPassword === comparePassword;
 }
 
-// export async function validateAuthenticationToken(token: string, secret: string): Promise<any> {
-//   jwt.verify(token, secret, (error: Error, decoded: IToken): Promise<IToken> => {
-//     if (!_.isNil(error)) {
-//       return Promise.reject(error);
-//     }
-//     return Promise.resolve(decoded);
-//   });
-// }
-
+/**
+ * Signs a jwtoken used for web authentication and validation of the type of user
+ * @param username the authenticating username
+ * @param userId the authenticating the userId
+ * @param secret the secret used for later validation
+ */
 export function signAuthenticationToken(username: string, userId: number, secret: string) {
   return jwt.sign({ username, id: userId }, secret, { expiresIn: '1h' });
 }
 
+/**
+ * Validates that the passed token is validated
+ * @param token the token to check
+ * @param secret the secret used for validation
+ */
 export async function validateAuthenticationToken(token: string, secret: string): Promise<any> {
   return new Promise((resolve, reject) => {
     jwt.verify(token, secret, (error: Error, decoded: IToken) => {
