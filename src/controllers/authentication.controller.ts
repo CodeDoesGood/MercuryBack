@@ -1,11 +1,10 @@
-import * as jwt from 'jsonwebtoken';
 import * as _ from 'lodash';
 
 import { NextFunction, Request, Response } from 'express';
 
 import { Administrator } from '../administrator';
 import { Configuration } from '../configuration';
-import constants from '../constants';
+import constants from '../constants/constants';
 import { logger } from '../logger';
 import * as utils from '../utils';
 import { Volunteer } from '../volunteer';
@@ -59,7 +58,7 @@ export async function validateUserCredentials(req: Request, res: Response, next:
   const volunteer = new Volunteer(null, username);
 
   try {
-    const exits = await volunteer.existsByUsername();
+    await volunteer.existsByUsername();
 
     if (utils.compareAuthenticatingPassword(password, volunteer.salt, volunteer.password)) {
       req.body.volunteer = volunteer;
@@ -86,8 +85,7 @@ export async function checkAuthenticationToken(req: Request, res: Response, next
     res.status(401).send({ error: 'Invalid token', description: constants.INVALID_TOKEN });
   } else {
     try {
-      const decoded: IToken = await utils.validateAuthenticationToken(token, secret);
-      req.body.decoded = decoded;
+      req.body.decoded = await utils.validateAuthenticationToken(token, secret);
       next();
     } catch (error) {
       res.status(401).send({ error: 'Expired token', description: constants.NO_TOKEN_PASSED });
@@ -103,7 +101,7 @@ export async function checkAdminPortalAccess(req: Request, res: Response, next: 
   const administrator = new Administrator(null, username);
 
   try {
-    const exists = await administrator.existsByUsername();
+    await administrator.existsByUsername();
     const canAccessAdminPortal: boolean | Error =  await administrator.canAccessAdminPortal();
 
     if (canAccessAdminPortal) {
@@ -130,7 +128,7 @@ export async function authenticateLoggingInUser(req: Request, res: Response) {
   const volunteer = new Volunteer(userId, username);
 
   try {
-    const exists = await volunteer.existsById();
+    await volunteer.existsById();
 
     if (!volunteer.getVerification()) {
       res.status(403).send({
