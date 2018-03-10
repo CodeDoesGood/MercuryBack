@@ -2,7 +2,7 @@ import * as _ from 'lodash';
 
 import { NextFunction, Request, Response } from 'express';
 
-import constants from '../constants';
+import constants from '../constants/constants';
 import { IProject, Project } from '../project';
 
 /**
@@ -138,8 +138,8 @@ async function updateProjectById(req: Request, res: Response) {
   const project = new Project(projectId);
 
   try {
-    const exists: boolean | Error = await project.exists();
-    const updated = await project.updateContent(content);
+    await project.exists();
+    await project.updateContent(content);
     res.status(200).send({ message: `Project updated id ${projectId}` });
   } catch (error) {
     res.status(500).send({
@@ -158,7 +158,7 @@ async function getProjectById(req: Request, res: Response) {
   const project = new Project(projectId);
 
   try {
-    const exists = await project.exists();
+    await project.exists();
     const content: IProject | Error = project.getContent();
     res.status(200).send({ message: '', content: { project: content } });
   } catch (error) {

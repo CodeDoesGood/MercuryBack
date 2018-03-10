@@ -3,7 +3,7 @@ import * as _ from 'lodash';
 import { NextFunction, Request, Response } from 'express';
 
 import { Configuration } from '../configuration';
-import constants from '../constants';
+import constants from '../constants/constants';
 import { Database } from '../database';
 
 const config = new Configuration('mercury', 'mercury.json');
@@ -72,8 +72,7 @@ export async function validateUsernameDoesExist(req: Request, res: Response, nex
 
   try {
     if (!res.headersSent) {
-      const usernameExists: number | Error = await databaseWrapper.doesUsernameExist(username);
-      req.body.id = usernameExists;
+      req.body.id = await databaseWrapper.doesUsernameExist(username);
       next();
     }
   } catch (error) {
@@ -103,8 +102,7 @@ export async function validateEmailDoesExist(req: Request, res: Response, next: 
 
   try {
     if (!res.headersSent) {
-      const emailExists: number | Error = await databaseWrapper.doesEmailExist(email);
-      req.body.id = emailExists;
+      req.body.id = await databaseWrapper.doesEmailExist(email);
       next();
     }
   } catch (error) {
