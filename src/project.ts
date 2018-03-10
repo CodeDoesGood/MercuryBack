@@ -6,8 +6,6 @@ import { Database } from './database';
 const config = new Configuration('mercury', 'mercury.json');
 
 export interface IProject {
-  [index: string]: any;
-
   created_datetime: Date;
   description?: string;
   hidden: boolean;
@@ -17,6 +15,8 @@ export interface IProject {
   status: number;
   summary?: string;
   title: string;
+
+  [index: string]: any;
 }
 
 export class Project extends Database {
@@ -69,21 +69,21 @@ export class Project extends Database {
     }
 
     return this.knex('project').where('project_id', this.projectId).first()
-    .then((project) => {
-      if (_.isNil(project)) {
-        return Promise.reject(new Error(`Project ${this.projectId} does not exist`));
-      }
-      this.createdDateTime = project.created_datetime;
-      this.title = project.title;
-      this.status = project.status;
-      this.projectCategory = project.project_category;
-      this.hidden = project.hidden;
-      this.imageDirectory = project.image_directory;
-      this.summary = project.summary;
-      this.description = project.description;
-      this.doesExist = true;
-      return Promise.resolve(true);
-    });
+      .then((project) => {
+        if (_.isNil(project)) {
+          return Promise.reject(new Error(`Project ${this.projectId} does not exist`));
+        }
+        this.createdDateTime = project.created_datetime;
+        this.title = project.title;
+        this.status = project.status;
+        this.projectCategory = project.project_category;
+        this.hidden = project.hidden;
+        this.imageDirectory = project.image_directory;
+        this.summary = project.summary;
+        this.description = project.description;
+        this.doesExist = true;
+        return Promise.resolve(true);
+      });
   }
 
   /**
@@ -134,13 +134,13 @@ export class Project extends Database {
       return Promise.reject(new Error(`Project ${this.projectId} does not exist or has not been checked for existence yet`));
     }
 
-    this.description     = projectContent.description;
-    this.hidden          = projectContent.hidden;
-    this.imageDirectory  = projectContent.image_directory;
+    this.description = projectContent.description;
+    this.hidden = projectContent.hidden;
+    this.imageDirectory = projectContent.image_directory;
     this.projectCategory = projectContent.project_category;
-    this.status          = projectContent.status;
-    this.summary         = projectContent.summary;
-    this.title           = projectContent.title;
+    this.status = projectContent.status;
+    this.summary = projectContent.summary;
+    this.title = projectContent.title;
 
     return this.knex('project').where('project_id', this.projectId).update({
       description: this.description,
@@ -160,15 +160,16 @@ export class Project extends Database {
    * @param projectContent IProject content of project information
    */
   public async setContent(projectContent: IProject): Promise<boolean> {
-    this.description     = _.defaultTo(projectContent.description, '');
-    this.hidden          = _.defaultTo(projectContent.hidden, false);
-    this.imageDirectory  = _.defaultTo(projectContent.image_directory, '');
+    this.description = _.defaultTo(projectContent.description, '');
+    this.hidden = _.defaultTo(projectContent.hidden, false);
+    this.imageDirectory = _.defaultTo(projectContent.image_directory, '');
     this.projectCategory = _.defaultTo(projectContent.project_category, null);
-    this.status          = _.defaultTo(projectContent.status, null);
-    this.summary         = _.defaultTo(projectContent.summary, null);
-    this.title           = _.defaultTo(projectContent.title, '');
+    this.status = _.defaultTo(projectContent.status, null);
+    this.summary = _.defaultTo(projectContent.summary, null);
+    this.title = _.defaultTo(projectContent.title, '');
     return Promise.resolve(true);
   }
+
   /**
    * Returns all the content of the project.
    */

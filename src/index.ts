@@ -26,4 +26,6 @@ app.use(bodyParser.json());
 app.use('/api', indexRoute);
 app.use(logErrors);
 
-app.listen(port, () => { logger.info(`Server listening on port: ${port}`); });
+app.listen(port, () => {
+  logger.info(`Server listening on port: ${port}`);
+});

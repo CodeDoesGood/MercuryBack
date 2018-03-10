@@ -4,6 +4,7 @@ import { NextFunction, Request, Response } from 'express';
 
 import constants from '../constants';
 import { IProject, Project } from '../project';
+
 /**
  * Validates that there is a project that exists by the id requested and calls next otherwise
  * sends a bad request back to the server.

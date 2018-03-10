@@ -33,7 +33,7 @@ async function getAllActiveProjects(req: Request, res: Response) {
     const projects: IProject[] | Error = await projectsWrapper.getAllActiveProjects();
     res.status(200).send({ message: 'All active projects', content: { projects } });
   } catch (error) {
-    res.send(500).send({ error: 'Projects Gathering', description: constants.UNABLE_TO_GATHER_ACTIVE_PROJECTS });
+    res.status(500).send({ error: 'Projects Gathering', description: constants.UNABLE_TO_GATHER_ACTIVE_PROJECTS });
   }
 }
 

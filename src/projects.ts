@@ -2,7 +2,6 @@ import * as _ from 'lodash';
 
 import { Configuration } from './configuration';
 import { Database } from './database';
-
 import { IProject } from './project';
 
 const config = new Configuration('mercury', 'mercury.json');
@@ -25,7 +24,10 @@ export class Projects extends Database {
    * Returns all active projects
    */
   public async getAllActiveProjects(): Promise<IProject[] | Error> {
-    return this.knex('project').where('status', 1).andWhere('hidden', false)
+    return this.knex('project')
+      .where('project.status', 1).andWhere('hidden', false)
+      // .join('project_status', 'project.status', '=', 'project_status.project_status_id')
+      // .join('project_category', 'project.project_category', 'project_category.project_category_id')
       .then(projects => Promise.resolve(projects))
       .catch((error: Error) => Promise.reject(error));
   }
