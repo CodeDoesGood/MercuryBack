@@ -3,7 +3,7 @@ import * as _ from 'lodash';
 import { NextFunction, Request, Response } from 'express';
 import { IAnnouncement, IPasswordResetCode, IToken, IVerificationCode } from '../user';
 
-import constants from '../constants';
+import constants from '../constants/constants';
 import { logger } from '../logger';
 import * as utils from '../utils';
 import { Volunteer } from '../volunteer';
@@ -101,7 +101,7 @@ export async function validateRequestResetDetails(req: Request, res: Response, n
     const volunteer = new Volunteer(null, username);
 
     try {
-      const exists = await volunteer.existsByUsername();
+      await volunteer.existsByUsername();
       if (volunteer.email === email) {
         req.body.volunteer = volunteer;
         next();
@@ -125,8 +125,7 @@ export async function createPasswordResetCode(req: Request, res: Response, next:
   const { volunteer }: { volunteer: Volunteer } = req.body;
 
   try {
-    const passwordResetCode: number = await volunteer.createPasswordResetCode();
-    req.body.resetPasswordCode = passwordResetCode;
+    req.body.resetPasswordCode = await volunteer.createPasswordResetCode();
     next();
   } catch (error) {
     res.status(500).send({ description: constants.VOLUNTEER_RESET_CODE_FAIL, error: 'Password reset code' });
@@ -302,7 +301,7 @@ export async function validateVerifyCodeExists(req: Request, res: Response, next
   req.body.volunteer = volunteer;
 
   try {
-    const exists = await volunteer.existsById();
+    await volunteer.existsById();
     await volunteer.doesVerificationCodeExist();
     next();
   } catch (error) {
@@ -320,8 +319,8 @@ export async function validateResetCodeExists(req: Request, res: Response, next:
   req.body.volunteer = volunteer;
 
   try {
-    const exists = await volunteer.existsByUsername();
-    const codeExists = await volunteer.doesPasswordResetCodeExist();
+    await volunteer.existsByUsername();
+    await volunteer.doesPasswordResetCodeExist();
     next();
   } catch (error) {
     res.status(400).send({ error: 'Code existence', description: constants.VOLUNTEER_VERIFICATION_CODE_DOES_NOT_EXIST });
@@ -340,8 +339,7 @@ export async function createNewVolunteer(req: Request, res: Response, next: Next
   volunteer.email = vol.email;
 
   try {
-    const verificationCode: number = await volunteer.createVolunteer(vol.password);
-    req.body.verificationCode = verificationCode;
+    req.body.verificationCode = await volunteer.createVolunteer(vol.password);
     next();
   } catch (error) {
     res.status(500).send({ error: 'Volunteer Creation', description: constants.VOLUNTEER_CREATE_FAIL(volunteer.username, error.message) });
@@ -360,7 +358,7 @@ export async function gatherActiveNotifications(req: Request, res: Response) {
   const volunteer = new Volunteer(userId, username);
 
   try {
-    const exists = await volunteer.existsById();
+    await volunteer.existsById();
     const notifications: IAnnouncement[] | Error = await volunteer.getActiveNotifications();
     res.status(200).send({ message: 'Notifications', content: { notifications } });
   } catch (error) {
@@ -381,7 +379,7 @@ export async function markNotificationAsRead(req: Request, res: Response) {
   const volunteer = new Volunteer(userId, username);
 
   try {
-    const exist = await volunteer.existsById();
+    await volunteer.existsById();
     await volunteer.dismissNotification(notificationId);
     res.sendStatus(200);
   } catch (error) {
@@ -401,7 +399,7 @@ export async function gatherVolunteerProfile(req: Request, res: Response) {
   const volunteer = new Volunteer(userId, username);
 
   try {
-    const exists = await volunteer.existsById();
+    await volunteer.existsById();
     res.status(200).send({ message: 'Volunteer Profile', content: { volunteer: volunteer.getProfile() } });
   } catch (error) {
     res.status(500).send({ error: 'User existing', description: constants.UNKNOWN_ERROR });

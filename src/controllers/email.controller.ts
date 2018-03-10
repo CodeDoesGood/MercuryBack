@@ -4,7 +4,7 @@ import * as _ from 'lodash';
 import { NextFunction, Request, Response } from 'express';
 
 import { Configuration } from '../configuration';
-import constants from '../constants';
+import constants from '../constants/constants';
 import { Email, IEmailContent } from '../email';
 import { logger } from '../logger';
 import { Volunteer } from '../volunteer';
@@ -100,7 +100,7 @@ export async function sendEmail(req: Request, res: Response) {
   const html: string = email.html;
 
   try {
-    const sentEmail = await emailClient.send(from, to, subject, text, text);
+    await emailClient.send(from, to, subject, text, html);
     res.status(200).send({ message });
   } catch (error) {
     logger.error(`Error attempting to send a email. to=${to} from=${from}, error=${error}`);
@@ -150,7 +150,7 @@ export async function createResendVerificationCode(req: Request, res: Response, 
   }
 
   try {
-    const exists = volunteer.existsById();
+    await volunteer.existsById();
 
     if (!volunteer.getVerification()) {
       const code: number | Error = await volunteer.createVerificationCode();
@@ -256,7 +256,7 @@ export async function sendContactUsRequestInbox(req: Request, res: Response) {
   const { sender }: { sender: { name: string; email: string; subject: string; text: string; } } = req.body;
 
   try {
-    const sentEmail = await emailClient.send(sender.email, config.getKey('email').email, sender.subject, sender.text, sender.text);
+    await emailClient.send(sender.email, config.getKey('email').email, sender.subject, sender.text, sender.text);
     res.sendStatus(200);
   } catch (error) {
     logger.error(`Error attempting to send a email. to=${config.getKey('email').email} from=${sender.email}, error=${error}`);
@@ -280,8 +280,8 @@ export function sendContactUsEmailStatus(req: Request, res: Response) {
  */
 export async function reverifyTheService(req: Request, res: Response) {
   try {
-    const serviceVerified: boolean | Error = await emailClient.verify();
-    res.status(200).send({ message: 'Email service restartede successfully' });
+    await emailClient.verify();
+    res.status(200).send({ message: 'Email service restarted successfully' });
   } catch (error) {
     res.status(500).send({ error: 'Email service', description: constants.EMAIL_VERIFY_FAILED(error) });
   }

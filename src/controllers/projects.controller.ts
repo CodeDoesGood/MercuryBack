@@ -2,7 +2,7 @@ import * as _ from 'lodash';
 
 import { NextFunction, Request, Response } from 'express';
 
-import constants from '../constants';
+import constants from '../constants/constants';
 import { Projects } from '../projects';
 
 import { IProject } from '../project';

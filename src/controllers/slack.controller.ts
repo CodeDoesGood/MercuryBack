@@ -1,10 +1,8 @@
 import { Request, Response } from 'express';
 import * as _ from 'lodash';
 
-import { logger } from '../logger';
-
 import { Configuration } from '../configuration';
-import constants from '../constants';
+import constants from '../constants/constants';
 import { Database } from '../database';
 import { Email } from '../email';
 import * as slack from '../slack';
