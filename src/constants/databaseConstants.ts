@@ -3,8 +3,13 @@
  * this will remove any constant mistake that would occur.
  */
 interface IProductStatus {
-  OFFLINE: string;
-  ONLINE: string;
+  OFFLINE: number;
+  ONLINE: number;
+}
+
+interface IProjectHidden {
+  HIDDEN: boolean;
+  SHOWN: boolean;
 }
 
 interface IProductAnnouncementType {
@@ -122,9 +127,14 @@ export const productAnnouncementType: IProductAnnouncementType = {
   SUCCESS: 'Success',
 };
 
-export const productStatus: IProductStatus = {
-  OFFLINE: 'Offline',
-  ONLINE: 'Online',
+export const projectStatus: IProductStatus = {
+  OFFLINE: 2,
+  ONLINE: 1,
+};
+
+export const projectHidden: IProjectHidden = {
+  HIDDEN: true,
+  SHOWN: false,
 };
 
 export const volunteerStatus: IVolunteerStatus = {
