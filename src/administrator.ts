@@ -1,7 +1,7 @@
 import * as _ from 'lodash';
 import { User } from './user';
 
-import { IProject, Project } from './project';
+import { IProject } from './project';
 
 export class Administrator extends User {
   constructor(administratorId?: number, username?: string) {
@@ -9,13 +9,13 @@ export class Administrator extends User {
   }
 
   /**
-   * checkes to see if the administrator has a valid admin_portal_access within the database
+   * checks to see if the administrator has a valid admin_portal_access within the database
    */
   public async canAccessAdminPortal(): Promise<boolean | Error> {
     if (_.isNil(this.adminPortalAccess)) {
       return this.knex('volunteer').select('admin_portal_access').where('volunteer_id', this.userId).first()
       .then((res: { admin_portal_access: number }) => {
-        this.adminPortalAccess = (res.admin_portal_access === 1) ? true : false;
+        this.adminPortalAccess = (res.admin_portal_access === 1);
         return Promise.resolve(this.adminPortalAccess);
       })
       .catch((error: Error) => Promise.reject(error));
@@ -29,7 +29,7 @@ export class Administrator extends User {
    */
   public async createNewProject(project: IProject): Promise<boolean> {
     if (_.isNil(this.adminPortalAccess)) {
-      return Promise.reject(`User is not authorsised for calling this request, admin_protal_acces=${this.adminPortalAccess}`);
+      return Promise.reject(`User is not authorised for calling this request, admin_portal_access=${this.adminPortalAccess}`);
     }
 
     return this.knex('project').insert(project);
