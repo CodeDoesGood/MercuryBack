@@ -5,6 +5,7 @@ import { NextFunction, Request, Response } from 'express';
 import constants from '../constants/constants';
 import { Projects } from '../projects';
 
+import ApiError from '../ApiError';
 import { IProject } from '../project';
 
 const projectsWrapper = new Projects();
@@ -14,12 +15,12 @@ const projectsWrapper = new Projects();
  * @returns A array of objects containing all project details for
  * every single project.
  */
-async function getAllProjects(req: Request, res: Response) {
+async function getAllProjects(req: Request, res: Response, next: NextFunction) {
   try {
     const projects: IProject[] | Error = await projectsWrapper.getAllProjects();
     res.status(200).send({ message: 'All projects', content: { projects } });
   } catch (error) {
-    res.send(500).send({ error: 'Project Gathering', description: constants.UNABLE_TO_GATHER_PROJECTS });
+    next(new ApiError(req, res, error, 500, 'Projects Gathering', constants.UNABLE_TO_GATHER_PROJECTS));
   }
 }
 
@@ -28,12 +29,12 @@ async function getAllProjects(req: Request, res: Response) {
  * @returns A array of objects containing all
  * details on active projects.
  */
-async function getAllActiveProjects(req: Request, res: Response) {
+async function getAllActiveProjects(req: Request, res: Response, next: NextFunction) {
   try {
     const projects: IProject[] | Error = await projectsWrapper.getAllActiveProjects();
     res.status(200).send({ message: 'All active projects', content: { projects } });
   } catch (error) {
-    res.status(500).send({ error: 'Projects Gathering', description: constants.UNABLE_TO_GATHER_ACTIVE_PROJECTS });
+    next(new ApiError(req, res, error, 500, 'Projects Gathering', constants.UNABLE_TO_GATHER_ACTIVE_PROJECTS));
   }
 }
 
@@ -75,14 +76,14 @@ function validateProjectCategory(req: Request, res: Response, next: NextFunction
  * @returns A array of objects containing all project details of projects that match the requested
  * status.
  */
-async function getAllProjectsByStatus(req: Request, res: Response) {
+async function getAllProjectsByStatus(req: Request, res: Response, next: NextFunction) {
   const { status }: { status: number } = req.body;
 
   try {
     const projects: IProject[] | Error = await projectsWrapper.getAllProjectsByStatus(status);
     res.status(200).send({ message: 'All projects by status', content: { projects } });
   } catch (error) {
-    res.send(500).send({ error: 'Projects Gathering', description: constants.UNABLE_TO_GATHER_BY_STATUS });
+    next(new ApiError(req, res, error, 500, 'Projects Gathering', constants.UNABLE_TO_GATHER_BY_STATUS(status)));
   }
 }
 
@@ -91,14 +92,14 @@ async function getAllProjectsByStatus(req: Request, res: Response) {
  * @returns A array of objects containing all project details of projects that match the requested
  * category.
  */
-async function getAllProjectsByCategory(req: Request, res: Response) {
+async function getAllProjectsByCategory(req: Request, res: Response, next: NextFunction) {
   const { category }: { category: number } = req.body;
 
   try {
     const projects: IProject[] | Error = await projectsWrapper.getAllProjectsByCategory(category);
     res.status(200).send({ message: 'All projects by category', content: { projects } });
   } catch (error) {
-    res.send(500).send({ error: 'Projects Gathering', description: constants.UNABLE_TO_GATHER_BY_CATEGORY });
+    next(new ApiError(req, res, error, 500, 'Projects Gathering', constants.UNABLE_TO_GATHER_BY_CATEGORY(category)));
   }
 }
 
@@ -106,12 +107,12 @@ async function getAllProjectsByCategory(req: Request, res: Response) {
  * Gets and sends all hidden projects.
  * @returns A array of objects containing all project details of projects that are hidden
  */
-async function getAllHiddenProjects(req: Request, res: Response) {
+async function getAllHiddenProjects(req: Request, res: Response, next: NextFunction) {
   try {
     const projects: IProject[] | Error = await projectsWrapper.getAllHiddenProjects();
     res.status(200).send({ message: 'All hidden projects', content: { projects } });
   } catch (error) {
-    res.send(500).send({ error: 'Projects Gathering', description: constants.UNABLE_TO_GATHER_ALL_HIDDEN });
+    next(new ApiError(req, res, error, 500, 'Projects Gathering', constants.UNABLE_TO_GATHER_ALL_HIDDEN));
   }
 }
 

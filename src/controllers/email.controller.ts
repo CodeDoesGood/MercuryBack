@@ -3,6 +3,7 @@ import * as _ from 'lodash';
 
 import { NextFunction, Request, Response } from 'express';
 
+import ApiError from '../ApiError';
 import { Configuration } from '../configuration';
 import constants from '../constants/constants';
 import { Email, IEmailContent } from '../email';
@@ -252,15 +253,17 @@ export function denyInvalidAndBlockedDomains(req: Request, res: Response, next: 
  * After validation of the name, email and senderText then send the email to the
  * email to the default CodeDoesGood inbox.
  */
-export async function sendContactUsRequestInbox(req: Request, res: Response) {
+export async function sendContactUsRequestInbox(req: Request, res: Response, next: NextFunction) {
   const { sender }: { sender: { name: string; email: string; subject: string; text: string; } } = req.body;
 
   try {
     await emailClient.send(sender.email, config.getKey('email').email, sender.subject, sender.text, sender.text);
     res.sendStatus(200);
   } catch (error) {
-    logger.error(`Error attempting to send a email. to=${config.getKey('email').email} from=${sender.email}, error=${error}`);
-    res.status(503).send({ error: 'Unavailable Service', description: constants.EMAIL_UNAVAILABLE });
+    const errorMessage = `Error sending email. to=${config.getKey('email').email} from=${sender.email}, error=${error.message}`;
+    const formattedError = Object.assign(error, { message: errorMessage });
+
+    next(new ApiError(req, res, formattedError, 503, 'Unavailable Service', constants.EMAIL_UNAVAILABLE));
   }
 }
 
@@ -276,27 +279,27 @@ export function sendContactUsEmailStatus(req: Request, res: Response) {
 }
 
 /**
- * Attempt to reverify the service for the email client and bring it back online.
+ * Attempt to re-verify the service for the email client and bring it back online.
  */
-export async function reverifyTheService(req: Request, res: Response) {
+export async function reverifyTheService(req: Request, res: Response, next: NextFunction) {
   try {
     await emailClient.verify();
     res.status(200).send({ message: 'Email service restarted successfully' });
   } catch (error) {
-    res.status(500).send({ error: 'Email service', description: constants.EMAIL_VERIFY_FAILED(error) });
+    next(new ApiError(req, res, error, 500, 'Email service', constants.EMAIL_VERIFY_FAILED(error)));
   }
 }
 
 /**
  * Attempts to send the stored late emails to the volunteer
  */
-export async function sendStoredLateEmails(req: Request, res: Response) {
+export async function sendStoredLateEmails(req: Request, res: Response, next: NextFunction) {
   try {
     const storedJsonPath = emailClient.getEmailJsonPath();
     const failedStored = await emailClient.sendStoredEmails(storedJsonPath);
     res.status(200).send({ message: 'Sent stored emails, returned emails that failed to send', content: failedStored });
   } catch (error) {
-    res.send(500).send({ error: 'Stored Emails', description: constants.EMAIL_FAILED_SEND_STORED(error) });
+    next(new ApiError(req, res, error, 500, 'Stored Emails', constants.EMAIL_FAILED_SEND_STORED(error)));
   }
 }
 
@@ -311,7 +314,7 @@ export function retrieveStoredLateEmails(req: Request, res: Response) {
 /**
  * Removes a stored late email by the index provided
  */
-export async function removeStoredEmailByIndex(req: Request, res: Response) {
+export async function removeStoredEmailByIndex(req: Request, res: Response, next: NextFunction) {
   if (_.isNil(req.params.email_id)) {
     return res.status(401).send({ error: 'Email Id', description: constants.STORED_EMAIL_MISSING_INDEX });
   }
@@ -324,14 +327,14 @@ export async function removeStoredEmailByIndex(req: Request, res: Response) {
 
     res.status(200).send({ message, content: { email_removed: emailIndex, updated:updatedEmails } });
   } catch (error) {
-    res.status(500).send({ error: 'Remove late Email', description: error.message });
+    next(new ApiError(req, res, error, 500, 'Remove late Emails', error.message));
   }
 }
 
 /**
  * Updates a late stored email by index, requires the full email to be sent down.
  */
-export async function updateStoredEmailByIndex(req: Request, res: Response) {
+export async function updateStoredEmailByIndex(req: Request, res: Response, next: NextFunction) {
   if (_.isNil(req.params.email_id)) {
     return res.status(401).send({ error: 'Email Id', description: constants.STORED_EMAIL_MISSING_INDEX });
   }
@@ -353,7 +356,7 @@ export async function updateStoredEmailByIndex(req: Request, res: Response) {
 
     res.status(200).send({ message, content: { email_updated: emailIndex, updated: updatedEmails } });
   } catch (error) {
-    res.status(500).send({ error: 'Update late email', description: error.message });
+    next(new ApiError(req, res, error, 500, 'RUpdate late email', error.message));
   }
 }
 
@@ -384,9 +387,9 @@ export function validateUpdatedServiceDetails(req: Request, res: Response, next:
 
 /**
  * Updates the service details on the config file and on the email client
- * triggering a restart / reverify of the service.
+ * triggering a restart / re-verify of the service.
  */
-export async function updateServiceDetails(req: Request, res: Response) {
+export async function updateServiceDetails(req: Request, res: Response, next: NextFunction) {
   try {
     const updatedServices = req.body.service;
     await emailClient.updateServiceDetails(updatedServices, config.getKey('email').password);
@@ -396,15 +399,15 @@ export async function updateServiceDetails(req: Request, res: Response) {
     storedConfig.email.service = updatedServices.service;
     config.update(storedConfig);
 
-    logger.info('[Email] the email service deatils have been updated and restarted');
+    logger.info('[Email] the email service details have been updated and restarted');
 
     res.status(200).send({ message: 'Updated services and restarted', content: { updated: updatedServices } });
   } catch (error) {
-    res.status(500).send({ error: 'Email Service', description: constants.EMAIL_VERIFY_FAILED(error) });
+    next(new ApiError(req, res, error, 500, 'Email Service', constants.EMAIL_VERIFY_FAILED(error)));
   }
 }
 
-export async function updateServicePassword(req: Request, res: Response) {
+export async function updateServicePassword(req: Request, res: Response, next: NextFunction) {
   const password = req.body.password;
 
   if (_.isNil(password)) {
@@ -420,6 +423,6 @@ export async function updateServicePassword(req: Request, res: Response) {
     logger.info('[Email] The email service password has been updated and restarted');
     res.status(200).send({ message: 'Updated service password' });
   } catch (error) {
-    res.status(500).send({ error: 'Email Service', description: constants.EMAIL_VERIFY_FAILED(error) });
+    next(new ApiError(req, res, error, 500, 'Email Service', constants.EMAIL_VERIFY_FAILED(error)));
   }
 }

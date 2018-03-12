@@ -1,6 +1,7 @@
-import { Request, Response } from 'express';
+import { NextFunction, Request, Response } from 'express';
 import * as _ from 'lodash';
 
+import ApiError from '../ApiError';
 import { Configuration } from '../configuration';
 import constants from '../constants/constants';
 import { Database } from '../database';
@@ -9,7 +10,7 @@ import * as slack from '../slack';
 
 const config = new Configuration('mercury', 'mercury.json');
 
-async function sendHeathCheck(req: Request, res: Response) {
+async function sendHeathCheck(req: Request, res: Response, next: NextFunction) {
   let webhookUrl: string = config.getKey('slack').mercury;
 
   if (process.env.NODE_ENV !== 'production') {
@@ -31,7 +32,7 @@ async function sendHeathCheck(req: Request, res: Response) {
     await slack.healthCheck(webhookUrl, emailStatus, databaseStatus);
     res.status(200).send({ message: 'Health check sent to slack' });
   } catch (error) {
-    res.status(500).send({ error: 'Slack', description: constants.SLACK_HEALTH_FAILED(error) });
+    next(new ApiError(req, res, error, 500, 'Slack', constants.SLACK_HEALTH_FAILED(error)));
   }
 }
 

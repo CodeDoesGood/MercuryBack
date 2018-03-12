@@ -68,7 +68,12 @@ export class Project extends Database {
       return Promise.reject(new Error(`id '${this.projectId}' passed is not a valid number`));
     }
 
-    return this.knex('project').where('project_id', this.projectId).first()
+    return this.knex('project').where('project.project_id', this.projectId).andWhere('hidden', false)
+      .select('project_id', 'created_datetime', 'title', 'project_status.status',
+        'project_category.category as project_category', 'image_directory', 'project.description', 'summary', 'data_entry_user_id')
+      .join('project_status', 'project.status', 'project_status.project_status_id')
+      .join('project_category', 'project.project_category', 'project_category.project_category_id')
+      .first()
       .then((project) => {
         if (_.isNil(project)) {
           return Promise.reject(new Error(`Project ${this.projectId} does not exist`));
@@ -83,7 +88,8 @@ export class Project extends Database {
         this.description = project.description;
         this.doesExist = true;
         return Promise.resolve(true);
-      });
+      })
+      .catch((error: Error) => Promise.reject((error)));
   }
 
   /**
@@ -91,19 +97,19 @@ export class Project extends Database {
    */
   public async validateProjectContent(): Promise<IProject> {
     if (_.isNil(this.title)) {
-      return Promise.reject(new Error(`title is required to create a project title=${this.title}`));
+      return Promise.reject((new Error(`title is required to create a project title=${this.title}`)));
     }
 
     if (_.isNil(this.status)) {
-      return Promise.reject(new Error(`status is required to create a project title=${this.status}`));
+      return Promise.reject((new Error(`status is required to create a project title=${this.status}`)));
     }
 
     if (_.isNil(this.projectCategory)) {
-      return Promise.reject(new Error(`projectCategory is required to create a project title=${this.projectCategory}`));
+      return Promise.reject((new Error(`projectCategory is required to create a project title=${this.projectCategory}`)));
     }
 
     if (_.isNil(this.hidden)) {
-      return Promise.reject(new Error(`hidden is required to create a project title=${this.hidden}`));
+      return Promise.reject(((new Error(`hidden is required to create a project title=${this.hidden}`))));
     }
 
     const date = new Date();

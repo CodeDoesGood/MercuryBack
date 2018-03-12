@@ -3,8 +3,8 @@ import * as _ from 'lodash';
 import { NextFunction, Request, Response } from 'express';
 import { IAnnouncement, IPasswordResetCode, IToken, IVerificationCode } from '../user';
 
+import ApiError from '../ApiError';
 import constants from '../constants/constants';
-import { logger } from '../logger';
 import * as utils from '../utils';
 import { Volunteer } from '../volunteer';
 
@@ -109,7 +109,7 @@ export async function validateRequestResetDetails(req: Request, res: Response, n
         res.status(400).send({ error: 'Email validation', description: constants.VOLUNTEER_EMAIL_MATCH });
       }
     } catch (error) {
-      res.status(400).send({ error: 'User existence', message: constants.VOLUNTEER_EXISTS });
+      next(new ApiError(req, res, error, 400, 'User existence', constants.VOLUNTEER_EXISTS));
     }
   }
 }
@@ -128,7 +128,7 @@ export async function createPasswordResetCode(req: Request, res: Response, next:
     req.body.resetPasswordCode = await volunteer.createPasswordResetCode();
     next();
   } catch (error) {
-    res.status(500).send({ description: constants.VOLUNTEER_RESET_CODE_FAIL, error: 'Password reset code' });
+    next(new ApiError(req, res, error, 400, 'Password reset code', constants.VOLUNTEER_RESET_CODE_FAIL));
   }
 }
 
@@ -210,7 +210,7 @@ export async function validateVerifyCodeAuthenticity(req: Request, res: Response
       res.status(401).send({ error: 'Invalid Code', description: constants.VOLUNTEER_INVALID_VERIFICATION_CODE });
     }
   } catch (error) {
-    res.status(500).send({ error: 'Verification', description: constants.VOLUNTEER_FAILED_GET_VERIFICATION_CODE(error) });
+    next(new ApiError(req, res, error, 400, 'Verification', constants.VOLUNTEER_FAILED_GET_VERIFICATION_CODE(error)));
   }
 }
 
@@ -233,7 +233,7 @@ export async function validatePasswordResetCodeAuthenticity(req: Request, res: R
       next();
     }
   } catch (error) {
-    res.status(401).send({ error: 'Invalid Password Code', description: constants.VOLUNTEER_INVALID_VERIFICATION_CODE });
+    next(new ApiError(req, res, error, 401, 'Invalid Password Code', constants.VOLUNTEER_INVALID_VERIFICATION_CODE));
   }
 }
 
@@ -255,7 +255,7 @@ export function validateNotificationId(req: Request, res: Response, next: NextFu
  * Updates the volunteers password with the new password by the
  * users id and then tells the client that there password has been updated.
  */
-export async function updateUsersPassword(req: Request, res: Response) {
+export async function updateUsersPassword(req: Request, res: Response, next: NextFunction) {
   const { volunteer, password }: { volunteer: Volunteer; password: string; } = req.body;
   const { username }: { username: string; } = volunteer;
 
@@ -263,7 +263,11 @@ export async function updateUsersPassword(req: Request, res: Response) {
     await volunteer.updatePassword(password);
     res.status(200).send({ message: `Volunteer ${username} password updated` });
   } catch (error) {
-    res.status(500).send({ error: 'Password updating', description: constants.VOLUNTEER_FAILED_UPDATE_PASSWORD(username, error) });
+    next(
+      new ApiError(
+        req, res, error, 500, 'Password updating',
+        constants.VOLUNTEER_FAILED_UPDATE_PASSWORD(username, error),
+      ));
   }
 }
 
@@ -271,7 +275,7 @@ export async function updateUsersPassword(req: Request, res: Response) {
  * Marks the account in the database as a verified account, allowing the user to login after the
  * set time period.
  */
-export async function verifyVolunteerAccount(req: Request, res: Response) {
+export async function verifyVolunteerAccount(req: Request, res: Response, next: NextFunction) {
   const { username, volunteer }: { username: string; volunteer: Volunteer; } = req.body;
 
   try {
@@ -279,8 +283,10 @@ export async function verifyVolunteerAccount(req: Request, res: Response) {
     await volunteer.verifyVolunteer();
     res.status(200).send({ message: `Volunteer ${username} email is now verified` });
   } catch (error) {
-    logger.error(`Failed to mark account ${username} as verified, error=${JSON.stringify(error)}`);
-    res.status(500).send({ error: 'Failed Verifying', description: constants.VOLUNTEER_VERIFY_MARK_FAIL(username) });
+    const errorMessage = `Failed to mark account ${username} as verified, error=${JSON.stringify(error)}`;
+    const formattedError = Object.assign(error, { message: errorMessage });
+
+    next(new ApiError(req, res, formattedError, 500, 'Failed Verifying', constants.VOLUNTEER_VERIFY_MARK_FAIL(username)));
   }
 }
 
@@ -305,7 +311,7 @@ export async function validateVerifyCodeExists(req: Request, res: Response, next
     await volunteer.doesVerificationCodeExist();
     next();
   } catch (error) {
-    res.status(400).send({ error: 'Code existence', description: constants.VOLUNTEER_VERIFICATION_CODE_DOES_NOT_EXIST });
+    next(new ApiError(req, res, error, 400, 'Code existence', constants.VOLUNTEER_VERIFICATION_CODE_DOES_NOT_EXIST));
   }
 }
 
@@ -323,7 +329,7 @@ export async function validateResetCodeExists(req: Request, res: Response, next:
     await volunteer.doesPasswordResetCodeExist();
     next();
   } catch (error) {
-    res.status(400).send({ error: 'Code existence', description: constants.VOLUNTEER_VERIFICATION_CODE_DOES_NOT_EXIST });
+    next(new ApiError(req, res, error, 400, 'Code existence', constants.VOLUNTEER_VERIFICATION_CODE_DOES_NOT_EXIST));
   }
 }
 
@@ -342,14 +348,15 @@ export async function createNewVolunteer(req: Request, res: Response, next: Next
     req.body.verificationCode = await volunteer.createVolunteer(vol.password);
     next();
   } catch (error) {
-    res.status(500).send({ error: 'Volunteer Creation', description: constants.VOLUNTEER_CREATE_FAIL(volunteer.username, error.message) });
+    const description = constants.VOLUNTEER_CREATE_FAIL(volunteer.username, error.message);
+    next(new ApiError(req, res, error, 500, 'Volunteer Creation', description));
   }
 }
 
 /**
  * Gets all active notifications for the requesting user, requires authentication token.
  */
-export async function gatherActiveNotifications(req: Request, res: Response) {
+export async function gatherActiveNotifications(req: Request, res: Response, next: NextFunction) {
   const decodedToken: IToken = req.body.decoded;
 
   const { username } = decodedToken;
@@ -362,14 +369,12 @@ export async function gatherActiveNotifications(req: Request, res: Response) {
     const notifications: IAnnouncement[] | Error = await volunteer.getActiveNotifications();
     res.status(200).send({ message: 'Notifications', content: { notifications } });
   } catch (error) {
-    res.status(500).send({
-      description: constants.VOLUNTEER_GET_NOTIFICATION_FAIL(volunteer.username, error),
-      error: 'Notifications error',
-    });
+    const description = constants.VOLUNTEER_GET_NOTIFICATION_FAIL(volunteer.username, error);
+    next(new ApiError(req, res, error, 500, 'Notifications error', description));
   }
 }
 
-export async function markNotificationAsRead(req: Request, res: Response) {
+export async function markNotificationAsRead(req: Request, res: Response, next: NextFunction) {
   const decodedToken: IToken = req.body.decoded;
 
   const { notificationId }: { notificationId: number; } = req.body;
@@ -383,10 +388,8 @@ export async function markNotificationAsRead(req: Request, res: Response) {
     await volunteer.dismissNotification(notificationId);
     res.sendStatus(200);
   } catch (error) {
-    res.status(500).send({
-      description: constants.VOLUNTEER_DISMISS_NOTIFICATION_FAIL(notificationId, error),
-      error: 'Notification dismissing',
-    });
+    const description = constants.VOLUNTEER_DISMISS_NOTIFICATION_FAIL(notificationId, error);
+    next(new ApiError(req, res, error, 500, 'Notification dismissing', description));
   }
 }
 
