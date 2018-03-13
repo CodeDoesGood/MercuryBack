@@ -8,7 +8,7 @@ import { Database } from '../database';
 import { Email } from '../email';
 import * as slack from '../slack';
 
-const config = new Configuration('mercury', 'mercury.json');
+const config = new Configuration();
 
 async function sendHeathCheck(req: Request, res: Response, next: NextFunction) {
   let webhookUrl: string = config.getKey('slack').mercury;

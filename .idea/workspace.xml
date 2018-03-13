@@ -2,7 +2,20 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="7ad9bb35-a2f8-4d48-8659-82180ef468b9" name="Default" comment="">
+      <change beforePath="" afterPath="$PROJECT_DIR$/src/types/json.d.ts" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
+      <change beforePath="$PROJECT_DIR$/package.json" afterPath="$PROJECT_DIR$/package.json" />
+      <change beforePath="$PROJECT_DIR$/src/configuration.ts" afterPath="$PROJECT_DIR$/src/configuration.ts" />
+      <change beforePath="$PROJECT_DIR$/src/controllers/authentication.controller.ts" afterPath="$PROJECT_DIR$/src/controllers/authentication.controller.ts" />
+      <change beforePath="$PROJECT_DIR$/src/controllers/database.controller.ts" afterPath="$PROJECT_DIR$/src/controllers/database.controller.ts" />
+      <change beforePath="$PROJECT_DIR$/src/controllers/email.controller.ts" afterPath="$PROJECT_DIR$/src/controllers/email.controller.ts" />
+      <change beforePath="$PROJECT_DIR$/src/controllers/slack.controller.ts" afterPath="$PROJECT_DIR$/src/controllers/slack.controller.ts" />
       <change beforePath="$PROJECT_DIR$/src/project.ts" afterPath="$PROJECT_DIR$/src/project.ts" />
+      <change beforePath="$PROJECT_DIR$/src/projects.ts" afterPath="$PROJECT_DIR$/src/projects.ts" />
+      <change beforePath="$PROJECT_DIR$/src/test/unit/configuration.test.ts" afterPath="$PROJECT_DIR$/src/test/unit/configuration.test.ts" />
+      <change beforePath="$PROJECT_DIR$/src/test/unit/database.test.ts" afterPath="$PROJECT_DIR$/src/test/unit/database.test.ts" />
+      <change beforePath="$PROJECT_DIR$/src/test/unit/email.test.ts" afterPath="$PROJECT_DIR$/src/test/unit/email.test.ts" />
+      <change beforePath="$PROJECT_DIR$/src/user.ts" afterPath="$PROJECT_DIR$/src/user.ts" />
     </list>
     <ignored path="$PROJECT_DIR$/.tmp/" />
     <ignored path="$PROJECT_DIR$/temp/" />
@@ -26,14 +39,68 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="project.ts" pinned="false" current-in-tab="true">
+      <file leaf-file-name="project.ts" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/project.ts">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="61">
-              <caret line="5" column="60" lean-forward="true" selection-start-line="5" selection-start-column="60" selection-end-line="5" selection-end-column="60" />
+            <state relative-caret-position="88">
+              <caret line="68" column="5" lean-forward="false" selection-start-line="68" selection-start-column="5" selection-end-line="68" selection-end-column="5" />
               <folding>
                 <element signature="e#0#28#0" expanded="true" />
               </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="configuration.ts" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/configuration.ts">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="598">
+              <caret line="26" column="23" lean-forward="false" selection-start-line="26" selection-start-column="23" selection-end-line="26" selection-end-column="23" />
+              <folding>
+                <element signature="e#0#33#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="configuration.test.ts" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/src/test/unit/configuration.test.ts">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="460">
+              <caret line="30" column="28" lean-forward="false" selection-start-line="30" selection-start-column="28" selection-end-line="30" selection-end-column="28" />
+              <folding>
+                <element signature="e#0#33#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="json.d.ts" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/types/json.d.ts">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="276">
+              <caret line="12" column="34" lean-forward="false" selection-start-line="12" selection-start-column="34" selection-end-line="12" selection-end-column="34" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="database.test.ts" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/test/unit/database.test.ts">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="299">
+              <caret line="20" column="56" lean-forward="false" selection-start-line="20" selection-start-column="56" selection-end-line="20" selection-end-column="56" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="package.json" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/package.json">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="253">
+              <caret line="11" column="50" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="56" selection-end-column="0" />
+              <folding />
             </state>
           </provider>
         </entry>
@@ -42,7 +109,7 @@
         <entry file="file://$PROJECT_DIR$/src/GenericError.ts">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="138">
-              <caret line="6" column="29" lean-forward="true" selection-start-line="6" selection-start-column="29" selection-end-line="6" selection-end-column="29" />
+              <caret line="6" column="29" lean-forward="false" selection-start-line="6" selection-start-column="29" selection-end-line="6" selection-end-column="29" />
               <folding />
             </state>
           </provider>
@@ -54,6 +121,8 @@
     <findStrings>
       <find>Generi</find>
       <find>GenericError</find>
+      <find>new Config</find>
+      <find>new Configuration('mercury', 'mercury.json');</find>
     </findStrings>
   </component>
   <component name="Git.Settings">
@@ -63,7 +132,11 @@
     <option name="CHANGED_PATHS">
       <list>
         <option value="$PROJECT_DIR$/src/projects.ts" />
+        <option value="$PROJECT_DIR$/package.json" />
         <option value="$PROJECT_DIR$/src/project.ts" />
+        <option value="$PROJECT_DIR$/src/types/json.d.ts" />
+        <option value="$PROJECT_DIR$/src/configuration.ts" />
+        <option value="$PROJECT_DIR$/src/test/unit/configuration.test.ts" />
       </list>
     </option>
   </component>
@@ -81,12 +154,67 @@
     <option name="width" value="1400" />
     <option name="height" value="1000" />
   </component>
+  <component name="ProjectInspectionProfilesVisibleTreeState">
+    <entry key="Project Default">
+      <profile-state>
+        <expanded-state>
+          <State>
+            <id />
+          </State>
+          <State>
+            <id>TypeScript</id>
+          </State>
+        </expanded-state>
+        <selected-state>
+          <State>
+            <id>TsLint</id>
+          </State>
+        </selected-state>
+      </profile-state>
+    </entry>
+  </component>
+  <component name="ProjectView">
+    <navigator currentView="ProjectPane" proportions="" version="1">
+      <flattenPackages />
+      <showMembers />
+      <showModules />
+      <showLibraryContents />
+      <hideEmptyPackages />
+      <abbreviatePackageNames />
+      <autoscrollToSource />
+      <autoscrollFromSource />
+      <sortByType />
+      <manualOrder />
+      <foldersAlwaysOnTop value="true" />
+    </navigator>
+    <panes>
+      <pane id="Scope" />
+      <pane id="Scratches" />
+      <pane id="ProjectPane">
+        <subPane>
+          <expand>
+            <path>
+              <item name="mercuryback" type="b2602c69:ProjectViewProjectNode" />
+              <item name="mercuryback" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="mercuryback" type="b2602c69:ProjectViewProjectNode" />
+              <item name="mercuryback" type="462c0819:PsiDirectoryNode" />
+              <item name="src" type="462c0819:PsiDirectoryNode" />
+            </path>
+          </expand>
+          <select />
+        </subPane>
+      </pane>
+    </panes>
+  </component>
   <component name="PropertiesComponent">
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="node.js.path.for.package.tslint" value="project" />
     <property name="node.js.detected.package.tslint" value="true" />
     <property name="node.js.selected.package.tslint" value="C:\Users\smmst\Documents\projects\codedoesgood\mercuryback\node_modules\tslint" />
     <property name="HbShouldOpenHtmlAsHb" value="" />
+    <property name="nodejs.mocha.mocha_node_package_dir" value="$PROJECT_DIR$/node_modules/mocha" />
   </component>
   <component name="RunDashboard">
     <option name="ruleStates">
@@ -99,6 +227,58 @@
         </RuleState>
       </list>
     </option>
+  </component>
+  <component name="RunManager">
+    <configuration name="start" type="js.build_tools.npm" factoryName="npm" temporary="true" nameIsGenerated="true">
+      <package-json value="$PROJECT_DIR$/package.json" />
+      <command value="run" />
+      <scripts>
+        <script value="start" />
+      </scripts>
+      <node-interpreter value="project" />
+      <envs />
+    </configuration>
+    <configuration name="start:debug" type="js.build_tools.npm" factoryName="npm" temporary="true" nameIsGenerated="true">
+      <package-json value="$PROJECT_DIR$/package.json" />
+      <command value="run" />
+      <scripts>
+        <script value="start:debug" />
+      </scripts>
+      <node-interpreter value="project" />
+      <envs />
+    </configuration>
+    <configuration name="test:unit" type="js.build_tools.npm" factoryName="npm" temporary="true" nameIsGenerated="true">
+      <package-json value="$PROJECT_DIR$/package.json" />
+      <command value="run" />
+      <scripts>
+        <script value="test:unit" />
+      </scripts>
+      <node-interpreter value="project" />
+      <envs />
+    </configuration>
+    <configuration name="tslint" type="js.build_tools.npm" factoryName="npm" temporary="true" nameIsGenerated="true">
+      <package-json value="$PROJECT_DIR$/package.json" />
+      <command value="run" />
+      <scripts>
+        <script value="tslint" />
+      </scripts>
+      <node-interpreter value="project" />
+      <envs />
+    </configuration>
+    <list size="4">
+      <item index="0" class="java.lang.String" itemvalue="npm.start:debug" />
+      <item index="1" class="java.lang.String" itemvalue="npm.tslint" />
+      <item index="2" class="java.lang.String" itemvalue="npm.test:unit" />
+      <item index="3" class="java.lang.String" itemvalue="npm.start" />
+    </list>
+    <recent_temporary>
+      <list size="4">
+        <item index="0" class="java.lang.String" itemvalue="npm.start" />
+        <item index="1" class="java.lang.String" itemvalue="npm.test:unit" />
+        <item index="2" class="java.lang.String" itemvalue="npm.tslint" />
+        <item index="3" class="java.lang.String" itemvalue="npm.start:debug" />
+      </list>
+    </recent_temporary>
   </component>
   <component name="ShelveChangesManager" show_recycled="false">
     <option name="remove_strategy" value="false" />
@@ -113,25 +293,33 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1520940182553</updated>
-      <workItem from="1520940183759" duration="231000" />
+      <workItem from="1520940183759" duration="3539000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="231000" />
+    <option name="totallyTimeSpent" value="3539000" />
+  </component>
+  <component name="TodoView">
+    <todo-panel id="selected-file">
+      <is-autoscroll-to-source value="true" />
+    </todo-panel>
+    <todo-panel id="all">
+      <are-packages-shown value="true" />
+      <is-autoscroll-to-source value="true" />
+    </todo-panel>
   </component>
   <component name="ToolWindowManager">
     <frame x="-8" y="-8" width="1936" height="1056" extended-state="6" />
-    <editor active="true" />
     <layout>
-      <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
+      <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32928178" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="-1" side_tool="true" content_ui="tabs" />
-      <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
-      <window_info id="npm" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="-1" side_tool="true" content_ui="tabs" />
-      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
-      <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.32928178" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
+      <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32928178" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
+      <window_info id="npm" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.24973656" sideWeight="0.50576603" order="-1" side_tool="true" content_ui="tabs" />
+      <window_info id="Run" active="true" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.32928178" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32928178" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
       <window_info id="TypeScript" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.24973656" sideWeight="0.49423394" order="0" side_tool="false" content_ui="combo" />
       <window_info id="Docker" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="false" weight="0.33" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
       <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
@@ -152,14 +340,16 @@
     <option name="myLimit" value="2678400000" />
   </component>
   <component name="XDebuggerManager">
-    <breakpoint-manager />
+    <breakpoint-manager>
+      <option name="time" value="3" />
+    </breakpoint-manager>
     <watches-manager />
   </component>
   <component name="editorHistoryManager">
     <entry file="file://$PROJECT_DIR$/src/GenericError.ts">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="138">
-          <caret line="6" column="29" lean-forward="true" selection-start-line="6" selection-start-column="29" selection-end-line="6" selection-end-column="29" />
+          <caret line="6" column="29" lean-forward="false" selection-start-line="6" selection-start-column="29" selection-end-line="6" selection-end-column="29" />
           <folding />
         </state>
       </provider>
@@ -172,12 +362,56 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/src/test/unit/database.test.ts">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="299">
+          <caret line="20" column="56" lean-forward="false" selection-start-line="20" selection-start-column="56" selection-end-line="20" selection-end-column="56" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/package.json">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="253">
+          <caret line="11" column="50" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="56" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/src/project.ts">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="61">
-          <caret line="5" column="60" lean-forward="true" selection-start-line="5" selection-start-column="60" selection-end-line="5" selection-end-column="60" />
+        <state relative-caret-position="88">
+          <caret line="68" column="5" lean-forward="false" selection-start-line="68" selection-start-column="5" selection-end-line="68" selection-end-column="5" />
           <folding>
             <element signature="e#0#28#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/types/json.d.ts">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="276">
+          <caret line="12" column="34" lean-forward="false" selection-start-line="12" selection-start-column="34" selection-end-line="12" selection-end-column="34" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/configuration.ts">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="598">
+          <caret line="26" column="23" lean-forward="false" selection-start-line="26" selection-start-column="23" selection-end-line="26" selection-end-column="23" />
+          <folding>
+            <element signature="e#0#33#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/test/unit/configuration.test.ts">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="460">
+          <caret line="30" column="28" lean-forward="false" selection-start-line="30" selection-start-column="28" selection-end-line="30" selection-end-column="28" />
+          <folding>
+            <element signature="e#0#33#0" expanded="true" />
           </folding>
         </state>
       </provider>

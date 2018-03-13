@@ -10,7 +10,7 @@ import { Email, IEmailContent } from '../email';
 import { logger } from '../logger';
 import { Volunteer } from '../volunteer';
 
-const config = new Configuration('mercury', 'mercury.json');
+const config = new Configuration();
 const emailClient = new Email(config.getKey('email'));
 
 emailClient.verify()

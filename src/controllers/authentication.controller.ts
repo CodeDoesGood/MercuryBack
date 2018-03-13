@@ -10,7 +10,7 @@ import constants from '../constants/constants';
 import * as utils from '../utils';
 import { Volunteer } from '../volunteer';
 
-const config = new Configuration('mercury', 'mercury.json');
+const config = new Configuration();
 
 interface IToken {
   username: string;

@@ -3,7 +3,7 @@ import * as _ from 'lodash';
 import { Configuration } from './configuration';
 import { Database } from './database';
 
-const config = new Configuration('mercury', 'mercury.json');
+const config = new Configuration();
 
 export interface IVolunteer {
   volunteer_id: number;

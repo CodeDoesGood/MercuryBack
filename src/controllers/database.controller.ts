@@ -7,7 +7,7 @@ import { Configuration } from '../configuration';
 import constants from '../constants/constants';
 import { Database } from '../database';
 
-const config = new Configuration('mercury', 'mercury.json');
+const config = new Configuration();
 const databaseWrapper = new Database(config.getKey('database'));
 
 /**

@@ -9,7 +9,7 @@ describe('#configurationWrapper', () => {
       const folder: any = undefined;
 
       try {
-        const config = new Configuration(folder, 'mercury.json');
+        const config = new Configuration();
         assert(false, 'Should throw a error if folder is not passed');
       } catch (error) {
         assert(true, error);
@@ -20,7 +20,7 @@ describe('#configurationWrapper', () => {
       const name: any = undefined;
 
       try {
-        const config = new Configuration('mercury', name);
+        const config = new Configuration();
         assert(false, 'Should throw a error if name is not passed');
       } catch (error) {
         assert(true, error);
@@ -31,7 +31,7 @@ describe('#configurationWrapper', () => {
       const folder: any = 1;
 
       try {
-        const config = new Configuration(folder, 'mercury.json');
+        const config = new Configuration();
         assert(false, 'Should throw a error if folder is not a string');
       } catch (error) {
         assert(true, error);
@@ -41,7 +41,7 @@ describe('#configurationWrapper', () => {
       const name: any = 1;
 
       try {
-        const config = new Configuration('mercury', name);
+        const config = new Configuration();
         assert(false, 'Should throw a error if name is not a string');
       } catch (error) {
         assert(true, error);
@@ -51,7 +51,7 @@ describe('#configurationWrapper', () => {
 
   describe('#load', () => {
     it('Should return the default configuration if it does not exist', () => {
-      let config = new Configuration('foldername', 'file.json');
+      let config = new Configuration();
 
       assert.equal(
       config.getConfiguration(),
@@ -66,7 +66,7 @@ describe('#configurationWrapper', () => {
     });
 
     it('Should return the stored configuration if it does exists', () => {
-      let config = new Configuration('mercury', 'mercury.json');
+      let config = new Configuration();
 
       assert.equal(
         config.getConfiguration() === config.getDefault(),
@@ -80,7 +80,7 @@ describe('#configurationWrapper', () => {
 
   describe('#update', () => {
     it('Should update the stored content in memory', () => {
-      let config = new Configuration('mercury', 'mercury.json');
+      let config = new Configuration();
 
       const oldConfig = config.getConfiguration();
       const updatedConfig = Object.assign({}, oldConfig, { updated: true });
@@ -95,7 +95,7 @@ describe('#configurationWrapper', () => {
     });
 
     it('Should update the stored content in the file on the disk', () => {
-      let config = new Configuration('mercury', 'mercury.json');
+      let config = new Configuration();
 
       const oldConfig = config.getConfiguration();
       const updatedConfig = Object.assign({}, oldConfig, { updated: true });

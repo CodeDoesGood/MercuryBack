@@ -5,7 +5,7 @@ import * as _ from 'lodash';
 import { Configuration } from '../..//configuration';
 import { Email, IEmailContent, IEmailOptions } from '../..//email';
 
-const config = new Configuration('mercury', 'mercury.json');
+const config = new Configuration();
 const email = new Email(config.getKey('email'));
 
 if (_.isNil(process.env.TRAVIS)) {
