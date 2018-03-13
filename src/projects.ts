@@ -19,7 +19,7 @@ export class Projects extends Database {
   public async getAllProjects(): Promise<IProject[] | Error> {
     return this.knex.select().from('project')
       .then(projects => Promise.resolve(projects))
-      .catch((error: Error) => Promise.reject(error));
+      .catch((error: Error) => Promise.reject(new GenericError(error)));
   }
 
   /**
@@ -37,7 +37,7 @@ export class Projects extends Database {
    */
   public async getAllProjectsByStatus(status: number, hidden: boolean = false): Promise<IProject[] | Error> {
     if (!_.isString(status) && !_.isNumber(status)) {
-      return Promise.reject(new Error(`userId "${status}" passed is not a valid string or number`));
+      return Promise.reject(new GenericError(new Error(`userId "${status}" passed is not a valid string or number`)));
     }
 
     return this.knex('project').where('project.status', status).andWhere('hidden', hidden)
@@ -47,7 +47,7 @@ export class Projects extends Database {
       .join('project_status', 'project.status', 'project_status.project_status_id')
       .join('project_category', 'project.project_category', 'project_category.project_category_id')
       .then(projects => Promise.resolve(projects))
-      .catch((error: Error) => Promise.reject(error));
+      .catch((error: Error) => Promise.reject(new GenericError(error)));
   }
 
   /**
@@ -61,7 +61,7 @@ export class Projects extends Database {
 
     return this.knex('project').where('project_category', category)
       .then(projects => Promise.resolve(projects))
-      .catch((error: Error) => Promise.reject(error));
+      .catch((error: Error) => Promise.reject(new GenericError(error)));
   }
 
   /**
@@ -70,6 +70,6 @@ export class Projects extends Database {
   public async getAllHiddenProjects(): Promise<IProject[] | Error> {
     return this.knex('project').where('hidden', true)
       .then(projects => Promise.resolve(projects))
-      .catch((error: Error) => Promise.reject(error));
+      .catch((error: Error) => Promise.reject(new GenericError(error)));
   }
 }

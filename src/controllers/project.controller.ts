@@ -158,7 +158,7 @@ async function getProjectById(req: Request, res: Response, next: NextFunction) {
   try {
     await project.exists();
     const content: IProject | Error = project.getContent();
-    res.status(200).send({ message: '', content: { project: content } });
+    res.status(200).send({ message: constants.GET_PROJECT(content.project_id, content.title), content: { project: content } });
   } catch (error) {
     next(new ApiError(req, res, error, 500, 'Get Project', constants.UNABLE_TO_GATHER_PROJECT(projectId)));
   }

@@ -58,6 +58,7 @@ interface IErrors {
 
   INVALID_PROJECT_ID_FORMAT: (projectId: number) => string;
   PROJECT_MUST_CONTAIN: (contain: string) => string;
+  GET_PROJECT: (id: number, title: string) => string;
 
   PROJECT_MUST_CONTAIN_HIDDEN: string;
   PROJECT_TYPE_CREATED_DATETIME_INVALID: string;
@@ -212,6 +213,8 @@ const errors: IErrors = {
   PROJECT_TYPE_STATUS_INVALID: 'status type is invalid, must be a string',
   PROJECT_TYPE_SUMMARY_INVALID: 'summary type is invalid, must be a string',
   PROJECT_TYPE_TITLE_INVALID: 'title type is invalid, must be a string',
+
+  GET_PROJECT: (projectId, projectTitle) => `Gathered project ${projectId}/${projectTitle}`,
 
   UNABLE_TO_GATHER_PROJECT: projectId => `Unable to gather project by id ${projectId}`,
   UNABLE_TO_UPDATE_PROJECT: projectId => `Unable to update project by id ${projectId}`,
