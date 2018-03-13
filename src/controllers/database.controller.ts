@@ -2,6 +2,7 @@ import * as _ from 'lodash';
 
 import { NextFunction, Request, Response } from 'express';
 
+import ApiError from '../ApiError';
 import { Configuration } from '../configuration';
 import constants from '../constants/constants';
 import { Database } from '../database';
@@ -106,6 +107,6 @@ export async function validateEmailDoesExist(req: Request, res: Response, next: 
       next();
     }
   } catch (error) {
-    res.status(400).send({ error: 'Email existance', description: constants.EMAIL_DOES_NOT_EXIST(email) });
+    next(new ApiError(req, res, error, 400, 'Email existence', constants.EMAIL_DOES_NOT_EXIST(email)));
   }
 }

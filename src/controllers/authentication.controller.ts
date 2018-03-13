@@ -4,8 +4,9 @@ import { NextFunction, Request, Response } from 'express';
 
 import { Administrator } from '../administrator';
 import { Configuration } from '../configuration';
+
+import ApiError from '../ApiError';
 import constants from '../constants/constants';
-import { logger } from '../logger';
 import * as utils from '../utils';
 import { Volunteer } from '../volunteer';
 
@@ -67,8 +68,7 @@ export async function validateUserCredentials(req: Request, res: Response, next:
       res.status(401).send({ error: 'Validate user credentials', description: constants.INCORRECT_PASSWORD });
     }
   } catch (error) {
-    logger.error(`Failed to gather volunteer login details by username while validating user credentials, error=${error}`);
-    res.status(500).send({ error: 'Validate user credentials', description: constants.FAILED_VALIDATION });
+    next(new ApiError(req, res, error, 500, 'Validate user credentials', constants.FAILED_VALIDATION));
   }
 }
 
@@ -88,7 +88,7 @@ export async function checkAuthenticationToken(req: Request, res: Response, next
       req.body.decoded = await utils.validateAuthenticationToken(token, secret);
       next();
     } catch (error) {
-      res.status(401).send({ error: 'Expired token', description: constants.NO_TOKEN_PASSED });
+      next(new ApiError(req, res, error, 500, 'Expired token', constants.NO_TOKEN_PASSED));
     }
   }
 }
@@ -110,7 +110,7 @@ export async function checkAdminPortalAccess(req: Request, res: Response, next: 
     }
     res.status(401).send({ error: 'Unauthorized Access', description: constants.VOLUNTEER_NOT_AUTH });
   } catch (error) {
-    res.status(401).send({ error: 'Unauthorized Access', description: constants.VOLUNTEER_NOT_AUTH });
+    next(new ApiError(req, res, error, 401, 'Unauthorized Access', constants.VOLUNTEER_NOT_AUTH));
   }
 }
 
@@ -121,7 +121,7 @@ export async function checkAdminPortalAccess(req: Request, res: Response, next: 
  * @param {string} req.username The username of the user
  * @param {string} req.password The password of the user
  */
-export async function authenticateLoggingInUser(req: Request, res: Response) {
+export async function authenticateLoggingInUser(req: Request, res: Response, next: NextFunction) {
   const { username, password }: { username: string; password: string } = req.body;
   const userId: number = req.body.id;
 
@@ -144,7 +144,6 @@ export async function authenticateLoggingInUser(req: Request, res: Response) {
       }
     }
   } catch (error) {
-    logger.error(`Failed to get Volunteer login details, error=${JSON.stringify(error)}`);
-    res.status(500).send({ error: 'Authentication', description: constants.FAILED_VOLUNTEER_GET(error) });
+    next(new ApiError(req, res, error, 500, 'Authentication', constants.FAILED_VOLUNTEER_GET(error)));
   }
 }

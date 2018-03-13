@@ -2,7 +2,6 @@ import * as _ from 'lodash';
 
 import { Configuration } from './configuration';
 import { Database } from './database';
-import { GenericError } from './GenericError';
 
 const config = new Configuration('mercury', 'mercury.json');
 
@@ -71,7 +70,7 @@ export class Project extends Database {
 
     return this.knex('project').where('project.project_id', this.projectId).andWhere('hidden', false)
       .select('project_id', 'created_datetime', 'title', 'project_status.status',
-              'project_category.category as project_category', 'image_directory', 'project.description', 'summary', 'data_entry_user_id')
+        'project_category.category as project_category', 'image_directory', 'project.description', 'summary', 'data_entry_user_id')
       .join('project_status', 'project.status', 'project_status.project_status_id')
       .join('project_category', 'project.project_category', 'project_category.project_category_id')
       .first()
@@ -90,7 +89,7 @@ export class Project extends Database {
         this.doesExist = true;
         return Promise.resolve(true);
       })
-      .catch((error: Error) => Promise.reject(new GenericError(error)));
+      .catch((error: Error) => Promise.reject((error)));
   }
 
   /**
@@ -98,19 +97,19 @@ export class Project extends Database {
    */
   public async validateProjectContent(): Promise<IProject> {
     if (_.isNil(this.title)) {
-      return Promise.reject(new GenericError(new Error(`title is required to create a project title=${this.title}`)));
+      return Promise.reject((new Error(`title is required to create a project title=${this.title}`)));
     }
 
     if (_.isNil(this.status)) {
-      return Promise.reject(new GenericError(new Error(`status is required to create a project title=${this.status}`)));
+      return Promise.reject((new Error(`status is required to create a project title=${this.status}`)));
     }
 
     if (_.isNil(this.projectCategory)) {
-      return Promise.reject(new GenericError(new Error(`projectCategory is required to create a project title=${this.projectCategory}`)));
+      return Promise.reject((new Error(`projectCategory is required to create a project title=${this.projectCategory}`)));
     }
 
     if (_.isNil(this.hidden)) {
-      return Promise.reject(new GenericError((new Error(`hidden is required to create a project title=${this.hidden}`))));
+      return Promise.reject(((new Error(`hidden is required to create a project title=${this.hidden}`))));
     }
 
     const date = new Date();
