@@ -2,7 +2,6 @@ import * as _ from 'lodash';
 
 import { Configuration } from './configuration';
 import { Database } from './database';
-import { GenericError } from './GenericError';
 
 const config = new Configuration('mercury', 'mercury.json');
 
