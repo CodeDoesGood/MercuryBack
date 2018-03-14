@@ -6,7 +6,7 @@ import { IProject } from './project';
 
 import * as databaseConstants from './constants/databaseConstants';
 
-const config = new Configuration('mercury', 'mercury.json');
+const config = new Configuration();
 
 export class Projects extends Database {
   constructor() {

@@ -7,7 +7,7 @@ import { Database } from '../..//database';
 
 import * as utils from '../..//utils';
 
-const config = new Configuration('mercury', 'mercury.json');
+const config = new Configuration();
 const databaseWrapper = new Database(config.getKey('database'));
 
 describe('Database Wrapper', () => {

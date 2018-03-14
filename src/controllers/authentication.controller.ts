@@ -10,7 +10,7 @@ import constants from '../constants/constants';
 import * as utils from '../utils';
 import { Volunteer } from '../volunteer';
 
-const config = new Configuration('mercury', 'mercury.json');
+const config = new Configuration();
 
 interface IToken {
   username: string;
@@ -129,7 +129,6 @@ export async function authenticateLoggingInUser(req: Request, res: Response, nex
 
   try {
     await volunteer.existsById();
-
     if (!volunteer.getVerification()) {
       res.status(403).send({
         description: constants.VOLUNTEER_VERIFICATION_REQUIRED(volunteer.username),

@@ -1,7 +1,7 @@
 import * as crypto from 'crypto';
 import * as fs from 'fs';
-import * as _ from 'lodash';
 
+import * as projectConfiguration from '../package.json';
 import { defaultConfig, IConfig } from './configuration.default';
 
 export class Configuration {
@@ -13,24 +13,12 @@ export class Configuration {
   public default: IConfig;
   public configuration: IConfig;
 
-  constructor(folder: string, name: string) {
-    if (_.isNil(folder)) {
-      throw new Error('Foolder cannot be null or undefined');
-    } else if (!_.isString(folder)) {
-      throw new Error('Folder must be a string');
-    }
-
-    if (_.isNil(name)) {
-      throw new Error('name cannot be null or undefined');
-    } else if (!_.isString(name)) {
-      throw new Error('name must be of type string');
-    }
-
+  constructor() {
     // the folder
-    this.folder = folder;
+    this.folder = projectConfiguration.name;
 
     // the file name
-    this.file = name;
+    this.file = `${projectConfiguration.name}.json`;
 
     // Home directory that will be used for storing the file
     this.homeDirectory = null;

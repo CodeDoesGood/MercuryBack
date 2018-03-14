@@ -20,7 +20,7 @@ describe('Volunteer Component', () => {
       assert.equal(_.isUndefined(volunteer.phone), false, 'Volunteer class must contain: "phone"');
       assert.equal(_.isUndefined(volunteer.location), false, 'Volunteer class must contain: "location"');
       assert.equal(_.isUndefined(volunteer.timezone), false, 'Volunteer class must contain: "timezone"');
-      assert.equal(_.isUndefined(volunteer.linkedInId), false, 'Volunteer class must contain: "linkedInId"');
+      assert.equal(_.isUndefined(volunteer.linkedInUrl), false, 'Volunteer class must contain: "linkedInUrl"');
       assert.equal(_.isUndefined(volunteer.slackId), false, 'Volunteer class must contain: "slackId"');
       assert.equal(_.isUndefined(volunteer.githubId), false, 'Volunteer class must contain: "githubId"');
       assert.equal(_.isUndefined(volunteer.developerLevel), false, 'Volunteer class must contain: "developerLevel"');
@@ -182,7 +182,7 @@ describe('Volunteer Component', () => {
             assert.equal(_.isNil(profile.developer_level), false, 'developer_level should be returned from getProfile');
             assert.equal(_.isNil(profile.email), false, 'email should be returned from getProfile');
             assert.equal(_.isNil(profile.github_id), false, 'github_id should be returned from getProfile');
-            assert.equal(_.isNil(profile.linked_in_id), false, 'linked_in_id should be returned from getProfile');
+            assert.equal(_.isNil(profile.linked_in_url), false, 'linked_in_url should be returned from getProfile');
             assert.equal(_.isNil(profile.location), false, 'location should be returned from getProfile');
             assert.equal(_.isNil(profile.name), false, 'name should be returned from getProfile');
             assert.equal(_.isNil(profile.phone), false, 'phone should be returned from getProfile');

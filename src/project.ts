@@ -3,7 +3,7 @@ import * as _ from 'lodash';
 import { Configuration } from './configuration';
 import { Database } from './database';
 
-const config = new Configuration('mercury', 'mercury.json');
+const config = new Configuration();
 
 export interface IProject {
   created_datetime: Date;
@@ -69,7 +69,8 @@ export class Project extends Database {
     }
 
     return this.knex('project').where('project.project_id', this.projectId).andWhere('hidden', false)
-      .select('project_id', 'created_datetime', 'title', 'project_status.status',
+      .select(
+        'project_id', 'created_datetime', 'title', 'project_status.status',
         'project_category.category as project_category', 'image_directory', 'project.description', 'summary', 'data_entry_user_id')
       .join('project_status', 'project.status', 'project_status.project_status_id')
       .join('project_category', 'project.project_category', 'project_category.project_category_id')

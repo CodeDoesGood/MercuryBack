@@ -393,7 +393,7 @@ export async function markNotificationAsRead(req: Request, res: Response, next: 
   }
 }
 
-export async function gatherVolunteerProfile(req: Request, res: Response) {
+export async function gatherVolunteerProfile(req: Request, res: Response, next: NextFunction) {
   const decodedToken: IToken = req.body.decoded;
 
   const { username }: { username: string; } = decodedToken;
@@ -403,8 +403,10 @@ export async function gatherVolunteerProfile(req: Request, res: Response) {
 
   try {
     await volunteer.existsById();
-    res.status(200).send({ message: 'Volunteer Profile', content: { volunteer: volunteer.getProfile() } });
+    const profile = await volunteer.getCompleteProfile();
+
+    res.status(200).send({ message: 'Volunteer Profile', content: { volunteer: profile } });
   } catch (error) {
-    res.status(500).send({ error: 'User existing', description: constants.UNKNOWN_ERROR });
+    next(new ApiError(req, res, error, 500, 'User Existing', constants.UNKNOWN_ERROR));
   }
 }

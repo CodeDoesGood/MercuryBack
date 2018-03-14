@@ -1,5 +1,5 @@
 {
-  "name": "mercuryback",
+  "name": "mercury",
   "version": "0.0.4",
   "description": "The supporting backend of the mercury project",
   "main": "src/index.ts",
