@@ -50,21 +50,6 @@ describe('#configurationWrapper', () => {
   });
 
   describe('#load', () => {
-    it('Should return the default configuration if it does not exist', () => {
-      let config = new Configuration();
-
-      assert.equal(
-      config.getConfiguration(),
-      config.default,
-      'If the file does not exist then the default configuration should be returned',
-    );
-
-      fs.unlinkSync(config.path);
-      fs.rmdirSync(`${config.homeDirectory}${config.folder}`);
-
-      config = null;
-    });
-
     it('Should return the stored configuration if it does exists', () => {
       let config = new Configuration();
 
