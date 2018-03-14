@@ -129,7 +129,6 @@ export async function authenticateLoggingInUser(req: Request, res: Response, nex
 
   try {
     await volunteer.existsById();
-
     if (!volunteer.getVerification()) {
       res.status(403).send({
         description: constants.VOLUNTEER_VERIFICATION_REQUIRED(volunteer.username),

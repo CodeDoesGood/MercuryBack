@@ -11,15 +11,20 @@ export interface IVolunteer {
   password: string;
   position: string;
   volunteerStatus: string;
+  volunteer_status: string;
   name: string;
   about: string;
   phone: string;
   location: string;
   timezone: string;
-  linkedInId: number;
+  linkedInUrl: number;
   slackId: number;
   githubId: number;
+  github_id: number;
+  slack_id: number;
+  linked_in_url: number;
   developerLevel: number;
+  developer_Level: number;
   adminPortalAccess: boolean;
   adminOverallLevel: string;
   verified: boolean;
@@ -78,7 +83,7 @@ export class User extends Database {
   public phone: string;
   public location: string;
   public timezone: string;
-  public linkedInId: number;
+  public linkedInUrl: number;
   public slackId: number;
   public githubId: number;
   public developerLevel: number;
@@ -103,7 +108,7 @@ export class User extends Database {
     this.phone = null;
     this.location = null;
     this.timezone = null;
-    this.linkedInId = null;
+    this.linkedInUrl = null;
     this.slackId = null;
     this.githubId = null;
     this.developerLevel = null;
@@ -114,6 +119,22 @@ export class User extends Database {
     this.salt = null;
   }
 
+  public async getCompleteProfile() {
+    if (_.isNil(this.userId)) {
+      return Promise.reject(new Error(`userId is null or undefined while attempt to check existence`));
+    }
+
+    // TODO Will need to merge position_id with a join with the correct position of the volunteer
+    return this.knex('volunteer')
+      .where('volunteer_id', this.userId)
+      .select(
+        'about', 'developer_level', 'email', 'github_id', 'linked_in_url', 'location',
+        'name', 'phone', 'position_id', 'slack_id', 'timezone', 'username', 'verified', 'volunteer_status')
+      .first()
+      .then((volunteer: IVolunteer) => this.setVolunteerContent(volunteer))
+      .then(() => Promise.resolve(this.getProfile()))
+      .catch((error: Error) => Promise.reject(error));
+  }
   /**
    * Used the userId to check to see if it exists and returns the volunteer details, which are
    * volunteer_id, username, email, password, salt and verified
@@ -160,11 +181,22 @@ export class User extends Database {
    */
   public async setVolunteerContent(volunteer: IVolunteer): Promise<void> {
     this.userId = volunteer.volunteer_id;
-    this.username = volunteer.username;
-    this.email = volunteer.email;
-    this.password = volunteer.password;
     this.salt = volunteer.salt;
+    this.password = volunteer.password;
+    this.about = volunteer.about;
+    this.developerLevel = volunteer.developer_Level;
+    this.email = volunteer.email;
+    this.githubId = volunteer.github_id;
+    this.linkedInUrl = volunteer.linked_in_url;
+    this.location = volunteer.location;
+    this.name = volunteer.name;
+    this.phone = volunteer.phone;
+    this.position = volunteer.position;
+    this.slackId = volunteer.slack_id;
+    this.timezone = volunteer.timezone;
+    this.username = volunteer.username;
     this.verified = volunteer.verified;
+    this.volunteerStatus = volunteer.volunteer_status;
     this.doesExist = true;
     return Promise.resolve();
   }
@@ -180,7 +212,7 @@ export class User extends Database {
       developer_level: _.defaultTo(this.developerLevel, ''),
       email: _.defaultTo(this.email, ''),
       github_id: _.defaultTo(this.githubId, ''),
-      linked_in_id: _.defaultTo(this.linkedInId, ''),
+      linked_in_url: _.defaultTo(this.linkedInUrl, ''),
       location: _.defaultTo(this.location, ''),
       name: _.defaultTo(this.name, ''),
       phone: _.defaultTo(this.phone, ''),
