@@ -182,7 +182,7 @@ describe('Volunteer Component', () => {
             assert.equal(_.isNil(profile.developer_level), false, 'developer_level should be returned from getProfile');
             assert.equal(_.isNil(profile.email), false, 'email should be returned from getProfile');
             assert.equal(_.isNil(profile.github_id), false, 'github_id should be returned from getProfile');
-            assert.equal(_.isNil(profile.linked_in_url), false, 'linked_in_url should be returned from getProfile');
+            assert.equal(_.isNil(profile.linked_in_id), false, 'linked_in_id should be returned from getProfile');
             assert.equal(_.isNil(profile.location), false, 'location should be returned from getProfile');
             assert.equal(_.isNil(profile.name), false, 'name should be returned from getProfile');
             assert.equal(_.isNil(profile.phone), false, 'phone should be returned from getProfile');

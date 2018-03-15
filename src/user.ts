@@ -17,12 +17,14 @@ export interface IVolunteer {
   phone: string;
   location: string;
   timezone: string;
-  linkedInUrl: number;
-  slackId: number;
-  githubId: number;
-  github_id: number;
-  slack_id: number;
-  linked_in_url: number;
+  linkedInId: number;
+  slackId: string;
+  githubId: string;
+  github_id: string;
+  slack_id: string;
+  twitter_id: string;
+  linked_in_id: string;
+  picture_url: string;
   developerLevel: number;
   developer_Level: number;
   adminPortalAccess: boolean;
@@ -83,9 +85,11 @@ export class User extends Database {
   public phone: string;
   public location: string;
   public timezone: string;
-  public linkedInUrl: number;
-  public slackId: number;
-  public githubId: number;
+  public linkedInId: string;
+  public pictureUrl: string;
+  public slackId: string;
+  public githubId: string;
+  public twitterId: string;
   public developerLevel: number;
   public adminPortalAccess: boolean;
   public adminOverallLevel: string;
@@ -108,9 +112,11 @@ export class User extends Database {
     this.phone = null;
     this.location = null;
     this.timezone = null;
-    this.linkedInUrl = null;
+    this.linkedInId = null;
     this.slackId = null;
     this.githubId = null;
+    this.twitterId = null;
+    this.pictureUrl = null;
     this.developerLevel = null;
     this.adminPortalAccess = null;
     this.adminOverallLevel = null;
@@ -128,7 +134,7 @@ export class User extends Database {
     return this.knex('volunteer')
       .where('volunteer_id', this.userId)
       .select(
-        'about', 'developer_level', 'email', 'github_id', 'linked_in_url', 'location',
+        'about', 'developer_level', 'email', 'github_id', 'linked_in_id', 'twitter_id', 'location', 'picture_url',
         'name', 'phone', 'position_id', 'slack_id', 'timezone', 'username', 'verified', 'volunteer_status')
       .first()
       .then((volunteer: IVolunteer) => this.setVolunteerContent(volunteer))
@@ -187,7 +193,9 @@ export class User extends Database {
     this.developerLevel = volunteer.developer_Level;
     this.email = volunteer.email;
     this.githubId = volunteer.github_id;
-    this.linkedInUrl = volunteer.linked_in_url;
+    this.twitterId = volunteer.twitter_id;
+    this.linkedInId = volunteer.linked_in_id;
+    this.pictureUrl = volunteer.picture_url;
     this.location = volunteer.location;
     this.name = volunteer.name;
     this.phone = volunteer.phone;
@@ -212,13 +220,15 @@ export class User extends Database {
       developer_level: _.defaultTo(this.developerLevel, ''),
       email: _.defaultTo(this.email, ''),
       github_id: _.defaultTo(this.githubId, ''),
-      linked_in_url: _.defaultTo(this.linkedInUrl, ''),
+      linked_in_id: _.defaultTo(this.linkedInId, ''),
       location: _.defaultTo(this.location, ''),
       name: _.defaultTo(this.name, ''),
       phone: _.defaultTo(this.phone, ''),
+      picture_url: _.defaultTo(this.pictureUrl, ''),
       position: _.defaultTo(this.position, ''),
       slack_id: _.defaultTo(this.slackId, ''),
       timezone: _.defaultTo(this.timezone, ''),
+      twitter_id: _.defaultTo(this.twitterId, ''),
       username: _.defaultTo(this.username, ''),
       verified: _.defaultTo(this.verified, ''),
       volunteer_id: _.defaultTo(this.userId, ''),
