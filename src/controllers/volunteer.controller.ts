@@ -393,6 +393,9 @@ export async function markNotificationAsRead(req: Request, res: Response, next: 
   }
 }
 
+/**
+ * Gets the full  profile for a user, good for user login
+ */
 export async function gatherVolunteerProfile(req: Request, res: Response, next: NextFunction) {
   const decodedToken: IToken = req.body.decoded;
 
@@ -404,6 +407,27 @@ export async function gatherVolunteerProfile(req: Request, res: Response, next: 
   try {
     await volunteer.existsById();
     const profile = await volunteer.getCompleteProfile();
+
+    res.status(200).send({ message: 'Volunteer Profile', content: { volunteer: profile } });
+  } catch (error) {
+    next(new ApiError(req, res, error, 500, 'User Existing', constants.UNKNOWN_ERROR));
+  }
+}
+
+/**
+ * Gets the general required profile for a user, good for community searching
+ */
+export async function gatherPartialVolunteerProfile(req: Request, res: Response, next: NextFunction) {
+  const volunteerId: number = req.params.volunteerId;
+
+  if (_.isNil(volunteerId)) {
+    return res.status(400).send({ error: 'Volunteer id missing', description: 'The volunteer id is missing to request the profile' });
+  }
+  const volunteer = new Volunteer(volunteerId);
+
+  try {
+    await volunteer.existsById();
+    const profile = await volunteer.getProfile();
 
     res.status(200).send({ message: 'Volunteer Profile', content: { volunteer: profile } });
   } catch (error) {
