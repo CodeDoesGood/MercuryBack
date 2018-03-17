@@ -23,7 +23,7 @@ app.use(cors());
 app.use(rateLimit);
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
-app.use('/api', indexRoute);
+app.use('/api/v1', indexRoute);
 app.use(logErrors);
 
 app.listen(port, () => {
