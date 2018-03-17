@@ -63,9 +63,14 @@ router[vol.PASSWORD.UPDATE.method](vol.PASSWORD.UPDATE.link, [
       Profile
 ******************/
 
-router[vol.PROFILE.GET.method](vol.PROFILE.GET.link, [
+router[vol.PROFILE.GETFULL.method](vol.PROFILE.GET.link, [
   authentication.checkAuthenticationToken.bind(this),
   volunteer.gatherVolunteerProfile.bind(this),
+]);
+
+router[vol.PROFILE.GETPARTIAL.method](vol.PROFILE.GET.link, [
+  authentication.checkAuthenticationToken.bind(this),
+  volunteer.gatherPartialVolunteerProfile.bind(this),
 ]);
 
 router[vol.PROFILE.REMOVE.method](vol.PROFILE.REMOVE.link, [infrastructure.unavailable.bind(this)]);

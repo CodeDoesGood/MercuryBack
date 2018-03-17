@@ -50,9 +50,13 @@ const volunteer = {
   },
 
   PROFILE: {
-    GET:    { link: '/volunteer/profile', method: 'get' },
+    GET:    { link: '/volunteer/profile/', method: 'get' },
     REMOVE: { link: '/volunteer/profile', method: 'delete' },
     UPDATE: { link: '/volunteer/profile', method: 'post' },
+
+    GETFULL: { link: '/volunteer/profile', method: 'get' },
+    // This will return the bare minimal about the profile, this should be used when searching the community
+    GETPARTIAL: { link: '/volunteer/profile/:id', method: 'get' },
   },
 
   NOTIFICATION: {
