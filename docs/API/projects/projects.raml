@@ -1,0 +1,63 @@
+#%RAML 1.0
+title: Projects endpoint
+version: 1
+protocols: [ HTTP ]
+baseUri: /{version}/projects
+mediaType: application/json
+
+types:
+  ProjectsContent:
+    type: object
+    properties:
+      projects: Project[]
+
+  Project:
+    type: object
+    properties:
+      description: string
+      hidden: boolean
+      image_directory: string
+      project_category: number
+      project_id: number
+      status: number
+      summary: string
+      title: string
+
+  Projects:
+    description: A standard projects response
+    type: object
+    example: !include projects.json
+    properties:
+      message: string
+      content: ProjectsContent
+
+/active:
+  get:
+    description: Get a array of projects of all active projects
+    responses:
+      200:
+        body: Projects
+/all:
+  get:
+    description: Get a array of projects of all projects
+    responses:
+      200:
+        body: Projects
+/category/{category_id}:
+  get:
+    description: Get a array of projects of all projects by category id
+    responses:
+      200:
+        body: Projects
+/hidden:
+  get:
+    description: Get a array of projects of all projects that are hidden
+    responses:
+      200:
+        body: Projects
+/status/{status_id}:
+  get:
+    description: Get a array of projects of all projects by status id
+    responses:
+      200:
+        body: Projects

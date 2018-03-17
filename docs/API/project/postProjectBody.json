@@ -1,0 +1,10 @@
+{
+ "project": {
+    "description": "string",
+    "image_directory": "string",
+    "project_category": "number",
+    "status": "number",
+    "summary": "string",
+    "title": "string"
+  }
+}

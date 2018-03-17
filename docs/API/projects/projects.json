@@ -1,0 +1,15 @@
+{
+  "message": "gathered message",
+  "content": {
+    "projects": [{
+      "description": "the project description",
+      "hidden": false,
+      "image_directory": "/images/project/project",
+      "project_category": 1,
+      "project_id": 1,
+      "status": 1,
+      "summary": "the project summary",
+      "title": "the project title"
+    }]
+  }
+}

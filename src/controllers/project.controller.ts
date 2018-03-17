@@ -71,7 +71,7 @@ export function validateProjectCreationContent(req: Request, res: Response, next
   }
 
   _.forEach(projectCreationRequirements, (requirement: string) => {
-    if (!project[requirement]  && !res.headersSent) {
+    if (!project[requirement] && !res.headersSent) {
       return res.status(400).send({ error: 'Project Validation', description: constants.PROJECT_MUST_CONTAIN(requirement) });
     }
   });
@@ -95,7 +95,10 @@ export function createNewProject(req: Request, res: Response) {
 
   project.setContent(projectContent)
     .then(() => project.createNewProject())
-    .then((id: number) => res.status(200).send({ message: `new project ${project.title}`, content: { id, title: project.title } }))
+    .then((id: number) => res.status(200).send({
+      content: { project: { project_id: id, title: project.title } },
+      message: `new project ${project.title}`,
+    }))
     .catch((error: Error) => res.status(500).send({ error: 'Project Creation', description: `error=${error.message}` }));
 }
 
@@ -107,7 +110,7 @@ function validateProjectUpdateContentTypes(req: Request, res: Response, next: Ne
 
   if (!_.isInteger(projectId)) {
     res.status(400).send({ error: 'Project Type Validation', description: constants.PROJECT_TYPE_ID_INVALID });
-  }  else if (!_.isString(project.title)) {
+  } else if (!_.isString(project.title)) {
     res.status(400).send({ error: 'Project Type Validation', description: constants.PROJECT_TYPE_TITLE_INVALID });
   } else if (!_.isInteger(project.status)) {
     res.status(400).send({ error: 'Project Type Validation', description: constants.PROJECT_TYPE_STATUS_INVALID });
