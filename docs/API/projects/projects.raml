@@ -9,6 +9,7 @@ types:
   ProjectsContent:
     type: object
     properties:
+      message: string
       projects: Project[]
 
   Project:
@@ -25,11 +26,8 @@ types:
 
   Projects:
     description: A standard projects response
-    type: object
+    type: ProjectsContent
     example: !include projects.json
-    properties:
-      message: string
-      content: ProjectsContent
 
 /active:
   get:
