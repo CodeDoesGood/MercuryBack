@@ -78,7 +78,7 @@ if (_.isNil(process.env.TRAVIS)) {
 
         return sendStored.sendStoredEmails(jsonPath, stored)
         .then((emails: { emails: IEmailContent[] }) => {
-          assert.equal(_.isNil(emails.emails[0]), true, 'If stored emails are empty the returned array should be empty');
+          assert.equal(_.isNil(emails.emails[0]), true, `If stored emails are empty the array should be empty, emails=${emails.emails}`);
         },    (error: Error) => assert(false, error.message));
       });
     });

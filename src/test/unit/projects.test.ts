@@ -34,7 +34,7 @@ if (_.isNil(process.env.TRAVIS)) {
         return projects.getAllActiveProjects()
           .then((gotProjects) => {
             _.forEach(gotProjects, (project: any) => {
-              assert.equal(project.status === '1', true, 'Status should be marked as active for all active projects');
+              assert.equal(project.status.toLowerCase() === 'online', true, 'Status should be marked as active for all active projects');
             });
           },    (error: Error) => { throw error; });
       });
@@ -60,7 +60,9 @@ if (_.isNil(process.env.TRAVIS)) {
         return projects.getAllProjectsByStatus(1)
           .then((gotProjects) => {
             _.forEach(gotProjects, (project: any) => {
-              assert.equal(project.status === '1', true, 'status should be marked as the passed status id "1" for all projects gathered');
+              assert.equal(
+                project.status.toLowerCase() === 'online', true,
+                'status should be marked as online id "1/Online" for all projects gathered');
             });
           },    (error) => { throw new Error(error); });
       });

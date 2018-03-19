@@ -98,7 +98,7 @@ export class Email {
         this.send(this.username, email.to, email.subject, email.text, email.html)
           .then((info: nodemailer.SentMessageInfo) => {
             logger.info(`[Email] Sent stored email: ${info.messageId}`);
-            updatedStoredEmails.emails.slice(index, 1);
+            updatedStoredEmails.emails =  updatedStoredEmails.emails.slice(index, 1);
             sentEmails += 1;
 
             if (sentEmails === storedEmails.emails.length) {
