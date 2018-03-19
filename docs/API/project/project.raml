@@ -2,7 +2,7 @@
 title: Project endpoint
 version: 1
 protocols: [ HTTP ]
-baseUri: /{version}
+baseUri: api/{version}
 mediaType: application/json
 
 types:
@@ -11,15 +11,13 @@ types:
     type: !include project.json
   
   createdProject:
-    description: The response message you will get when creating a new project
     type: !include projectCreatePostResponse.json
       
   GetProject:
-    description: The response of a get request to the project endpoint
     type: !include projectGetResponse.json
+    example: !include projectGetIdExample.json
   
   PostProject:
-    description: The required body to update a project
     type: !include postProjectBody.json
 
 /project:

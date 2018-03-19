@@ -62,7 +62,7 @@ export class Email {
    * @param jsonPath The path to the json file
    * @param passedEmails Overhaul of json stored emails, if this is passed then the stored emails would not be retrieved
    */
-  public async sendStoredEmails(jsonPath: string, passedEmails?: IEmailContent[]) {
+  public async sendStoredEmails(jsonPath: string, passedEmails?: IEmailContent[]): Promise<{ emails: IEmailContent[] } | any>  {
     if (!this.online) {
       return Promise.reject(new Error(`[Email] Service must be online to send stored emails`));
     }

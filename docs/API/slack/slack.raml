@@ -1,0 +1,21 @@
+#%RAML 1.0
+title: Slack endpoint
+version: 1
+protocols: [ HTTP ]
+baseUri: api/{version}/slack
+mediaType: application/json
+
+types:
+  SlackHealth:
+    description: slack health response
+    type: object
+    example: { "message":  "Health check sent to slack" }
+    properties:
+      message: string
+
+/health:
+  get:
+    description: Sends a slack message to the slack group of the health of the server
+    responses:
+      200:
+        body: SlackHealth

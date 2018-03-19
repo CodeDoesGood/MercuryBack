@@ -1,0 +1,15 @@
+{
+  "message": "Gathered project 1/Helping Hands",
+  "content": {
+    "project": {
+      "created_datetime": "2017-12-04T00:00:00.000Z",
+      "description": "Helping Hands",
+      "image_directory": "",
+      "project_category": "IOS",
+      "project_id": 1,
+      "status": "Online",
+      "summary": "Helping Hands",
+      "title": "Helping Hands"
+    }
+  }
+}

@@ -2,60 +2,56 @@
 title: Projects endpoint
 version: 1
 protocols: [ HTTP ]
-baseUri: /{version}/projects
+baseUri: api/{version}/projects
 mediaType: application/json
-
-types:
-  ProjectsContent:
-    type: object
-    properties:
-      message: string
-      projects: Project[]
-
-  Project:
-    type: object
-    properties:
-      description: string
-      hidden: boolean
-      image_directory: string
-      project_category: number
-      project_id: number
-      status: number
-      summary: string
-      title: string
-
-  Projects:
-    description: A standard projects response
-    type: ProjectsContent
-    example: !include projects.json
 
 /active:
   get:
     description: Get a array of projects of all active projects
+    example: !include projects.json
     responses:
       200:
-        body: Projects
+        body:
+          application/json:
+            type: !include projectsReponse.json
+            example: !include projects.json
 /all:
   get:
     description: Get a array of projects of all projects
     responses:
       200:
-        body: Projects
+        body:
+          application/json:
+            type: !include projectsReponse.json
+            example: !include projects.json
+
 /category/{category_id}:
   get:
     description: Get a array of projects of all projects by category id
+    example: !include projects.json
     responses:
       200:
-        body: Projects
+        body:
+          application/json:
+            type: !include projectsReponse.json
+            example: !include projects.json
 /hidden:
   get:
     description: Get a array of projects of all projects that are hidden
+    example: !include projects.json
     responses:
       200:
-        body: Projects
+        body:
+          application/json:
+            type: !include projectsReponse.json
+            example: !include projects.json
 /status/{status_id}:
   get:
     description: Get a array of projects of all projects by status id
+    example: !include projects.json
     responses:
       200:
-        body: Projects
+        body:
+          application/json:
+            type: !include projectsReponse.json
+            example: !include projects.json

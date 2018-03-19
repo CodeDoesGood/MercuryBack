@@ -1,0 +1,10 @@
+{
+  "message": "Updated services and restarted",
+  "content": {
+    "updated": {
+      "user": "contact@codedoesgood.org",
+      "service": "gmail",
+      "secure": true
+    }
+  }
+}

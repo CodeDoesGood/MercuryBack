@@ -1,0 +1,10 @@
+{
+  "message": "string",
+  "content": {
+    "updated": {
+      "user": "string",
+      "secure": "boolean",
+      "service": "string"
+    }
+  }
+}

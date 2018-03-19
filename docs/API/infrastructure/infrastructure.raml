@@ -2,22 +2,16 @@
 title: Infrastructure endpoint
 version: 1
 protocols: [ HTTP ]
-baseUri: /{version}/infrastructure
+baseUri: api/{version}/infrastructure
 mediaType: application/json
 
 types:
-  Testing:
-    properties:
-      testing: string
-
-
   Hello:
     description: A infrastructure up response
     type: object
     example: { "message":  "hello" }
     properties:
       message: string
-      banna: Testing
 
 /hello:
   get:

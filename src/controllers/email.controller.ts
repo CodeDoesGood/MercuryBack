@@ -296,7 +296,7 @@ export async function reverifyTheService(req: Request, res: Response, next: Next
 export async function sendStoredLateEmails(req: Request, res: Response, next: NextFunction) {
   try {
     const storedJsonPath = emailClient.getEmailJsonPath();
-    const failedStored = await emailClient.sendStoredEmails(storedJsonPath);
+    const failedStored: { emails: IEmailContent[] } = await emailClient.sendStoredEmails(storedJsonPath);
     res.status(200).send({ message: 'Sent stored emails, returned emails that failed to send', content: failedStored });
   } catch (error) {
     next(new ApiError(req, res, error, 500, 'Stored Emails', constants.EMAIL_FAILED_SEND_STORED(error)));
@@ -325,7 +325,7 @@ export async function removeStoredEmailByIndex(req: Request, res: Response, next
     const updatedEmails: IEmailContent[] | Error = await emailClient.removeStoredEmailByIndex(emailIndex);
     const message = `Removed stored email ${emailIndex}`;
 
-    res.status(200).send({ message, content: { email_removed: emailIndex, updated:updatedEmails } });
+    res.status(200).send({ message, content: { email_removed: emailIndex, updated: updatedEmails } });
   } catch (error) {
     next(new ApiError(req, res, error, 500, 'Remove late Emails', error.message));
   }
@@ -365,7 +365,7 @@ export async function updateStoredEmailByIndex(req: Request, res: Response, next
  * with the password redacted.
  */
 export function sendAdminServiceDetails(req: Request, res: Response) {
-  res.status(200).send({ message: 'Email Service Details', content: emailClient.getServiceConfig() });
+  res.status(200).send({ message: 'Email Service Details', content: { service:  emailClient.getServiceConfig() } });
 }
 
 export function validateUpdatedServiceDetails(req: Request, res: Response, next: NextFunction) {

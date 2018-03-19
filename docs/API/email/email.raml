@@ -1,0 +1,98 @@
+#%RAML 1.0
+title: Email endpoint
+version: 1
+protocols: [ HTTP ]
+baseUri: api/{version}/email
+mediaType: application/json
+
+types:
+  GetService:
+    type: !include serviceGetResponse.json
+    example: !include serviceGetResponseExample.json
+
+  PostService:
+    type: !include servicePostResponse.json
+    example: !include servicePostResponseExample.json
+
+  PostServiceBody:
+    type: !include servicePostBody.json
+    example: !include servicePostBodyExample.json
+
+  RestartService:
+    type: !include serviceRestartGetResponse.json
+    example: !include serviceRestartGetResponseExample.json
+
+  PasswordUpdate:
+    type: !include serviceRestartGetResponse.json
+    example: !include servicePasswordUpdateExample.json
+
+  StoredGet:
+    type: !include storedEmailGetResponse.json
+    example: !include storedEmailGetResponseExample.json
+
+  StoredSendGet:
+    type: !include storedEmailGetResponse.json
+    example: !include storedEmailSendExample.json
+
+  StoredIdUpdate:
+    type: !include updateEmailPostResponse.json
+    example: !include updateEmailPostResponseExample.json
+
+  StoredIdDelete:
+    type: !include removeEmailDeleteReponse.json
+    example: !include removeEmailDeleteResponseExample.json
+
+/service:
+  description: Sends the administration service details to the requesting user
+  get:
+    description: Gets the current state of the email service
+    responses:
+      200:
+        body: GetService
+  post:
+    description: Update the existing email service content and get the updated response back
+    body: PostServiceBody
+    responses:
+      200:
+        body: PostService
+  /restart:
+    description: Restarts the email service which deals with sending emails
+    get:
+      responses:
+        200:
+          body: RestartService
+
+  /password:
+    post:
+      description: Update the existing password for the email service
+      body: !include updateServicePasswordPost.json
+      responses:
+        200:
+          body: PasswordUpdate
+
+/stored:
+  description:
+  get:
+    description: Gets a array of emails that are currently stored to be sent later
+    responses:
+      200:
+        body: StoredGet
+  /send:
+    get:
+      description: Attempts to send any emails that are being stored to be sent later, returns list of failed emails
+      responses:
+        200:
+          body: StoredSendGet
+  /{email_id}:
+    post:
+      description: Update a stored late email by id, response of updated email and if updated
+      body: !include updateEmailPostEmail.json
+      responses:
+        200:
+          body: StoredIdUpdate
+    delete:
+      description: Remove a late stored email by id, returns list of new stored emails
+      responses:
+        200:
+          body: StoredIdDelete
+

@@ -1,15 +1,18 @@
 {
-  "message": "gathered message",
+  "message": "Message based on query",
   "content": {
-    "projects": [{
-      "description": "the project description",
-      "hidden": false,
-      "image_directory": "/images/project/project",
-      "project_category": 1,
-      "project_id": 1,
-      "status": 1,
-      "summary": "the project summary",
-      "title": "the project title"
-    }]
+    "projects": [
+      {
+        "project_id": 1,
+        "created_datetime": "2017-12-04T00:00:00.000Z",
+        "title": "Helping Hands",
+        "status": "Online",
+        "project_category": "IOS",
+        "image_directory": "/projects/helpinghands/images/cover.png",
+        "description": "Helping Hands",
+        "summary": "Helping Hands",
+        "data_entry_user_id": 1
+      }
+    ]
   }
 }

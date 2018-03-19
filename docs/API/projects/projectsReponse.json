@@ -1,0 +1,16 @@
+{
+  "message": "string",
+  "content": {
+    "projects": [{
+      "project_id": "string",
+      "created_datetime": "string",
+      "title": "string",
+      "status": "string",
+      "project_category": "string",
+      "image_directory": "string",
+      "description": "string",
+      "summary": "string",
+      "data_entry_user_id": "number"
+    }]
+  }
+}
