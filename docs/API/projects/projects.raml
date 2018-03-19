@@ -5,25 +5,41 @@ protocols: [ HTTP ]
 baseUri: api/{version}/projects
 mediaType: application/json
 
+types:
+  ActiveGet:
+    type: !include projectsReponse.json
+    example: !include projects.json
+
+  AllGet:
+    type: !include projectsReponse.json
+    example: !include projects.json
+
+  CategoryIdGet:
+    type: !include projectsReponse.json
+    example: !include projects.json
+
+  HiddenIdGet:
+    type: !include projectsReponse.json
+    example: !include projects.json
+
+  StatusGet:
+    type: !include projectsReponse.json
+    example: !include projects.json
+
 /active:
   get:
     description: Get a array of projects of all active projects
     example: !include projects.json
     responses:
       200:
-        body:
-          application/json:
-            type: !include projectsReponse.json
-            example: !include projects.json
+        body: ActiveGet
+
 /all:
   get:
     description: Get a array of projects of all projects
     responses:
       200:
-        body:
-          application/json:
-            type: !include projectsReponse.json
-            example: !include projects.json
+        body: AllGet
 
 /category/{category_id}:
   get:
@@ -31,27 +47,20 @@ mediaType: application/json
     example: !include projects.json
     responses:
       200:
-        body:
-          application/json:
-            type: !include projectsReponse.json
-            example: !include projects.json
+        body: CategoryIdGet
+
 /hidden:
   get:
     description: Get a array of projects of all projects that are hidden
     example: !include projects.json
     responses:
       200:
-        body:
-          application/json:
-            type: !include projectsReponse.json
-            example: !include projects.json
+        body: HiddenIdGet
+
 /status/{status_id}:
   get:
     description: Get a array of projects of all projects by status id
     example: !include projects.json
     responses:
       200:
-        body:
-          application/json:
-            type: !include projectsReponse.json
-            example: !include projects.json
+        body: StatusGet
