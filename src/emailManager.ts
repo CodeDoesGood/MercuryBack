@@ -230,11 +230,13 @@ export class EmailManager extends Database {
    * Returns the current service configuration that is used to connect and make
    * the email client.
    */
-  public getServiceConfig = (): IEmailServices => ({
-    secure: true,
-    service: this.configuration.service,
-    user: this.configuration.email,
-  });
+  public getServiceConfig(): IEmailServices {
+    return {
+      secure: true,
+      service: this.configuration.service,
+      user: this.configuration.email,
+    };
+  }
 
   /**
    * Builds the transporter from nodemailer that will be used to send the emails.
