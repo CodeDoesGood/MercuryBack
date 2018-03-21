@@ -1,0 +1,10 @@
+{
+  "message": "Email Service Details",
+  "content": {
+    "service": {
+      "secure": true,
+      "service": "gmail",
+      "user": "contact@codedoesgood.org"
+    }
+  }
+}

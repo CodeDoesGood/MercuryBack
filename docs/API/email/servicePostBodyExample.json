@@ -1,0 +1,7 @@
+{
+  "service": {
+    "user": "contact@codedoesgood.org",
+    "service": "gmail",
+    "secure": true
+  }
+}

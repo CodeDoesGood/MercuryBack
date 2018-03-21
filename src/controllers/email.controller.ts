@@ -6,25 +6,29 @@ import { NextFunction, Request, Response } from 'express';
 import ApiError from '../ApiError';
 import { Configuration } from '../configuration';
 import constants from '../constants/constants';
-import { Email, IEmailContent } from '../email';
+import { Email } from '../email';
+import { EmailManager, IEmailContent } from '../emailManager';
 import { logger } from '../logger';
 import { Volunteer } from '../volunteer';
 
 const config = new Configuration();
-const emailClient = new Email(config.getKey('email'));
+const emailManager = new EmailManager(config.getKey('email'));
 
-emailClient.verify()
-.then(() => {
-  return emailClient.sendStoredEmails(emailClient.getEmailJsonPath());
-})
-.then(() => logger.info(`[Email] Email Client is ready, service=${emailClient.getService()}, email=${emailClient.username}`))
-.catch(error => logger.error(`[Email] Error creating email connection, error=${error}`));
+const verified = async () => {
+  try {
+    await emailManager.verify();
+    await emailManager.sendStoredEmails(emailManager.getEmailJSONPath());
+    logger.info(`[Email] Email Client is ready, service=${emailManager.getService()}, email=${emailManager.getUsername()}`);
+  } catch (error) {
+    logger.error(`[Email] Error creating email connection, error=${error}`);
+  }
+};
 
 /**
  * Get the resend details from the get params of the request
  */
 export function getResendVerifyDetails(req: Request, res: Response, next: NextFunction) {
-  const { username }: { username: string; } = req.params;
+  const { username }: { username: string } = req.params;
   req.body.username = username;
   next();
 }
@@ -37,7 +41,7 @@ export function getResendVerifyDetails(req: Request, res: Response, next: NextFu
 export function validateConnectionStatus(req: Request, res: Response, next: NextFunction) {
   const email: IEmailContent = req.body.email;
 
-  if (emailClient.getStatus()) {
+  if (emailManager.getEmailOnline()) {
     next();
   } else {
     const jsonPath: string = config.getKey('email').stored;
@@ -46,7 +50,6 @@ export function validateConnectionStatus(req: Request, res: Response, next: Next
     storedEmails.emails.push(email);
 
     fs.writeFileSync(jsonPath, JSON.stringify(storedEmails, null, '\t'));
-
     res.status(503).send({ error: 'Email Service', description: constants.EMAIL_UNAVAILABLE });
   }
 }
@@ -70,17 +73,10 @@ export function createVerificationEmail(req: Request, res: Response, next: NextF
     verificationLink = `http://localhost:8080/verify/${volunteer.username}/${code}`;
   }
 
-  const emailToSend: IEmailContent = {
-    from: config.getKey('email').email,
-    html: verificationLink,
-    subject: '[CodeDoesGood] Verification Email',
-    text: verificationLink,
-    to: req.body.volunteer.email,
-  };
-
+  const email = new Email(volunteer.email, '[CodeDoesGood] Verification Email', verificationLink, verificationLink);
   const message: string = `Account ${volunteer.username} created, you will soon get a verification email`;
 
-  req.body.email = emailToSend;
+  req.body.email = email;
   req.body.message = message;
   next();
 }
@@ -92,19 +88,13 @@ export function createVerificationEmail(req: Request, res: Response, next: NextF
  * @param req.body.message A string containing the message to be sent after the email has been sent
  */
 export async function sendEmail(req: Request, res: Response) {
-  const { email, message }: { email: IEmailContent; message: string; } = req.body;
-
-  const to: string = email.to;
-  const from: string = email.from;
-  const subject: string = email.subject;
-  const text: string = email.text;
-  const html: string = email.html;
+  const { email, message }: { email: Email; message: string } = req.body;
 
   try {
-    await emailClient.send(from, to, subject, text, html);
+    await emailManager.send(email);
     res.status(200).send({ message });
   } catch (error) {
-    logger.error(`Error attempting to send a email. to=${to} from=${from}, error=${error}`);
+    logger.error(`Error attempting to send a email. to=${email.to}, error=${error}`);
     return res.status(503).send({ error: 'Unavailable Service', description: constants.EMAIL_UNAVAILABLE });
   }
 }
@@ -114,27 +104,19 @@ export async function sendEmail(req: Request, res: Response) {
  * to confirm there current email address.
  */
 export function createResendVerificationEmail(req: Request, res: Response, next: NextFunction) {
-  const { volunteer }: { volunteer: Volunteer } = req.body;
-  const code: string = req.body.verificationCode;
+  const { volunteer, verificationCode }: { volunteer: Volunteer; verificationCode } = req.body;
   let verificationLink: string;
 
   if (config.getKey('online')) {
-    verificationLink = `${config.getKey('online_address')}/verify/${volunteer.username}/${code}`;
+    verificationLink = `${config.getKey('online_address')}/verify/${volunteer.username}/${verificationCode}`;
   } else {
-    verificationLink = `http://localhost:8080/verify/${volunteer.username}/${code}`;
+    verificationLink = `http://localhost:8080/verify/${volunteer.username}/${verificationCode}`;
   }
 
-  const emailToSend: IEmailContent = {
-    from: config.getKey('email').email,
-    html: verificationLink,
-    subject: '[CodeDoesGood] Resend-Verification Email',
-    text: verificationLink,
-    to: req.body.volunteer.email,
-  };
-
+  const email = new Email(volunteer.email, '[CodeDoesGood] Resend-Verification Email', verificationLink, verificationLink);
   const message: string = `Resent new verification email for ${volunteer.username}`;
 
-  req.body.email = emailToSend;
+  req.body.email = email;
   req.body.message = message;
   next();
 }
@@ -162,7 +144,7 @@ export async function createResendVerificationCode(req: Request, res: Response, 
       res.status(400).send({ error: 'verification exists', description: constants.VOLUNTEER_IS_VERIFIED(volunteer.username) });
     }
   } catch (error) {
-    res.status(500).send({ error:'Authentication', description: constants.FAILED_VOLUNTEER_GET(error) });
+    res.status(500).send({ error: 'Authentication', description: constants.FAILED_VOLUNTEER_GET(error) });
   }
 }
 
@@ -172,35 +154,23 @@ export async function createResendVerificationCode(req: Request, res: Response, 
  * to reset the users password.
  */
 export function createPasswordResetLinkToRequestingEmail(req: Request, res: Response, next: NextFunction) {
-  const { volunteer } = req.body;
-  const { username, email }: { username: string; email: string; } = volunteer;
-
-  const code: number = req.body.resetPasswordCode;
-
+  const { volunteer, resetPasswordCode } = req.body;
   let link: string;
 
   if (config.getKey('online')) {
-    link = `${config.getKey('online_address')}/reset/${username}/${code}`;
+    link = `${config.getKey('online_address')}/reset/${volunteer.username}/${resetPasswordCode}`;
   } else {
-    link = `http://localhost:8080/reset/${username}/${code}`;
+    link = `http://localhost:8080/reset/${volunteer.username}/${resetPasswordCode}`;
   }
 
-  const content: string = `A password reset has been requested for the Volunteer: ${username}. If you did not make this request you ` +
+  const content: string =
+    `A password reset has been requested for the Volunteer: ${volunteer.username}. If you did not make this request you ` +
     `can safely ignore this email.\\n\\nIf you do actually want to reset your password, visit this link: ${link}`;
 
-  logger.info(`Created password reset link for user=${username}, link=${link}`);
-
-  const emailToSend: IEmailContent = {
-    from: config.getKey('email').email,
-    html: content,
-    subject: '[CodeDoesGood] Password Reset Email',
-    text: content,
-    to: email,
-  };
-
+  const email = new Email(volunteer.email, '[CodeDoesGood] Password Reset Email', content, content);
   const message = constants.EMAIL_RESET_SENT;
 
-  req.body.email = emailToSend;
+  req.body.email = email;
   req.body.message = message;
   next();
 }
@@ -216,24 +186,32 @@ export function validateContactUsRequestInformation(req: Request, res: Response,
 
   let valid: boolean = true;
 
-  const sender: { name: string; email: string; subject: string; text: string; } = {
-    email: senderEmail, name: senderName, subject: senderSubject, text: senderText,
+  const sender: { name: string; email: string; subject: string; text: string } = {
+    email: senderEmail,
+    name: senderName,
+    subject: senderSubject,
+    text: senderText,
   };
 
-  _.forEach(sender, (item) => { if (_.isNil(item)) { valid = false; } });
+  _.forEach(sender, (item) => {
+    if (_.isNil(item)) {
+      valid = false;
+    }
+  });
 
   if (!valid) {
     return res.status(400).send({ error: 'Invalid fields', description: constants.EMAIL_FIELDS_REQUIRED });
   }
 
-  if (sender.name.length > constants.EMAIL_MAX_LENGTH ||
+  if (
+    sender.name.length > constants.EMAIL_MAX_LENGTH ||
     sender.email.length > constants.EMAIL_MAX_LENGTH ||
-    sender.subject.length > constants.EMAIL_MAX_LENGTH) {
+    sender.subject.length > constants.EMAIL_MAX_LENGTH
+  ) {
     return res.status(400).send({ error: 'Invalid length', description: constants.EMAIL_AND_NAME_LENGTH });
   }
 
-  if (sender.text.length > constants.EMAIL_BODY_MAX_LENGTH ||
-    sender.text.length < constants.EMAIL_BODY_MIN_LENGTH) {
+  if (sender.text.length > constants.EMAIL_BODY_MAX_LENGTH || sender.text.length < constants.EMAIL_BODY_MIN_LENGTH) {
     return res.status(400).send({ error: 'Invalid length', description: constants.EMAIL_BODY_LENGTH });
   }
 
@@ -254,15 +232,15 @@ export function denyInvalidAndBlockedDomains(req: Request, res: Response, next: 
  * email to the default CodeDoesGood inbox.
  */
 export async function sendContactUsRequestInbox(req: Request, res: Response, next: NextFunction) {
-  const { sender }: { sender: { name: string; email: string; subject: string; text: string; } } = req.body;
+  const { sender }: { sender: { name: string; email: string; subject: string; text: string } } = req.body;
 
   try {
-    await emailClient.send(sender.email, config.getKey('email').email, sender.subject, sender.text, sender.text);
+    const email = new Email(sender.email, sender.subject, sender.text, sender.text);
+    await emailManager.send(email);
     res.sendStatus(200);
   } catch (error) {
     const errorMessage = `Error sending email. to=${config.getKey('email').email} from=${sender.email}, error=${error.message}`;
     const formattedError = Object.assign(error, { message: errorMessage });
-
     next(new ApiError(req, res, formattedError, 503, 'Unavailable Service', constants.EMAIL_UNAVAILABLE));
   }
 }
@@ -271,7 +249,7 @@ export async function sendContactUsRequestInbox(req: Request, res: Response, nex
  * Sends OK or Internal Server Error based on the true / false email status.
  */
 export function sendContactUsEmailStatus(req: Request, res: Response) {
-  if (emailClient.getStatus()) {
+  if (emailManager.getEmailOnline()) {
     res.sendStatus(200);
   } else {
     res.status(503).send({ error: 'Unavailable Service', description: constants.EMAIL_UNAVAILABLE });
@@ -283,7 +261,7 @@ export function sendContactUsEmailStatus(req: Request, res: Response) {
  */
 export async function reverifyTheService(req: Request, res: Response, next: NextFunction) {
   try {
-    await emailClient.verify();
+    await emailManager.verify();
     res.status(200).send({ message: 'Email service restarted successfully' });
   } catch (error) {
     next(new ApiError(req, res, error, 500, 'Email service', constants.EMAIL_VERIFY_FAILED(error)));
@@ -295,8 +273,8 @@ export async function reverifyTheService(req: Request, res: Response, next: Next
  */
 export async function sendStoredLateEmails(req: Request, res: Response, next: NextFunction) {
   try {
-    const storedJsonPath = emailClient.getEmailJsonPath();
-    const failedStored = await emailClient.sendStoredEmails(storedJsonPath);
+    const storedJsonPath = emailManager.getEmailJSONPath();
+    const failedStored: { emails: IEmailContent[] } = await emailManager.sendStoredEmails(storedJsonPath);
     res.status(200).send({ message: 'Sent stored emails, returned emails that failed to send', content: failedStored });
   } catch (error) {
     next(new ApiError(req, res, error, 500, 'Stored Emails', constants.EMAIL_FAILED_SEND_STORED(error)));
@@ -307,7 +285,7 @@ export async function sendStoredLateEmails(req: Request, res: Response, next: Ne
  * Sends stored emails to requesting client
  */
 export function retrieveStoredLateEmails(req: Request, res: Response) {
-  const storedEmails: { emails: IEmailContent[] } = emailClient.getStoredEmails();
+  const storedEmails: { emails: IEmailContent[] } = emailManager.getStoredEmails();
   res.status(200).send({ message: 'stored late emails', content: { emails: storedEmails.emails } });
 }
 
@@ -322,10 +300,10 @@ export async function removeStoredEmailByIndex(req: Request, res: Response, next
   const emailIndex = parseInt(req.params.email_id, 10);
 
   try {
-    const updatedEmails: IEmailContent[] | Error = await emailClient.removeStoredEmailByIndex(emailIndex);
+    const updatedEmails: IEmailContent[] | Error = await emailManager.removeStoredEmailByIndex(emailIndex);
     const message = `Removed stored email ${emailIndex}`;
 
-    res.status(200).send({ message, content: { email_removed: emailIndex, updated:updatedEmails } });
+    res.status(200).send({ message, content: { email_removed: emailIndex, updated: updatedEmails } });
   } catch (error) {
     next(new ApiError(req, res, error, 500, 'Remove late Emails', error.message));
   }
@@ -351,7 +329,7 @@ export async function updateStoredEmailByIndex(req: Request, res: Response, next
   }
 
   try {
-    const updatedEmails: IEmailContent[] | Error = await emailClient.replaceStoredEmailByIndex(emailIndex, email);
+    const updatedEmails: IEmailContent[] | Error = await emailManager.replaceStoredEmailByIndex(emailIndex, email);
     const message: string = `Updated stored email ${emailIndex}`;
 
     res.status(200).send({ message, content: { email_updated: emailIndex, updated: updatedEmails } });
@@ -361,18 +339,18 @@ export async function updateStoredEmailByIndex(req: Request, res: Response, next
 }
 
 /**
- * Sends the emailClient service details to the requesting administrator
+ * Sends the emailManager service details to the requesting administrator
  * with the password redacted.
  */
 export function sendAdminServiceDetails(req: Request, res: Response) {
-  res.status(200).send({ message: 'Email Service Details', content: emailClient.getServiceConfig() });
+  res.status(200).send({ message: 'Email Service Details', content: { service: emailManager.getServiceConfig() } });
 }
 
 export function validateUpdatedServiceDetails(req: Request, res: Response, next: NextFunction) {
   const requiredObjects: string[] = ['user', 'service', 'secure'];
 
   if (_.isNil(req.body.service)) {
-    return res.status(500).send({ error: 'Service update', description: constants.EMAIL_SERVICE_OBJECT_REQUIRED  });
+    return res.status(500).send({ error: 'Service update', description: constants.EMAIL_SERVICE_OBJECT_REQUIRED });
   }
 
   const service = _.pick(req.body.service, requiredObjects);
@@ -392,7 +370,7 @@ export function validateUpdatedServiceDetails(req: Request, res: Response, next:
 export async function updateServiceDetails(req: Request, res: Response, next: NextFunction) {
   try {
     const updatedServices = req.body.service;
-    await emailClient.updateServiceDetails(updatedServices, config.getKey('email').password);
+    await emailManager.updateServiceDetails(updatedServices, config.getKey('email').password);
 
     const storedConfig = config.getConfiguration();
     storedConfig.email.email = updatedServices.user;
@@ -415,7 +393,7 @@ export async function updateServicePassword(req: Request, res: Response, next: N
   }
 
   try {
-    await emailClient.updateServicePassword(password);
+    await emailManager.updateServicePassword(password);
     const storedConfig = config.getConfiguration();
     storedConfig.email.password = password;
     config.update(storedConfig);

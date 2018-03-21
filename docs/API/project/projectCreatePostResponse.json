@@ -1,0 +1,9 @@
+{
+  "message": "string",
+  "content": {
+    "project": {
+      "project_id": "number",
+      "title": "string"
+    }
+  }
+}

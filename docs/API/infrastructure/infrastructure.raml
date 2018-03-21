@@ -1,0 +1,21 @@
+#%RAML 1.0
+title: Infrastructure endpoint
+version: 1
+protocols: [ HTTP ]
+baseUri: api/{version}/infrastructure
+mediaType: application/json
+
+types:
+  Hello:
+    description: A infrastructure up response
+    type: object
+    example: { "message":  "hello" }
+    properties:
+      message: string
+
+/hello:
+  get:
+    description: A check to see if the infrastucture is up and running
+    responses:
+      200:
+        body: Hello

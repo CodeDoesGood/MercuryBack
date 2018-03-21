@@ -1,0 +1,14 @@
+{
+  "message": "stored late emails",
+  "content": {
+    "emails": [
+      {
+        "from": "contact@codedoesgood.org",
+        "html": "http://localhost:8080/verify/digiteh111/9000329581948",
+        "subject": "[CodeDoesGood] Verification Email",
+        "text": "http://localhost:8080/verify/digiteh111/9000329581948",
+        "to": "email@email.ac.uk"
+      }
+    ]
+  }
+}

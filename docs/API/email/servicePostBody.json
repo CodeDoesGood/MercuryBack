@@ -1,0 +1,7 @@
+{
+  "service": {
+    "user": "string",
+    "service": "string",
+    "secure": "boolean"
+  }
+}

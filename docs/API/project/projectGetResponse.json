@@ -1,0 +1,16 @@
+{
+  "message": "string",
+  "content": {
+    "project": {
+      "created_datetime": "datetime",
+      "description": "string",
+      "hidden": "boolean",
+      "image_directory": "string",
+      "project_category": "number",
+      "project_id": "number",
+      "status": "number",
+      "summary": "string",
+      "title": "string"
+    }
+  }
+}

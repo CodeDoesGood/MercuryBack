@@ -1,0 +1,38 @@
+#%RAML 1.0
+title: Project endpoint
+version: 1
+protocols: [ HTTP ]
+baseUri: api/{version}
+mediaType: application/json
+
+types:
+  Project:
+    description: A standard project
+    type: !include project.json
+  
+  createdProject:
+    type: !include projectCreatePostResponse.json
+      
+  GetProject:
+    type: !include projectGetResponse.json
+    example: !include projectGetIdExample.json
+  
+  PostProject:
+    type: !include postProjectBody.json
+
+/project:
+  post:
+    description: Create a new project
+    body: Project
+    responses:
+      200:
+        body: createdProject
+  /{project_id}:
+    get:
+      description: Get a existing project by a project id
+      responses:
+        200:
+          body: GetProject
+    post:
+      description: update a existing project by id
+      body: PostProject
