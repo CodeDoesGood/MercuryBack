@@ -5,7 +5,7 @@ import ApiError from '../ApiError';
 import { Configuration } from '../configuration';
 import constants from '../constants/constants';
 import { Database } from '../database';
-import { Email } from '../email';
+import { EmailManager } from '../emailManager';
 import * as slack from '../slack';
 
 const config = new Configuration();
@@ -17,7 +17,7 @@ async function sendHeathCheck(req: Request, res: Response, next: NextFunction) {
     webhookUrl = config.getKey('slack').debug;
   }
 
-  const email = new Email(config.getKey('email'));
+  const email = new EmailManager(config.getKey('email'));
   const database = new Database(config.getKey('database'));
 
   if (_.isNil(webhookUrl)) {
@@ -36,6 +36,4 @@ async function sendHeathCheck(req: Request, res: Response, next: NextFunction) {
   }
 }
 
-export {
-  sendHeathCheck,
-};
+export { sendHeathCheck };
