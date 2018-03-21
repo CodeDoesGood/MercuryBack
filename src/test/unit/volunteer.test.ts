@@ -282,7 +282,7 @@ describe('Volunteer Component', () => {
 
         administrator.canAccessAdminPortal().then(
           () => {
-            throw new Error("Shouldn't resolve when the volunteer id is not passed");
+            throw new Error('Shouldnt resolve when the volunteer id is not passed');
           },
           () => assert(true),
         );
@@ -303,12 +303,12 @@ describe('Volunteer Component', () => {
         );
       });
 
-      it("Should reject if the volunteer doesn't exists", () => {
+      it('Should reject if the volunteer doesnt exists', () => {
         const volunteer = new Volunteer(99999);
 
         return volunteer.existsById().then(
           () => {
-            throw new Error("Exist shouldn't resolve when the volunteer doesn't exist");
+            throw new Error('Exist shouldnt resolve when the volunteer doesnt exist');
           },
           (error: Error) => {
             assert.equal(error.message, 'User does not exist by id', error.message);
@@ -321,7 +321,7 @@ describe('Volunteer Component', () => {
 
         return volunteer.existsById().then(
           () => {
-            throw new Error("Shouldn't resolve if the project_id is not set");
+            throw new Error('Shouldnt resolve if the project_id is not set');
           },
           (error: Error) => {
             assert.equal(error.message, 'userId is null or undefined while attempt to check existence', error.message);
@@ -429,7 +429,7 @@ describe('Volunteer Component', () => {
 
         return volunteer.getVerificationCode().then(
           () => {
-            throw new Error("Shoudln't resolve with a invalid userId");
+            throw new Error('Shoudlnt resolve with a invalid userId');
           },
           (error: Error) => {
             assert.equal(error.message, `userId "${volunteer.userId}" passed is not a valid number`, error.message);
@@ -444,7 +444,7 @@ describe('Volunteer Component', () => {
 
         return volunteer.removeVerificationCode().then(
           () => {
-            throw new Error("Shouldn't resolve when the userId is invalid");
+            throw new Error('Shouldnt resolve when the userId is invalid');
           },
           (error: Error) => {
             assert.equal(error.message, `userId "${volunteer.userId}" passed is not a valid number`, error.message);
@@ -564,7 +564,7 @@ describe('Volunteer Component', () => {
 
         return volunteer.getPasswordResetCode().then(
           () => {
-            throw new Error("Shoudln't resolve with a invalid userId");
+            throw new Error('Shoudlnt resolve with a invalid userId');
           },
           (error: Error) => {
             assert.equal(error.message, `userId "${volunteer.userId}" passed is not a valid number`, error.message);
@@ -579,7 +579,7 @@ describe('Volunteer Component', () => {
 
         return volunteer.removePasswordResetCode().then(
           () => {
-            throw new Error("Shouldn't resolve when the userId is invalid");
+            throw new Error('Shouldnt resolve when the userId is invalid');
           },
           (error: Error) => {
             assert.equal(error.message, `userId "${volunteer.userId}" passed is not a valid number`, error.message);
@@ -626,7 +626,7 @@ describe('Volunteer Component', () => {
           .then(() => volunteer.doesPasswordResetCodeExist())
           .then(
             () => {
-              throw new Error("Shouldn't resolve when no password reset code exists");
+              throw new Error('Shouldnt resolve when no password reset code exists');
             },
             (error: Error) => {
               assert.equal(error.message, `No password reset code exists for user ${volunteer.userId}`, error.message);
@@ -658,7 +658,7 @@ describe('Volunteer Component', () => {
 
         return volunteer.doesPasswordResetCodeExist().then(
           () => {
-            throw new Error("Shouldn't resolve when a the project_id is invalid");
+            throw new Error('Shouldnt resolve when a the project_id is invalid');
           },
           (error: Error) => {
             assert.equal(error.message, `userId "${volunteer.userId}" passed is not a valid number`, error.message);
@@ -690,7 +690,7 @@ describe('Volunteer Component', () => {
 
         try {
           const verified: boolean = await volunteer.verifyVolunteer();
-          assert("shouldn't resolve when the userId is invalid");
+          assert('shouldnt resolve when the userId is invalid');
         } catch (error) {
           assert.equal(error.message, `Cannot verify when userId is null or undefined, userId=${volunteer.userId}`, error.message);
         }
@@ -736,7 +736,7 @@ describe('Volunteer Component', () => {
 
         return volunteer.createVolunteer(undefined).then(
           () => {
-            throw new Error("volunteer creation shouldn't create the name is not defined.");
+            throw new Error('volunteer creation shouldnt create the name is not defined.');
           },
           (error: Error) => {
             assert.equal(
@@ -756,7 +756,7 @@ describe('Volunteer Component', () => {
 
         return volunteer.createVolunteer('thepassword').then(
           () => {
-            throw new Error("volunteer creation shouldn't create the name is not defined.");
+            throw new Error('volunteer creation shouldnt create the name is not defined.');
           },
           (error: Error) => {
             assert.equal(
@@ -777,7 +777,7 @@ describe('Volunteer Component', () => {
 
         return volunteer.createVolunteer('thepassword').then(
           () => {
-            throw new Error("volunteer creation shouldn't create the name is not defined.");
+            throw new Error('volunteer creation shouldnt create the name is not defined.');
           },
           (error: Error) => {
             assert.equal(
@@ -798,7 +798,7 @@ describe('Volunteer Component', () => {
 
         return volunteer.createVolunteer(undefined).then(
           () => {
-            throw new Error("Creation shouldn't resolve when no password is given");
+            throw new Error('Creation shouldnt resolve when no password is given');
           },
           (error: Error) => {
             assert.equal(error.message, `You must provide a password to create the volunteer=${volunteer.username}`, error.message);
@@ -817,7 +817,7 @@ describe('Volunteer Component', () => {
           .then(() => volunteer.doesVerificationCodeExist())
           .then(
             () => {
-              throw new Error("Shouldn't resolve when no password reset code exists");
+              throw new Error('Shouldnt resolve when no password reset code exists');
             },
             (error: Error) => {
               assert.equal(error.message, `No verification code exists for user ${volunteer.userId}`, error.message);
@@ -849,7 +849,7 @@ describe('Volunteer Component', () => {
 
         return volunteer.doesVerificationCodeExist().then(
           () => {
-            throw new Error("Shouldn't resolve when a the project_id is invalid");
+            throw new Error('Shouldnt resolve when a the project_id is invalid');
           },
           (error: Error) => {
             assert.equal(error.message, `userId "${volunteer.userId}" passed is not a valid number`, error.message);
