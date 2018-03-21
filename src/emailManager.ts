@@ -72,10 +72,10 @@ export class EmailManager extends Database {
     return new Promise((resolve, reject) => {
       this.transporter.verify((error: Error, result: boolean) => {
         if (!_.isNil(error)) {
-          Promise.reject(error);
+          reject(error);
         } else {
           this.emailOnline = true;
-          Promise.resolve(result);
+          resolve(result);
         }
       });
     });
@@ -196,7 +196,7 @@ export class EmailManager extends Database {
         this.send(email)
           .then((info: nodemailer.SentMessageInfo) => {
             logger.info(`[Email] Sent stored email: ${info.messageId}`);
-            updatedStoredEmails.emails.slice(index, 1);
+            updatedStoredEmails.emails = updatedStoredEmails.emails.slice(index, 1);
             sentEmails += 1;
 
             if (sentEmails === storedEmails.emails.length) {
@@ -222,6 +222,9 @@ export class EmailManager extends Database {
 
   // Get the path to the json file
   public getEmailJSONPath = (): string => this.stored;
+
+  // Sets the online status of the email service
+  public setEmailOnline = (online: boolean) => (this.emailOnline = online);
 
   /**
    * Returns the current service configuration that is used to connect and make

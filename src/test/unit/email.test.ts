@@ -35,7 +35,7 @@ if (_.isNil(process.env.TRAVIS)) {
             assert(false, `Shouldn\'t verify correctly if the service is offline, done=${done}`);
           },
           (error: Error) => {
-            assert.equal(emailClient.online, false, 'online status should be false if it did not verify');
+            assert.equal(emailClient.getEmailOnline(), false, 'online status should be false if it did not verify');
           },
         );
       });
@@ -46,7 +46,7 @@ if (_.isNil(process.env.TRAVIS)) {
       const sendStored = new EmailManager(emailConfig);
       const jsonPath: string = sendStored.getEmailJSONPath();
 
-      sendStored.online = true;
+      sendStored.setEmailOnline(true);
 
       it('Should resolve the empty array if the emails are empty', () => {
         return sendStored.sendStoredEmails(jsonPath, []).then(
@@ -59,12 +59,12 @@ if (_.isNil(process.env.TRAVIS)) {
 
       it('should reject if online is marked as false', () => {
         const sendStoredoffline = new EmailManager(config.getKey('email'));
-        sendStoredoffline.online = false;
+        sendStoredoffline.setEmailOnline(false);
 
         return sendStoredoffline.sendStoredEmails(jsonPath).then(
           () => assert(false, 'Should not resolve if the online status is marked as false'),
           (error: Error) => {
-            assert.equal(sendStoredoffline.online, false, 'Online should be marked as false when rejecting');
+            assert.equal(sendStoredoffline.getEmailOnline(), false, 'Online should be marked as false when rejecting');
           },
         );
       });
@@ -168,20 +168,21 @@ if (_.isNil(process.env.TRAVIS)) {
     });
 
     describe('#updateServicePassword', () => {
-      const updateEmailClient = new EmailManager(config.getKey('email'));
+      const upEmail = new EmailManager(config.getKey('email'));
       const emailConfig: IEmailOptions = config.getKey('email');
 
       it('Should resolve verified if the updated password works', () => {
-        return updateEmailClient
+        return upEmail
           .updateServicePassword(emailConfig.password)
           .then(
-            (done: boolean) => assert.equal(done, true, `Should resolve true when the password is correct, done=${done}`),
-            (error: Error) => assert(false, `${error.message}, user=${updateEmailClient.getUsername()}`),
+            () =>
+              assert.equal(upEmail.getEmailOnline(), true, `Should resolve when the password is correct, done=${upEmail.getEmailOnline()}`),
+            (error: Error) => assert(false, `${error.message}, user=${upEmail.getUsername()}`),
           );
       });
 
       it('Should reject if the password is wrong', () => {
-        return updateEmailClient
+        return upEmail
           .updateServicePassword('wrong')
           .then(
             (done: boolean) => assert.equal(done, false, `Should reject when the password is incorrect, done=${done}`),
@@ -277,37 +278,13 @@ if (_.isNil(process.env.TRAVIS)) {
         );
       });
 
-      it('Should reject if to is missing from the build requirements', () => {
-        const email = new Email(sendConfig.email, replacement, 'test text', 'test text');
-
-        return emailManager.send(email).then(
-          () => {
-            assert(false, 'Email shouldnt attempt to send when to is missing from requirements');
-          },
-          (error: Error) => assert(true),
-        );
-      });
-
-      it('Should reject if subject is missing from the build requirements', () => {
-        const email = new Email(sendConfig.email, 'text', replacement, 'test text');
-
-        return emailManager.send(email).then(
-          () => {
-            assert(false, 'Email shouldnt attempt to send when subject is missing from requirements');
-          },
-          (error: Error) => assert(true),
-        );
-      });
-
-      it('Should reject if text is missing from the build requirements', () => {
-        const email = new Email(sendConfig.email, 'text', 'text', replacement);
-
-        return emailManager.send(email).then(
-          () => {
-            assert(false, 'Email shouldnt attempt to send when text is missing from requirements');
-          },
-          (error: Error) => assert(true),
-        );
+      it('Should reject if any email content is missing from the build requirements', () => {
+        try {
+          const email = new Email(sendConfig.email, 'text', replacement, 'test text');
+          assert(false, 'Email shouldnt attempt to send when subject is missing from requirements');
+        } catch (error) {
+          assert(true);
+        }
       });
     });
 
