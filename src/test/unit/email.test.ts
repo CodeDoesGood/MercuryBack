@@ -3,7 +3,7 @@ import * as fs from 'fs';
 import * as _ from 'lodash';
 
 import { Configuration } from '../..//configuration';
-import { Email } from '../..//email';
+import { Email } from '../../email';
 import { EmailManager, IEmailContent, IEmailOptions } from '../../emailManager';
 
 const config = new Configuration();
@@ -319,8 +319,15 @@ if (_.isNil(process.env.TRAVIS)) {
 
       it('Should reject if if the index is null', async () => {
         try {
-          const storedEmails = { emails: exampleStoredEmails.slice() };
-          await emailManager.replaceStoredEmailByIndex(null, storedEmails);
+          const replacement = {
+            from: 'updated',
+            html: 'updated',
+            subject: 'updated',
+            text: 'updated',
+            to: 'updated',
+          };
+
+          await emailManager.replaceStoredEmailByIndex(null, replacement);
           assert(false, 'Should not remove if index is null');
         } catch (error) {
           assert(true);
