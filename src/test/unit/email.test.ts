@@ -316,10 +316,11 @@ if (_.isNil(process.env.TRAVIS)) {
           to: 'receiver',
         },
       ];
-    
+
       it('Should reject if if the index is null', async () => {
         try {
-          await emailManager.replaceStoredEmailByIndex(null, emailsStored);
+          const storedEmails = { emails: exampleStoredEmails.slice() };
+          await emailManager.replaceStoredEmailByIndex(null, storedEmails);
           assert(false, 'Should not remove if index is null');
         } catch (error) {
           assert(true);
