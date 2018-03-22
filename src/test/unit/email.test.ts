@@ -238,6 +238,15 @@ if (_.isNil(process.env.TRAVIS)) {
         },
       ];
 
+      it('Should reject if if the index is null', async () => {
+        try {
+          await emailManager.removeStoredEmailByIndex(null, emailsStored);
+          assert(false, 'Should not remove if index is null');
+        } catch (error) {
+          assert(true);
+        }
+      });
+
       it('Should remove a email by index if it exists', () => {
         const storedEmails = { emails: exampleStoredEmails.slice() };
 
@@ -307,6 +316,15 @@ if (_.isNil(process.env.TRAVIS)) {
           to: 'receiver',
         },
       ];
+    
+      it('Should reject if if the index is null', async () => {
+        try {
+          await emailManager.replaceStoredEmailByIndex(null, emailsStored);
+          assert(false, 'Should not remove if index is null');
+        } catch (error) {
+          assert(true);
+        }
+      });
 
       it('Should update a email by index if it exists', () => {
         const storedEmails = { emails: exampleStoredEmails.slice() };
