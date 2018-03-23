@@ -1,3 +1,4 @@
+import * as assert from 'assert';
 import * as fs from 'fs';
 import * as _ from 'lodash';
 import * as nodemailer from 'nodemailer';
@@ -132,6 +133,8 @@ export class EmailManager extends Database {
   public async removeStoredEmailByIndex(index: number, passedEmails = this.getStoredEmails()): Promise<IEmailContent[] | Error> {
     const jsonPath: string = this.getEmailJSONPath();
 
+    assert(!_.isNil(index), 'Index should not be null when passed');
+
     if (index > passedEmails.emails.length) {
       return Promise.reject(new Error('Cannot remove email by index as index is out of range'));
     }
@@ -149,6 +152,8 @@ export class EmailManager extends Database {
    */
   public async replaceStoredEmailByIndex(index: number, email: IEmailContent, passedEmails = this.getStoredEmails()) {
     const jsonPath = this.getEmailJSONPath();
+
+    assert(!_.isNil(index), 'Index should not be null when passed');
 
     if (index > passedEmails.emails.length) {
       return Promise.reject(new Error('Cannot update email by index as index is out of range'));
