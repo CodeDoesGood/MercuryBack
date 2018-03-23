@@ -24,6 +24,7 @@ coverage
 build/Release
 build*/**
 docs/API/pages
+docs/todo.todo
 
 # Dependency directory
 # https://docs.npmjs.com/misc/faq#should-i-check-my-node-modules-folder-into-git
