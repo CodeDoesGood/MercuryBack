@@ -1,12 +1,6 @@
 {
   "message": "message",
   "content": {
-    "email_removed": "boolean",
-    "updated": [{
-      "to": "string",
-      "subject": "string",
-      "text": "string",
-      "html": "string"
-    }]
+    "email_removed": "boolean"
   }
 }

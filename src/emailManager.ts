@@ -27,10 +27,10 @@ export interface IEmailOptions {
 
 export interface IEmailContent {
   [index: string]: string;
-  to: string;
-  subject: string;
-  text: string;
-  html: string;
+  to?: string;
+  subject?: string;
+  text?: string;
+  html?: string;
 }
 
 export interface IEmailServices {
@@ -107,61 +107,57 @@ export class EmailManager extends Database {
   }
 
   /**
-   * returns stored late emails that are stored in the json file.
+   * Get stored emails from the stored late emails table in the database
    */
-  public getStoredEmails(): { emails: IEmailContent[] } {
-    const jsonPath: string = this.getEmailJSONPath();
-
-    // If the file does not exist already we shall create it but resolve as there is no emails to be sent.
-    if (!fs.existsSync(jsonPath)) {
-      const template: { emails: any } = { emails: [] };
-
-      fs.writeFileSync(jsonPath, JSON.stringify(template, null, '\t'));
-      logger.info(`[Email] Stored json file does not exist to retrieve late email content, creating...`);
-      return { emails: [] };
-    }
-
-    const storedEmails: { emails: IEmailContent[] } = JSON.parse(fs.readFileSync(jsonPath, 'utf8'));
-    return storedEmails;
+  public async getStoredEmails(): Promise<IEmailContent[]> {
+    return this.knex('stored_emails')
+      .select(
+        'stored_id as id',
+        'stored_to as to',
+        'stored_from as from',
+        'stored_subject as subject',
+        'stored_text as text',
+        'stored_html as html',
+        'stored_retry_count as retry_count',
+        'stored_created_datetime as created_datetime',
+        'stored_modified_datetime as modified_datetime',
+      )
+      .then((emails: IEmailContent[]) => Promise.resolve(emails))
+      .catch((error: Error) => Promise.reject(error));
   }
 
   /**
-   * Attempts to rmeove a stored email by its index
-   * @param index email index to remove
-   * @param passedEmails Overhaul of json stored emails, if this is passed then the stored emails would not be retrieved
+   * Removes a email by a index from the stored_emails table
+   * @param index index of the email to remove
    */
-  public async removeStoredEmailByIndex(index: number, passedEmails = this.getStoredEmails()): Promise<IEmailContent[] | Error> {
-    const jsonPath: string = this.getEmailJSONPath();
+  public async removeStoredEmailByIndex(index: number): Promise<number> {
+    assert(!_.isNil(index), 'Index cannot be null for removing stored emails');
 
-    assert(!_.isNil(index), 'Index should not be null when passed');
-
-    if (index > passedEmails.emails.length) {
-      return Promise.reject(new Error('Cannot remove email by index as index is out of range'));
-    }
-
-    passedEmails.emails.splice(index, 1);
-    fs.writeFileSync(jsonPath, JSON.stringify({ emails: passedEmails.emails }, null, '\t'));
-
-    return Promise.resolve(passedEmails.emails);
+    return this.knex('stored_emails')
+      .where('stored_id', index)
+      .del();
   }
 
   /**
-   * Replace a email index in the stored json
-   * @param index the index of the email to update
-   * @param email IEmailContent email to update
+   * Updates content within the database of selected content
+   * @param index the id to update
+   * @param email The email content that will be updated
    */
-  public async replaceStoredEmailByIndex(index: number, email: IEmailContent, passedEmails = this.getStoredEmails()) {
-    const jsonPath = this.getEmailJSONPath();
+  public async updateStoredEmailByIndex(index: number, email: IEmailContent): Promise<number> {
+    assert(!_.isNil(index), 'Index cannot be null for updating stored emails');
 
-    assert(!_.isNil(index), 'Index should not be null when passed');
+    // filter out everything apart from what we are updating
+    const updated = _.pick(email, ['to', 'subject', 'from', 'text', 'html']);
 
-    if (index > passedEmails.emails.length) {
-      return Promise.reject(new Error('Cannot update email by index as index is out of range'));
-    }
-
-    passedEmails.emails[index] = email;
-    fs.writeFileSync(jsonPath, JSON.stringify({ emails: passedEmails.emails }, null, '\t'));
-    return Promise.resolve(passedEmails.emails);
+    return this.knex('stored_emails')
+      .where('stored_id', index)
+      .update({
+        stored_html: email.html,
+        stored_modified_datetime: new Date(),
+        stored_subject: email.subject,
+        stored_text: email.text,
+        stored_to: email.to,
+      });
   }
 
   public async sendStoredEmails(jsonPath: string, passedEmails?: IEmailContent[]): Promise<{ emails: IEmailContent[] } | any> {

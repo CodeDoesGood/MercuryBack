@@ -284,9 +284,13 @@ export async function sendStoredLateEmails(req: Request, res: Response, next: Ne
 /**
  * Sends stored emails to requesting client
  */
-export function retrieveStoredLateEmails(req: Request, res: Response) {
-  const storedEmails: { emails: IEmailContent[] } = emailManager.getStoredEmails();
-  res.status(200).send({ message: 'stored late emails', content: { emails: storedEmails.emails } });
+export async function retrieveStoredLateEmails(req: Request, res: Response, next: NextFunction) {
+  try {
+    const emails: IEmailContent[] = await emailManager.getStoredEmails();
+    res.status(200).send({ message: 'stored late emails', content: { emails } });
+  } catch (error) {
+    next(new ApiError(req, res, error, 500, 'Stored emails', 'Failed to get stored emails'));
+  }
 }
 
 /**
@@ -300,10 +304,10 @@ export async function removeStoredEmailByIndex(req: Request, res: Response, next
   const emailIndex = parseInt(req.params.email_id, 10);
 
   try {
-    const updatedEmails: IEmailContent[] | Error = await emailManager.removeStoredEmailByIndex(emailIndex);
+    const updatedEmails: number = await emailManager.removeStoredEmailByIndex(emailIndex);
     const message = `Removed stored email ${emailIndex}`;
 
-    res.status(200).send({ message, content: { email_removed: emailIndex, updated: updatedEmails } });
+    res.status(200).send({ message, content: { email_removed: emailIndex } });
   } catch (error) {
     next(new ApiError(req, res, error, 500, 'Remove late Emails', error.message));
   }
@@ -329,7 +333,7 @@ export async function updateStoredEmailByIndex(req: Request, res: Response, next
   }
 
   try {
-    const updatedEmails: IEmailContent[] | Error = await emailManager.replaceStoredEmailByIndex(emailIndex, email);
+    const updatedEmails: number = await emailManager.updateStoredEmailByIndex(emailIndex, email);
     const message: string = `Updated stored email ${emailIndex}`;
 
     res.status(200).send({ message, content: { email_updated: emailIndex, updated: updatedEmails } });
