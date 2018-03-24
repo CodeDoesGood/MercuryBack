@@ -320,7 +320,7 @@ if (_.isNil(process.env.TRAVIS)) {
           (updated: any) => {
             assert(updated.exists === 0, `no email exists at that index: ${Number.MAX_SAFE_INTEGER}, len: ${storedEmails.emails.length}`);
           },
-          (error: Error) => assert(false, error),
+          (error: string) => assert(false, error),
         );
       });
     });
