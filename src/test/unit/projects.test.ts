@@ -11,7 +11,7 @@ if (_.isNil(process.env.TRAVIS)) {
         const projects = new Projects();
 
         return projects.getAllProjects().then(
-          gotProjects => {
+          (gotProjects: any) => {
             _.forEach(gotProjects, (project: any) => {
               assert.equal(!_.isUndefined(project.project_id), true, 'project_id should not be undefined within a project.');
               assert.equal(!_.isUndefined(project.created_datetime), true, 'created_datetime should not be undefined within a project.');
@@ -79,7 +79,7 @@ if (_.isNil(process.env.TRAVIS)) {
               );
             });
           },
-          error => {
+          (error: string) => {
             throw new Error(error);
           },
         );
@@ -104,7 +104,7 @@ if (_.isNil(process.env.TRAVIS)) {
         const projects = new Projects();
 
         return projects.getAllProjectsByCategory(1).then(
-          gotProjects => {
+          (gotProjects: Error) => {
             _.forEach(gotProjects, (project: any) => {
               assert.equal(
                 project.project_category === 1,

@@ -90,7 +90,7 @@ export class Project extends Database {
       .join('project_status', 'project.status', 'project_status.project_status_id')
       .join('project_category', 'project.project_category', 'project_category.project_category_id')
       .first()
-      .then(project => {
+      .then((project: any) => {
         if (_.isNil(project)) {
           return Promise.reject(new Error(`Project ${this.projectId} does not exist`));
         }
