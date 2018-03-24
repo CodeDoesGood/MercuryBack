@@ -178,7 +178,7 @@ const errors: IErrors = {
 
   EMAIL_AND_NAME_LENGTH: 'Please make sure email and name are less than 50 characters each\n',
   EMAIL_BODY_LENGTH: 'Please use less than 500 characters for contact text or greater than 5',
-  EMAIL_FIELDS_REQUIRED: "Please, make sure you've filled all of the required fields",
+  EMAIL_FIELDS_REQUIRED: 'Please, make sure youve filled all of the required fields',
 
   FAILED_VALIDATION: 'Failed to validate volunteer credentials',
   INCORRECT_PASSWORD: 'The password provided was incorrect',
@@ -189,18 +189,18 @@ const errors: IErrors = {
   DATABASE_UNAVAILABLE: 'The database service is currently unavailable',
   EMAIL_UNAVAILABLE: 'The email service is currently unavailable, your email will be sent later',
 
-  EMAIL_RESET_SENT: "An email will be sent to that account's address shortly",
+  EMAIL_RESET_SENT: 'An email will be sent to that accounts address shortly',
 
-  EMAIL_ALREADY_EXISTS: (email) => `The email ${email} already exists`,
+  EMAIL_ALREADY_EXISTS: email => `The email ${email} already exists`,
   EMAIL_FAILED_SEND_STORED: (error: Error) => `Failed to send stored late emails to volunteers, error=${error.message}`,
   EMAIL_VERIFY_FAILED: (error: Error) => `Email service failed to restart, error=${error.message}`,
   USERNAME_ALREADY_EXISTS: (username: string) => `The username ${username} already exists`,
 
-  EMAIL_DOES_NOT_EXIST: (email) => `The email ${email} does not exist`,
+  EMAIL_DOES_NOT_EXIST: email => `The email ${email} does not exist`,
   USERNAME_DOES_NOT_EXIST: (username: string) => `The username ${username} does not exist`,
 
-  INVALID_PROJECT_ID_FORMAT: (projectId) => `Id '${projectId}' is in a invalid format or not provided`,
-  PROJECT_MUST_CONTAIN: (contain) => `The projet must contain ${contain} value`,
+  INVALID_PROJECT_ID_FORMAT: projectId => `Id '${projectId}' is in a invalid format or not provided`,
+  PROJECT_MUST_CONTAIN: contain => `The projet must contain ${contain} value`,
 
   INVALID_PROJECT_FORMAT: 'The provided project is not a valid format',
   PROJECT_MUST_CONTAIN_HIDDEN: 'The project must contain the hidden value',
@@ -217,23 +217,23 @@ const errors: IErrors = {
 
   GET_PROJECT: (projectId, projectTitle) => `Gathered project ${projectId}/${projectTitle}`,
 
-  UNABLE_TO_GATHER_PROJECT: (projectId) => `Unable to gather project by id ${projectId}`,
-  UNABLE_TO_UPDATE_PROJECT: (projectId) => `Unable to update project by id ${projectId}`,
+  UNABLE_TO_GATHER_PROJECT: projectId => `Unable to gather project by id ${projectId}`,
+  UNABLE_TO_UPDATE_PROJECT: projectId => `Unable to update project by id ${projectId}`,
 
   UNABLE_TO_GATHER_ACTIVE_PROJECTS: 'Unable to gather all active projects',
   UNABLE_TO_GATHER_PROJECTS: 'Unable to gather the projects',
 
-  INVALID_CATEGORY_FORMAT: (category) => `Category '${category}' is in a invalid format or not provided`,
-  INVALID_STATUS_FORMAT: (status) => `Status '${status}' is in a invalid format or not provided`,
+  INVALID_CATEGORY_FORMAT: category => `Category '${category}' is in a invalid format or not provided`,
+  INVALID_STATUS_FORMAT: status => `Status '${status}' is in a invalid format or not provided`,
 
   UNABLE_TO_GATHER_ALL_HIDDEN: 'Unable to gather all hidden projects',
-  UNABLE_TO_GATHER_BY_CATEGORY: (category) => `Unable to gather all projects by category '${category}'`,
-  UNABLE_TO_GATHER_BY_STATUS: (status) => `Unable to gather all projects by status '${status}'`,
+  UNABLE_TO_GATHER_BY_CATEGORY: category => `Unable to gather all projects by category '${category}'`,
+  UNABLE_TO_GATHER_BY_STATUS: status => `Unable to gather all projects by status '${status}'`,
 
   INVALID_VOLUNTEER_FORMAT: 'volunteer provided is not in a valid format',
 
-  VOLUNTEER_REQUIREMENT_NEEDED: (requirement) => `Volunteer must contain ${requirement}`,
-  VOLUNTEER_REQUIREMENT_STRING: (requirement) => `Volunteer ${requirement} must be a string`,
+  VOLUNTEER_REQUIREMENT_NEEDED: requirement => `Volunteer must contain ${requirement}`,
+  VOLUNTEER_REQUIREMENT_STRING: requirement => `Volunteer ${requirement} must be a string`,
 
   VOLUNTEER_EMAIL_MATCH: 'The email passed does not match the volunteer email',
   VOLUNTEER_EXISTS: 'Volunteer does not exist',

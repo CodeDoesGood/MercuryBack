@@ -225,6 +225,10 @@ export class EmailManager extends Database {
    * sends all stored late emails and returns a promise array of email ids that failed to be sent
    */
   public async sendStoredEmails(): Promise<IEmailContent[]> {
+    if (!this.getEmailOnline()) {
+      return Promise.reject('Cannot send emails when the emails service is offline');
+    }
+
     const failed: number[] = [];
 
     const emails = await this.getStoredEmails();
