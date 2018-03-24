@@ -17,7 +17,7 @@
     "start:debug": "node --inspect ./build/index.js",
     "test:unit": "ts-mocha -p ./ --exit ./src/test/unit/index.test.ts",
     "test:travis": "SET TRAVIS=true && ts-mocha -p ./ --exit ./build/src/unit/index.test.ts",
-    "prepublish": "npm run lint && npm run build && npm run test:travis"
+    "prepublish": "npm run lint && npm run build && npm run test:unit"
   },
   "author": "CodeDoesGood",
   "license": "MIT",
