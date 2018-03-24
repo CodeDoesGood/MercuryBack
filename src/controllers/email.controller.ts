@@ -309,6 +309,25 @@ export async function removeStoredEmailByIndex(req: Request, res: Response, next
   }
 }
 
+export async function emailExistsById(req: Request, res: Response, next: NextFunction) {
+  if (_.isNil(req.params.email_id)) {
+    return res.status(400).send({ error: 'Email Id', description: constants.STORED_EMAIL_MISSING_INDEX });
+  }
+
+  const emailId: number = req.params.email_id;
+
+  try {
+    const { exists }: { exists: number } = await emailManager.doesStoredEmailExist(emailId);
+    if (exists === 0) {
+      res.status(400).send({ error: 'Email Id', description: constants.STORED_EMAIL_FAILED_CHECK });
+    } else {
+      next();
+    }
+  } catch (error) {
+    next(new ApiError(req, res, error, 500, 'Email Existing', constants.STORED_EMAIL_FAILED_CHECK));
+  }
+}
+
 /**
  * Updates a late stored email by index, requires the full email to be sent down.
  */

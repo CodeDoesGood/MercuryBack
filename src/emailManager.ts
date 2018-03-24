@@ -110,6 +110,17 @@ export class EmailManager extends Database {
   }
 
   /**
+   * returns 1 or 0 if it exists or not
+   * @param emailId the id of the email to check if it exists
+   */
+  public async doesStoredEmailExist(emailId: number): Promise<{ exists: number }> {
+    return this.knex('stored_email')
+      .count('stored_id as exists')
+      .where('stored_id', emailId)
+      .first();
+  }
+
+  /**
    * Get stored emails from the stored late emails table in the database
    */
   public async getStoredEmails(): Promise<IEmailContent[]> {
