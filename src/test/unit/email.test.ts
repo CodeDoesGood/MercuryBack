@@ -193,16 +193,16 @@ if (_.isNil(process.env.TRAVIS)) {
 
     describe('#getStoredEmails', () => {
       it('Should get a array of stored emails', () => {
-        const storedEmails: { emails: IEmailContent[] } = emailManager.getStoredEmails();
+        const storedEmails: IEmailContent[] | any = emailManager.getStoredEmails();
 
-        assert.equal(_.isNil(storedEmails.emails), false, 'Email array should exist even if no emails exist');
-        assert.equal(_.isArray(storedEmails.emails), true, 'Emails array should be a valid array and not anything else');
+        assert.equal(_.isNil(storedEmails), false, 'Email array should exist even if no emails exist');
+        assert.equal(_.isArray(storedEmails), true, 'Emails array should be a valid array and not anything else');
 
-        if (_.isNil(storedEmails.emails[0])) {
+        if (_.isNil(storedEmails[0])) {
           return assert(true);
         }
 
-        _.forEach(storedEmails.emails, (storedEmail: IEmailContent) => {
+        _.forEach(storedEmails, (storedEmail: IEmailContent) => {
           assert.equal(_.isNil(storedEmail.html), false, 'Each email should contain the html field');
           assert.equal(_.isNil(storedEmail.subject), false, 'Each email should contain the subject field');
           assert.equal(_.isNil(storedEmail.text), false, 'Each email should contain the text field');
@@ -240,7 +240,7 @@ if (_.isNil(process.env.TRAVIS)) {
 
       it('Should reject if if the index is null', async () => {
         try {
-          await emailManager.removeStoredEmailByIndex(null, emailsStored);
+          await emailManager.removeStoredEmailByIndex(null);
           assert(false, 'Should not remove if index is null');
         } catch (error) {
           assert(true);
@@ -250,8 +250,8 @@ if (_.isNil(process.env.TRAVIS)) {
       it('Should remove a email by index if it exists', () => {
         const storedEmails = { emails: exampleStoredEmails.slice() };
 
-        return emailManager.removeStoredEmailByIndex(0, storedEmails).then(
-          (updated: IEmailContent[]) => {
+        return emailManager.removeStoredEmailByIndex(0).then(
+          (updated) => {
             assert.equal(updated[0].html, '1', 'Updated emails should have index 1 as index 0 after removing first index');
           },
           (error: Error) => assert(false, error.message),
@@ -261,8 +261,8 @@ if (_.isNil(process.env.TRAVIS)) {
       it('Should throw a error if no email exists at that index', () => {
         const storedEmails = { emails: exampleStoredEmails.slice() };
 
-        return emailManager.removeStoredEmailByIndex(Number.MAX_SAFE_INTEGER, storedEmails).then(
-          (updated: IEmailContent[]) => {
+        return emailManager.removeStoredEmailByIndex(Number.MAX_SAFE_INTEGER).then(
+          (updated) => {
             assert(false, `No email exists at that index, index: ${Number.MAX_SAFE_INTEGER}, len: ${storedEmails.emails.length}`);
           },
           (error: Error) => assert(true),
@@ -297,7 +297,7 @@ if (_.isNil(process.env.TRAVIS)) {
       });
     });
 
-    describe('#replaceStoredEmailByIndex', () => {
+    describe('#updateStoredEmailByIndex', () => {
       const emailsStored = emailManager.getStoredEmails();
 
       const exampleStoredEmails = [
@@ -327,7 +327,7 @@ if (_.isNil(process.env.TRAVIS)) {
             to: 'updated',
           };
 
-          await emailManager.replaceStoredEmailByIndex(null, replacement);
+          await emailManager.updateStoredEmailByIndex(null, replacement);
           assert(false, 'Should not remove if index is null');
         } catch (error) {
           assert(true);
@@ -344,8 +344,8 @@ if (_.isNil(process.env.TRAVIS)) {
           to: 'updated',
         };
 
-        return emailManager.replaceStoredEmailByIndex(0, replacement, storedEmails).then(
-          (updated: IEmailContent[]) => {
+        return emailManager.updateStoredEmailByIndex(0, replacement).then(
+          (updated) => {
             assert.equal(updated[0].html, 'updated', 'Should update a email by index if it exists');
           },
           (error: Error) => assert(false, error.message),
@@ -362,8 +362,8 @@ if (_.isNil(process.env.TRAVIS)) {
           to: 'updated',
         };
 
-        return emailManager.replaceStoredEmailByIndex(Number.MAX_SAFE_INTEGER, replacement, storedEmails).then(
-          (updated: IEmailContent[]) => {
+        return emailManager.updateStoredEmailByIndex(Number.MAX_SAFE_INTEGER, replacement).then(
+          (updated) => {
             assert(false, `no email exists at that index: ${Number.MAX_SAFE_INTEGER}, len: ${storedEmails.emails.length}`);
           },
           (error: Error) => assert(true),
