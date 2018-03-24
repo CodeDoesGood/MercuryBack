@@ -29,8 +29,10 @@ export class Database {
 
     if (_.isNil(process.env.TRAVIS)) {
       this.connect()
-        .then(() => this.online = true)
-        .catch((error: Error) => { throw error; });
+        .then(() => (this.online = true))
+        .catch((error: Error) => {
+          throw error;
+        });
     }
   }
 
@@ -38,7 +40,8 @@ export class Database {
    * Makes a connection to the sql database using knex
    */
   public async connect(): Promise<boolean> {
-    return this.knex.raw('select 1+1 as answer')
+    return this.knex
+      .raw('select 1+1 as answer')
       .then(() => Promise.resolve(true))
       .catch((error: Error) => Promise.reject(error));
   }
@@ -52,7 +55,10 @@ export class Database {
       return Promise.reject(new Error(`email "${email}" passed is not a valid string`));
     }
 
-    return this.knex('volunteer').select('volunteer_id').where('email', email).first()
+    return this.knex('volunteer')
+      .select('volunteer_id')
+      .where('email', email)
+      .first()
       .then((result: IVolunteer) => Promise.resolve(result.volunteer_id))
       .catch((error: Error) => Promise.reject(error));
   }
@@ -66,7 +72,10 @@ export class Database {
       return Promise.reject(new Error(`userId "${username}" passed is not a valid string`));
     }
 
-    return this.knex('volunteer').select('volunteer_id').where('username', username).first()
+    return this.knex('volunteer')
+      .select('volunteer_id')
+      .where('username', username)
+      .first()
       .then((result: IVolunteer) => Promise.resolve(result.volunteer_id))
       .catch((error: Error) => Promise.reject(error));
   }
@@ -78,5 +87,5 @@ export class Database {
    * Updates the database password used for communication with the sql server
    * @param password the password that will be used for updating the content
    */
-  public setDatabasePassword = (password: string): string => this.config.connection.password = password;
+  public setDatabasePassword = (password: string): string => (this.config.connection.password = password);
 }

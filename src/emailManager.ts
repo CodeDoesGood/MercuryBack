@@ -7,6 +7,7 @@ import { Configuration } from './configuration';
 import { Database } from './database';
 import { Email } from './email';
 import { logger } from './logger';
+import { asyncForEach } from './utils';
 
 const config = new Configuration();
 
@@ -26,11 +27,14 @@ export interface IEmailOptions {
 }
 
 export interface IEmailContent {
-  [index: string]: string;
+  id?: number;
   to?: string;
   subject?: string;
   text?: string;
   html?: string;
+  retry_count?: number;
+  created_datetime?: string;
+  modified_datetime?: string;
 }
 
 export interface IEmailServices {
@@ -160,56 +164,58 @@ export class EmailManager extends Database {
       });
   }
 
-  public async sendStoredEmails(jsonPath: string, passedEmails?: IEmailContent[]): Promise<{ emails: IEmailContent[] } | any> {
-    if (!this.emailOnline) {
-      return Promise.reject(new Error(`[Email] Service must be online to send stored emails`));
-    }
+  /**
+   * Returns a group of emails based on there id
+   * @param idArray A array of stored_emails ids
+   */
+  public async getEmailsFromIds(idArray: number[]): Promise<IEmailContent[]> {
+    return this.knex('stored_emails')
+      .select(
+        'stored_id as id',
+        'stored_to as to',
+        'stored_from as from',
+        'stored_subject as subject',
+        'stored_text as text',
+        'stored_html as html',
+        'stored_retry_count as retry_count',
+        'stored_created_datetime as created_datetime',
+        'stored_modified_datetime as modified_datetime',
+      )
+      .whereIn('stored_id', idArray);
+  }
 
-    // If the file does not exist already we shall create it but resolve as there is no emails to be sent.
-    if (!fs.existsSync(jsonPath)) {
-      const template: { emails: any } = { emails: [] };
+  /**
+   * Increases all stored emails retry count by one in the array of stored_ids
+   * @param idArray an array of email ids
+   */
+  public async increaseFailedSendTotal(idArray: number[]) {
+    return this.knex('stored_emails')
+      .increment('stored_retry_count', 1)
+      .whereIn('stored_id', idArray);
+  }
 
-      fs.writeFileSync(jsonPath, JSON.stringify(template, null, '\t'));
-      logger.info(`[Email] Stored json file does not exist to retrieve late email content, creating...`);
-      return Promise.resolve(template);
-    }
+  /**
+   * sends all stored late emails and returns a promise array of email ids that failed to be sent
+   */
+  public async sendStoredEmails(): Promise<IEmailContent[]> {
+    const failed: number[] = [];
 
-    let storedEmails: { emails: IEmailContent[] } = null;
+    const emails = await this.getStoredEmails();
 
-    if (_.isNil(passedEmails)) {
-      storedEmails = JSON.parse(fs.readFileSync(jsonPath, 'utf8'));
-    } else {
-      storedEmails = { emails: passedEmails };
-    }
+    await asyncForEach(emails, async (email: IEmailContent) => {
+      const emailToSend = new Email(email.to, email.subject, email.text, email.html);
 
-    const updatedStoredEmails: { emails: IEmailContent[] } = { emails: storedEmails.emails.slice() };
-
-    let sentEmails: number = 0;
-
-    if (_.isNil(storedEmails.emails[0])) {
-      logger.info(`[Email] No late stored emails to send 😊`);
-      return Promise.resolve(storedEmails);
-    }
-
-    return new Promise((resolve, reject) => {
-      _.forEach(storedEmails.emails, (emailContent: IEmailContent, index: number) => {
-        const email = new Email(emailContent.to, emailContent.subject, emailContent.text, emailContent.html);
-        this.send(email)
-          .then((info: nodemailer.SentMessageInfo) => {
-            logger.info(`[Email] Sent stored email: ${info.messageId}`);
-            updatedStoredEmails.emails = updatedStoredEmails.emails.slice(index, 1);
-            sentEmails += 1;
-
-            if (sentEmails === storedEmails.emails.length) {
-              if (_.isNil(passedEmails)) {
-                fs.writeFileSync(jsonPath, JSON.stringify(updatedStoredEmails, null, '\t'));
-              }
-              resolve(updatedStoredEmails);
-            }
-          })
-          .catch((error: Error) => logger.warn(`[Email] Failed to send store email ${error.message}`));
-      });
+      try {
+        await this.send(emailToSend);
+        await this.removeStoredEmailByIndex(email.id);
+      } catch (error) {
+        failed.push(email.id);
+      }
     });
+
+    await this.increaseFailedSendTotal(failed);
+    const failedEmails = await this.getEmailsFromIds(failed);
+    return Promise.resolve(failedEmails);
   }
 
   // Return the online status of the manager

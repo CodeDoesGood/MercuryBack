@@ -10,6 +10,7 @@ import { Email } from '../email';
 import { EmailManager, IEmailContent } from '../emailManager';
 import { logger } from '../logger';
 import { Volunteer } from '../volunteer';
+import { fail } from 'assert';
 
 const config = new Configuration();
 const emailManager = new EmailManager(config.getKey('email'));
@@ -17,12 +18,14 @@ const emailManager = new EmailManager(config.getKey('email'));
 const verified = async () => {
   try {
     await emailManager.verify();
-    await emailManager.sendStoredEmails(emailManager.getEmailJSONPath());
+    await emailManager.sendStoredEmails();
     logger.info(`[Email] Email Client is ready, service=${emailManager.getService()}, email=${emailManager.getUsername()}`);
   } catch (error) {
     logger.error(`[Email] Error creating email connection, error=${error}`);
   }
 };
+
+verified();
 
 /**
  * Get the resend details from the get params of the request
@@ -274,7 +277,7 @@ export async function reverifyTheService(req: Request, res: Response, next: Next
 export async function sendStoredLateEmails(req: Request, res: Response, next: NextFunction) {
   try {
     const storedJsonPath = emailManager.getEmailJSONPath();
-    const failedStored: { emails: IEmailContent[] } = await emailManager.sendStoredEmails(storedJsonPath);
+    const failedStored: IEmailContent[] = await emailManager.sendStoredEmails();
     res.status(200).send({ message: 'Sent stored emails, returned emails that failed to send', content: failedStored });
   } catch (error) {
     next(new ApiError(req, res, error, 500, 'Stored Emails', constants.EMAIL_FAILED_SEND_STORED(error)));

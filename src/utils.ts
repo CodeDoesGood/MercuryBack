@@ -11,8 +11,12 @@ import { IToken } from './user';
  * @return {{salt, hashedPassword}} A object containing the salt and salted / hashed password
  * to be stored.
  */
-export function saltAndHash(passedPassword: string, passedSalt: string = null): {
-  salt: string; hashedPassword: string;
+export function saltAndHash(
+  passedPassword: string,
+  passedSalt: string = null,
+): {
+  salt: string;
+  hashedPassword: string;
 } {
   let salt: string = passedSalt;
 
@@ -66,4 +70,15 @@ export async function validateAuthenticationToken(token: string, secret: string)
       }
     });
   });
+}
+
+/**
+ * A fully functional async foreach that will wait for each completed request
+ * @param array A array of awaitable aysnc functions
+ * @param callback The callback of the awaited fucntion
+ */
+export async function asyncForEach(array, callback) {
+  for (let index = 0; index < array.length; index += 1) {
+    await callback(array[index], index, array);
+  }
 }
