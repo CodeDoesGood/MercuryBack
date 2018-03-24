@@ -10,7 +10,6 @@ import { Email } from '../email';
 import { EmailManager, IEmailContent } from '../emailManager';
 import { logger } from '../logger';
 import { Volunteer } from '../volunteer';
-import { fail } from 'assert';
 
 const config = new Configuration();
 const emailManager = new EmailManager(config.getKey('email'));
@@ -47,12 +46,7 @@ export function validateConnectionStatus(req: Request, res: Response, next: Next
   if (emailManager.getEmailOnline()) {
     next();
   } else {
-    const jsonPath: string = config.getKey('email').stored;
-    const storedEmails: { emails: IEmailContent[] } = JSON.parse(fs.readFileSync(jsonPath, 'utf8'));
-
-    storedEmails.emails.push(email);
-
-    fs.writeFileSync(jsonPath, JSON.stringify(storedEmails, null, '\t'));
+    emailManager.newStoredEmail(email);
     res.status(503).send({ error: 'Email Service', description: constants.EMAIL_UNAVAILABLE });
   }
 }
@@ -276,7 +270,6 @@ export async function reverifyTheService(req: Request, res: Response, next: Next
  */
 export async function sendStoredLateEmails(req: Request, res: Response, next: NextFunction) {
   try {
-    const storedJsonPath = emailManager.getEmailJSONPath();
     const failedStored: IEmailContent[] = await emailManager.sendStoredEmails();
     res.status(200).send({ message: 'Sent stored emails, returned emails that failed to send', content: failedStored });
   } catch (error) {

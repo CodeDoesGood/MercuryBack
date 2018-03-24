@@ -58,7 +58,6 @@ export class EmailManager extends Database {
 
     this.emailOnline = false;
     this.configuration = emailConfiguration;
-    this.stored = emailConfiguration.stored;
     this.transporter = this.buildTransporter();
   }
 
@@ -114,7 +113,7 @@ export class EmailManager extends Database {
    * Get stored emails from the stored late emails table in the database
    */
   public async getStoredEmails(): Promise<IEmailContent[]> {
-    return this.knex('stored_emails')
+    return this.knex('stored_email')
       .select(
         'stored_id as id',
         'stored_to as to',
@@ -131,13 +130,13 @@ export class EmailManager extends Database {
   }
 
   /**
-   * Removes a email by a index from the stored_emails table
+   * Removes a email by a index from the stored_email table
    * @param index index of the email to remove
    */
   public async removeStoredEmailByIndex(index: number): Promise<number> {
     assert(!_.isNil(index), 'Index cannot be null for removing stored emails');
 
-    return this.knex('stored_emails')
+    return this.knex('stored_email')
       .where('stored_id', index)
       .del();
   }
@@ -153,7 +152,7 @@ export class EmailManager extends Database {
     // filter out everything apart from what we are updating
     const updated = _.pick(email, ['to', 'subject', 'from', 'text', 'html']);
 
-    return this.knex('stored_emails')
+    return this.knex('stored_email')
       .where('stored_id', index)
       .update({
         stored_html: email.html,
@@ -165,11 +164,28 @@ export class EmailManager extends Database {
   }
 
   /**
+   * Write a new email into the database if it fails to send
+   * @param email email to be written
+   */
+  public async newStoredEmail(email: IEmailContent) {
+    return this.knex('stored_email').insert({
+      stored_created_datetime: new Date(),
+      stored_from: this.configuration.email,
+      stored_html: email.html,
+      stored_modified_datetime: new Date(),
+      stored_retry_count: 1,
+      stored_subject: email.subject,
+      stored_text: email.text,
+      stored_to: email.to,
+    });
+  }
+
+  /**
    * Returns a group of emails based on there id
-   * @param idArray A array of stored_emails ids
+   * @param idArray A array of stored_email ids
    */
   public async getEmailsFromIds(idArray: number[]): Promise<IEmailContent[]> {
-    return this.knex('stored_emails')
+    return this.knex('stored_email')
       .select(
         'stored_id as id',
         'stored_to as to',
@@ -189,7 +205,7 @@ export class EmailManager extends Database {
    * @param idArray an array of email ids
    */
   public async increaseFailedSendTotal(idArray: number[]) {
-    return this.knex('stored_emails')
+    return this.knex('stored_email')
       .increment('stored_retry_count', 1)
       .whereIn('stored_id', idArray);
   }
@@ -226,9 +242,6 @@ export class EmailManager extends Database {
 
   // Returns the current user / who will send it
   public getUsername = (): string => this.configuration.email;
-
-  // Get the path to the json file
-  public getEmailJSONPath = (): string => this.stored;
 
   // Sets the online status of the email service
   public setEmailOnline = (online: boolean) => (this.emailOnline = online);

@@ -44,12 +44,11 @@ if (_.isNil(process.env.TRAVIS)) {
     describe('#sendStoredEmails', () => {
       const emailConfig = Object.assign({}, config.getKey('email'));
       const sendStored = new EmailManager(emailConfig);
-      const jsonPath: string = sendStored.getEmailJSONPath();
 
       sendStored.setEmailOnline(true);
 
       it('Should resolve the empty array if the emails are empty', () => {
-        return sendStored.sendStoredEmails(jsonPath, []).then(
+        return sendStored.sendStoredEmails().then(
           (emails: { emails: IEmailContent[] }) => {
             assert.equal(_.isNil(emails.emails[0]), true, `stored emails are empty the returned should be empty, array=${emails.emails}`);
           },
@@ -61,7 +60,7 @@ if (_.isNil(process.env.TRAVIS)) {
         const sendStoredoffline = new EmailManager(config.getKey('email'));
         sendStoredoffline.setEmailOnline(false);
 
-        return sendStoredoffline.sendStoredEmails(jsonPath).then(
+        return sendStoredoffline.sendStoredEmails().then(
           () => assert(false, 'Should not resolve if the online status is marked as false'),
           (error: Error) => {
             assert.equal(sendStoredoffline.getEmailOnline(), false, 'Online should be marked as false when rejecting');
@@ -87,7 +86,7 @@ if (_.isNil(process.env.TRAVIS)) {
           },
         ];
 
-        return sendStored.sendStoredEmails(jsonPath, stored).then(
+        return sendStored.sendStoredEmails().then(
           (emails: { emails: IEmailContent[] }) => {
             assert.equal(_.isNil(emails.emails[0]), true, 'If stored emails are empty the returned array should be empty');
           },
@@ -99,14 +98,6 @@ if (_.isNil(process.env.TRAVIS)) {
     describe('#getService', () => {
       it('Should return the same service as stored in the config', () => {
         assert.equal(config.getKey('email').service, emailManager.getService(), 'Services should match, config and email service base');
-      });
-    });
-
-    describe('#getEmailJsonPath', () => {
-      it('Should return a string json path that exists', () => {
-        const jsonPath = emailManager.getEmailJSONPath();
-
-        assert.equal(fs.existsSync(jsonPath), true, 'Path given by jsonPath should exist');
       });
     });
 
