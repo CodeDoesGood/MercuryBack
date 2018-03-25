@@ -17,12 +17,14 @@ const emailManager = new EmailManager(config.getKey('email'));
 const verified = async () => {
   try {
     await emailManager.verify();
-    await emailManager.sendStoredEmails(emailManager.getEmailJSONPath());
+    await emailManager.sendStoredEmails();
     logger.info(`[Email] Email Client is ready, service=${emailManager.getService()}, email=${emailManager.getUsername()}`);
   } catch (error) {
     logger.error(`[Email] Error creating email connection, error=${error}`);
   }
 };
+
+verified();
 
 /**
  * Get the resend details from the get params of the request
@@ -44,12 +46,7 @@ export function validateConnectionStatus(req: Request, res: Response, next: Next
   if (emailManager.getEmailOnline()) {
     next();
   } else {
-    const jsonPath: string = config.getKey('email').stored;
-    const storedEmails: { emails: IEmailContent[] } = JSON.parse(fs.readFileSync(jsonPath, 'utf8'));
-
-    storedEmails.emails.push(email);
-
-    fs.writeFileSync(jsonPath, JSON.stringify(storedEmails, null, '\t'));
+    emailManager.newStoredEmail(email);
     res.status(503).send({ error: 'Email Service', description: constants.EMAIL_UNAVAILABLE });
   }
 }
@@ -273,8 +270,7 @@ export async function reverifyTheService(req: Request, res: Response, next: Next
  */
 export async function sendStoredLateEmails(req: Request, res: Response, next: NextFunction) {
   try {
-    const storedJsonPath = emailManager.getEmailJSONPath();
-    const failedStored: { emails: IEmailContent[] } = await emailManager.sendStoredEmails(storedJsonPath);
+    const failedStored: IEmailContent[] = await emailManager.sendStoredEmails();
     res.status(200).send({ message: 'Sent stored emails, returned emails that failed to send', content: failedStored });
   } catch (error) {
     next(new ApiError(req, res, error, 500, 'Stored Emails', constants.EMAIL_FAILED_SEND_STORED(error)));
@@ -284,9 +280,13 @@ export async function sendStoredLateEmails(req: Request, res: Response, next: Ne
 /**
  * Sends stored emails to requesting client
  */
-export function retrieveStoredLateEmails(req: Request, res: Response) {
-  const storedEmails: { emails: IEmailContent[] } = emailManager.getStoredEmails();
-  res.status(200).send({ message: 'stored late emails', content: { emails: storedEmails.emails } });
+export async function retrieveStoredLateEmails(req: Request, res: Response, next: NextFunction) {
+  try {
+    const emails: IEmailContent[] = await emailManager.getStoredEmails();
+    res.status(200).send({ message: 'stored late emails', content: { emails } });
+  } catch (error) {
+    next(new ApiError(req, res, error, 500, 'Stored emails', 'Failed to get stored emails'));
+  }
 }
 
 /**
@@ -300,12 +300,31 @@ export async function removeStoredEmailByIndex(req: Request, res: Response, next
   const emailIndex = parseInt(req.params.email_id, 10);
 
   try {
-    const updatedEmails: IEmailContent[] | Error = await emailManager.removeStoredEmailByIndex(emailIndex);
+    const updatedEmails: number = await emailManager.removeStoredEmailByIndex(emailIndex);
     const message = `Removed stored email ${emailIndex}`;
 
-    res.status(200).send({ message, content: { email_removed: emailIndex, updated: updatedEmails } });
+    res.status(200).send({ message, content: { email_removed: emailIndex } });
   } catch (error) {
     next(new ApiError(req, res, error, 500, 'Remove late Emails', error.message));
+  }
+}
+
+export async function emailExistsById(req: Request, res: Response, next: NextFunction) {
+  if (_.isNil(req.params.email_id)) {
+    return res.status(400).send({ error: 'Email Id', description: constants.STORED_EMAIL_MISSING_INDEX });
+  }
+
+  const emailId: number = req.params.email_id;
+
+  try {
+    const { exists }: { exists: number } = await emailManager.doesStoredEmailExist(emailId);
+    if (exists === 0) {
+      res.status(400).send({ error: 'Email Id', description: constants.STORED_EMAIL_FAILED_CHECK });
+    } else {
+      next();
+    }
+  } catch (error) {
+    next(new ApiError(req, res, error, 500, 'Email Existing', constants.STORED_EMAIL_FAILED_CHECK));
   }
 }
 
@@ -329,7 +348,7 @@ export async function updateStoredEmailByIndex(req: Request, res: Response, next
   }
 
   try {
-    const updatedEmails: IEmailContent[] | Error = await emailManager.replaceStoredEmailByIndex(emailIndex, email);
+    const updatedEmails: number = await emailManager.updateStoredEmailByIndex(emailIndex, email);
     const message: string = `Updated stored email ${emailIndex}`;
 
     res.status(200).send({ message, content: { email_updated: emailIndex, updated: updatedEmails } });

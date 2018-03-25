@@ -123,6 +123,7 @@ interface IErrors {
   STORED_EMAIL_MISSING_INDEX: string;
   STORED_EMAIL_UPDATE_REQUIRED: string;
   STORED_EMAIL_REQUIREMENTS: string;
+  STORED_EMAIL_FAILED_CHECK: string;
 
   EMAIL_SERVICE_OBJECT_REQUIRED: string;
   EMAIL_SERVICE_REQUIRES_USER: string;
@@ -177,7 +178,7 @@ const errors: IErrors = {
 
   EMAIL_AND_NAME_LENGTH: 'Please make sure email and name are less than 50 characters each\n',
   EMAIL_BODY_LENGTH: 'Please use less than 500 characters for contact text or greater than 5',
-  EMAIL_FIELDS_REQUIRED: 'Please, make sure you\'ve filled all of the required fields',
+  EMAIL_FIELDS_REQUIRED: 'Please, make sure youve filled all of the required fields',
 
   FAILED_VALIDATION: 'Failed to validate volunteer credentials',
   INCORRECT_PASSWORD: 'The password provided was incorrect',
@@ -188,15 +189,15 @@ const errors: IErrors = {
   DATABASE_UNAVAILABLE: 'The database service is currently unavailable',
   EMAIL_UNAVAILABLE: 'The email service is currently unavailable, your email will be sent later',
 
-  EMAIL_RESET_SENT: 'An email will be sent to that account\'s address shortly',
+  EMAIL_RESET_SENT: 'An email will be sent to that accounts address shortly',
 
   EMAIL_ALREADY_EXISTS: email => `The email ${email} already exists`,
-  EMAIL_FAILED_SEND_STORED: error => `Failed to send stored late emails to volunteers, error=${error.message}`,
-  EMAIL_VERIFY_FAILED: error => `Email service failed to restart, error=${error.message}`,
-  USERNAME_ALREADY_EXISTS: username => `The username ${username} already exists`,
+  EMAIL_FAILED_SEND_STORED: (error: Error) => `Failed to send stored late emails to volunteers, error=${error.message}`,
+  EMAIL_VERIFY_FAILED: (error: Error) => `Email service failed to restart, error=${error.message}`,
+  USERNAME_ALREADY_EXISTS: (username: string) => `The username ${username} already exists`,
 
   EMAIL_DOES_NOT_EXIST: email => `The email ${email} does not exist`,
-  USERNAME_DOES_NOT_EXIST: username => `The username ${username} does not exist`,
+  USERNAME_DOES_NOT_EXIST: (username: string) => `The username ${username} does not exist`,
 
   INVALID_PROJECT_ID_FORMAT: projectId => `Id '${projectId}' is in a invalid format or not provided`,
   PROJECT_MUST_CONTAIN: contain => `The projet must contain ${contain} value`,
@@ -238,30 +239,31 @@ const errors: IErrors = {
   VOLUNTEER_EXISTS: 'Volunteer does not exist',
   VOLUNTEER_NOT_AUTH: 'Volunteer is not authorized',
 
-  VOLUNTEER_FAILED_GET_RESET_CODE: error => `Failed to get password reset code, error=${error}`,
-  VOLUNTEER_FAILED_REMOVE_RESET_CODE: error => `Failed to remove password reset code, error=${error}`,
+  VOLUNTEER_FAILED_GET_RESET_CODE: (error: Error) => `Failed to get password reset code, error=${error}`,
+  VOLUNTEER_FAILED_REMOVE_RESET_CODE: (error: Error) => `Failed to remove password reset code, error=${error}`,
   VOLUNTEER_FAILED_UPDATE_PASSWORD: (username, error) => `Failed to update password for ${username}, error=${error}`,
   VOLUNTEER_RESET_CODE_FAIL: 'Unable to generate password reset code',
   VOLUNTEER_UPDATE_PASSWORD_REQUIRE: 'Both oldPassword and password need to be provided',
-  VOLUNTEER_VERIFICATION_REQUIRED: username => `Volunteer ${username} must be verified to continue.`,
+  VOLUNTEER_VERIFICATION_REQUIRED: (username: string) => `Volunteer ${username} must be verified to continue.`,
 
-  VOLUNTEER_FAILED_GET_VERIFICATION_CODE: error => `Failed to get verification code, error=${error}`,
+  VOLUNTEER_FAILED_GET_VERIFICATION_CODE: (error: Error) => `Failed to get verification code, error=${error}`,
   VOLUNTEER_INVALID_VERIFICATION_CODE: 'The code passed was not the correct code for verification',
   VOLUNTEER_VERIFICATION_CODE_DOES_NOT_EXIST: 'Verification Code Does not exist',
 
   VOLUNTEER_CREATE_FAIL: (username, error) => `Failed to create the user ${username}, error=${error}`,
-  VOLUNTEER_VERIFY_MARK_FAIL: username => `Failed to mark account ${username} as verified`,
+  VOLUNTEER_VERIFY_MARK_FAIL: (username: string) => `Failed to mark account ${username} as verified`,
 
   NOTIFICATION_ID_REQUIRED: 'export const You must pass a notification id to dismiss',
   VOLUNTEER_DISMISS_NOTIFICATION_FAIL: (notificationId, error) => `Unable to dismiss notification ${notificationId}, error=${error}`,
   VOLUNTEER_GET_NOTIFICATION_FAIL: (username, error) => `Failed to gather notifications for user ${username}, error=${error}`,
 
-  FAILED_VOLUNTEER_GET: error => `Failed to get volunteer, error=${error}`,
-  VOLUNTEER_IS_VERIFIED: username => `Volunteer ${username} is already verified`,
+  FAILED_VOLUNTEER_GET: (error: Error) => `Failed to get volunteer, error=${error}`,
+  VOLUNTEER_IS_VERIFIED: (username: string) => `Volunteer ${username} is already verified`,
 
-  SLACK_HEALTH_FAILED: error => `Health check failed to send to slack, error=${error.message}`,
+  SLACK_HEALTH_FAILED: (error: Error) => `Health check failed to send to slack, error=${error.message}`,
   SLACK_HOOK_MISSING: 'Slack webhook url was not provided for hook request.',
 
+  STORED_EMAIL_FAILED_CHECK: 'Stored email does not exist by id to update',
   STORED_EMAIL_MISSING_INDEX: 'Stored email index is required for a stored email to be removed',
   STORED_EMAIL_REQUIREMENTS: 'Stored email update object must require the html, subject, text, to',
   STORED_EMAIL_UPDATE_REQUIRED: 'Stored email update requires a new email to be passed via the body, { email: [] }',

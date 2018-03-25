@@ -7,6 +7,7 @@ import { Configuration } from './configuration';
 import { Database } from './database';
 import { Email } from './email';
 import { logger } from './logger';
+import { asyncForEach } from './utils';
 
 const config = new Configuration();
 
@@ -26,11 +27,14 @@ export interface IEmailOptions {
 }
 
 export interface IEmailContent {
-  [index: string]: string;
-  to: string;
-  subject: string;
-  text: string;
-  html: string;
+  id?: number;
+  to?: string;
+  subject?: string;
+  text?: string;
+  html?: string;
+  retry_count?: number;
+  created_datetime?: string;
+  modified_datetime?: string;
 }
 
 export interface IEmailServices {
@@ -54,7 +58,6 @@ export class EmailManager extends Database {
 
     this.emailOnline = false;
     this.configuration = emailConfiguration;
-    this.stored = emailConfiguration.stored;
     this.transporter = this.buildTransporter();
   }
 
@@ -107,113 +110,143 @@ export class EmailManager extends Database {
   }
 
   /**
-   * returns stored late emails that are stored in the json file.
+   * returns 1 or 0 if it exists or not
+   * @param emailId the id of the email to check if it exists
    */
-  public getStoredEmails(): { emails: IEmailContent[] } {
-    const jsonPath: string = this.getEmailJSONPath();
-
-    // If the file does not exist already we shall create it but resolve as there is no emails to be sent.
-    if (!fs.existsSync(jsonPath)) {
-      const template: { emails: any } = { emails: [] };
-
-      fs.writeFileSync(jsonPath, JSON.stringify(template, null, '\t'));
-      logger.info(`[Email] Stored json file does not exist to retrieve late email content, creating...`);
-      return { emails: [] };
-    }
-
-    const storedEmails: { emails: IEmailContent[] } = JSON.parse(fs.readFileSync(jsonPath, 'utf8'));
-    return storedEmails;
+  public async doesStoredEmailExist(emailId: number): Promise<{ exists: number }> {
+    return this.knex('stored_email')
+      .count('stored_id as exists')
+      .where('stored_id', emailId)
+      .first();
   }
 
   /**
-   * Attempts to rmeove a stored email by its index
-   * @param index email index to remove
-   * @param passedEmails Overhaul of json stored emails, if this is passed then the stored emails would not be retrieved
+   * Get stored emails from the stored late emails table in the database
    */
-  public async removeStoredEmailByIndex(index: number, passedEmails = this.getStoredEmails()): Promise<IEmailContent[] | Error> {
-    const jsonPath: string = this.getEmailJSONPath();
-
-    assert(!_.isNil(index), 'Index should not be null when passed');
-
-    if (index > passedEmails.emails.length) {
-      return Promise.reject(new Error('Cannot remove email by index as index is out of range'));
-    }
-
-    passedEmails.emails.splice(index, 1);
-    fs.writeFileSync(jsonPath, JSON.stringify({ emails: passedEmails.emails }, null, '\t'));
-
-    return Promise.resolve(passedEmails.emails);
+  public async getStoredEmails(): Promise<IEmailContent[]> {
+    return this.knex('stored_email')
+      .select(
+        'stored_id as id',
+        'stored_to as to',
+        'stored_from as from',
+        'stored_subject as subject',
+        'stored_text as text',
+        'stored_html as html',
+        'stored_retry_count as retry_count',
+        'stored_created_datetime as created_datetime',
+        'stored_modified_datetime as modified_datetime',
+      )
+      .then((emails: IEmailContent[]) => Promise.resolve(emails))
+      .catch((error: Error) => Promise.reject(error));
   }
 
   /**
-   * Replace a email index in the stored json
-   * @param index the index of the email to update
-   * @param email IEmailContent email to update
+   * Removes a email by a index from the stored_email table
+   * @param index index of the email to remove
    */
-  public async replaceStoredEmailByIndex(index: number, email: IEmailContent, passedEmails = this.getStoredEmails()) {
-    const jsonPath = this.getEmailJSONPath();
+  public async removeStoredEmailByIndex(index: number): Promise<number> {
+    assert(!_.isNil(index), 'Index cannot be null for removing stored emails');
 
-    assert(!_.isNil(index), 'Index should not be null when passed');
-
-    if (index > passedEmails.emails.length) {
-      return Promise.reject(new Error('Cannot update email by index as index is out of range'));
-    }
-
-    passedEmails.emails[index] = email;
-    fs.writeFileSync(jsonPath, JSON.stringify({ emails: passedEmails.emails }, null, '\t'));
-    return Promise.resolve(passedEmails.emails);
+    return this.knex('stored_email')
+      .where('stored_id', index)
+      .del();
   }
 
-  public async sendStoredEmails(jsonPath: string, passedEmails?: IEmailContent[]): Promise<{ emails: IEmailContent[] } | any> {
-    if (!this.emailOnline) {
-      return Promise.reject(new Error(`[Email] Service must be online to send stored emails`));
-    }
+  /**
+   * Updates content within the database of selected content
+   * @param index the id to update
+   * @param email The email content that will be updated
+   */
+  public async updateStoredEmailByIndex(index: number, email: IEmailContent): Promise<number> {
+    assert(!_.isNil(index), 'Index cannot be null for updating stored emails');
 
-    // If the file does not exist already we shall create it but resolve as there is no emails to be sent.
-    if (!fs.existsSync(jsonPath)) {
-      const template: { emails: any } = { emails: [] };
+    // filter out everything apart from what we are updating
+    const updated = _.pick(email, ['to', 'subject', 'from', 'text', 'html']);
 
-      fs.writeFileSync(jsonPath, JSON.stringify(template, null, '\t'));
-      logger.info(`[Email] Stored json file does not exist to retrieve late email content, creating...`);
-      return Promise.resolve(template);
-    }
-
-    let storedEmails: { emails: IEmailContent[] } = null;
-
-    if (_.isNil(passedEmails)) {
-      storedEmails = JSON.parse(fs.readFileSync(jsonPath, 'utf8'));
-    } else {
-      storedEmails = { emails: passedEmails };
-    }
-
-    const updatedStoredEmails: { emails: IEmailContent[] } = { emails: storedEmails.emails.slice() };
-
-    let sentEmails: number = 0;
-
-    if (_.isNil(storedEmails.emails[0])) {
-      logger.info(`[Email] No late stored emails to send 😊`);
-      return Promise.resolve(storedEmails);
-    }
-
-    return new Promise((resolve, reject) => {
-      _.forEach(storedEmails.emails, (emailContent: IEmailContent, index: number) => {
-        const email = new Email(emailContent.to, emailContent.subject, emailContent.text, emailContent.html);
-        this.send(email)
-          .then((info: nodemailer.SentMessageInfo) => {
-            logger.info(`[Email] Sent stored email: ${info.messageId}`);
-            updatedStoredEmails.emails = updatedStoredEmails.emails.slice(index, 1);
-            sentEmails += 1;
-
-            if (sentEmails === storedEmails.emails.length) {
-              if (_.isNil(passedEmails)) {
-                fs.writeFileSync(jsonPath, JSON.stringify(updatedStoredEmails, null, '\t'));
-              }
-              resolve(updatedStoredEmails);
-            }
-          })
-          .catch((error: Error) => logger.warn(`[Email] Failed to send store email ${error.message}`));
+    return this.knex('stored_email')
+      .where('stored_id', index)
+      .update({
+        stored_html: email.html,
+        stored_modified_datetime: new Date(),
+        stored_subject: email.subject,
+        stored_text: email.text,
+        stored_to: email.to,
       });
+  }
+
+  /**
+   * Write a new email into the database if it fails to send
+   * @param email email to be written
+   */
+  public async newStoredEmail(email: IEmailContent) {
+    return this.knex('stored_email').insert({
+      stored_created_datetime: new Date(),
+      stored_from: this.configuration.email,
+      stored_html: email.html,
+      stored_modified_datetime: new Date(),
+      stored_retry_count: 1,
+      stored_subject: email.subject,
+      stored_text: email.text,
+      stored_to: email.to,
     });
+  }
+
+  /**
+   * Returns a group of emails based on there id
+   * @param idArray A array of stored_email ids
+   */
+  public async getEmailsFromIds(idArray: number[]): Promise<IEmailContent[]> {
+    return this.knex('stored_email')
+      .select(
+        'stored_id as id',
+        'stored_to as to',
+        'stored_from as from',
+        'stored_subject as subject',
+        'stored_text as text',
+        'stored_html as html',
+        'stored_retry_count as retry_count',
+        'stored_created_datetime as created_datetime',
+        'stored_modified_datetime as modified_datetime',
+      )
+      .whereIn('stored_id', idArray);
+  }
+
+  /**
+   * Increases all stored emails retry count by one in the array of stored_ids
+   * @param idArray an array of email ids
+   */
+  public async increaseFailedSendTotal(idArray: number[]) {
+    return this.knex('stored_email')
+      .increment('stored_retry_count', 1)
+      .whereIn('stored_id', idArray);
+  }
+
+  /**
+   * sends all stored late emails and returns a promise array of email ids that failed to be sent
+   */
+  public async sendStoredEmails(): Promise<IEmailContent[]> {
+    if (!this.getEmailOnline()) {
+      return Promise.reject('Cannot send emails when the emails service is offline');
+    }
+
+    const failed: number[] = [];
+
+    const emails = await this.getStoredEmails();
+
+    await asyncForEach(emails, async (email: IEmailContent) => {
+      const emailToSend = new Email(email.to, email.subject, email.text, email.html);
+
+      try {
+        await this.send(emailToSend);
+        await this.removeStoredEmailByIndex(email.id);
+      } catch (error) {
+        failed.push(email.id);
+      }
+    });
+
+    await this.increaseFailedSendTotal(failed);
+    const failedEmails = await this.getEmailsFromIds(failed);
+    return Promise.resolve(failedEmails);
   }
 
   // Return the online status of the manager
@@ -224,9 +257,6 @@ export class EmailManager extends Database {
 
   // Returns the current user / who will send it
   public getUsername = (): string => this.configuration.email;
-
-  // Get the path to the json file
-  public getEmailJSONPath = (): string => this.stored;
 
   // Sets the online status of the email service
   public setEmailOnline = (online: boolean) => (this.emailOnline = online);

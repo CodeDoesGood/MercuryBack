@@ -3,11 +3,15 @@
   "content": {
     "emails": [
       {
-        "from": "contact@codedoesgood.org",
-        "html": "http://localhost:8080/verify/digiteh111/9000329581948",
-        "subject": "[CodeDoesGood] Verification Email",
-        "text": "http://localhost:8080/verify/digiteh111/9000329581948",
-        "to": "email@email.ac.uk"
+        "id": 1,
+        "to": "slinekermiller@gmail.com",
+        "from": "codedoegood@gmail.com",
+        "subject": "subject",
+        "text": "text",
+        "html": "text",
+        "retry_count": 1,
+        "created_datetime": "2008-11-11T13:23:44.000Z",
+        "modified_datetime": "2008-11-11T13:23:44.000Z"
       }
     ]
   }

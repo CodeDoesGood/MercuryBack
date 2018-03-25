@@ -44,14 +44,13 @@ if (_.isNil(process.env.TRAVIS)) {
     describe('#sendStoredEmails', () => {
       const emailConfig = Object.assign({}, config.getKey('email'));
       const sendStored = new EmailManager(emailConfig);
-      const jsonPath: string = sendStored.getEmailJSONPath();
 
       sendStored.setEmailOnline(true);
 
       it('Should resolve the empty array if the emails are empty', () => {
-        return sendStored.sendStoredEmails(jsonPath, []).then(
-          (emails: { emails: IEmailContent[] }) => {
-            assert.equal(_.isNil(emails.emails[0]), true, `stored emails are empty the returned should be empty, array=${emails.emails}`);
+        return sendStored.sendStoredEmails().then(
+          (emails: IEmailContent[]) => {
+            assert.equal(_.isNil(emails[0]), true, `stored emails are empty the returned should be empty, array=${emails}`);
           },
           (error: Error) => assert(false, error.message),
         );
@@ -61,7 +60,7 @@ if (_.isNil(process.env.TRAVIS)) {
         const sendStoredoffline = new EmailManager(config.getKey('email'));
         sendStoredoffline.setEmailOnline(false);
 
-        return sendStoredoffline.sendStoredEmails(jsonPath).then(
+        return sendStoredoffline.sendStoredEmails().then(
           () => assert(false, 'Should not resolve if the online status is marked as false'),
           (error: Error) => {
             assert.equal(sendStoredoffline.getEmailOnline(), false, 'Online should be marked as false when rejecting');
@@ -87,9 +86,9 @@ if (_.isNil(process.env.TRAVIS)) {
           },
         ];
 
-        return sendStored.sendStoredEmails(jsonPath, stored).then(
-          (emails: { emails: IEmailContent[] }) => {
-            assert.equal(_.isNil(emails.emails[0]), true, 'If stored emails are empty the returned array should be empty');
+        return sendStored.sendStoredEmails().then(
+          (emails: IEmailContent[]) => {
+            assert.equal(_.isNil(emails[0]), true, 'If stored emails are empty the returned array should be empty');
           },
           (error: Error) => assert(false, error.message),
         );
@@ -99,14 +98,6 @@ if (_.isNil(process.env.TRAVIS)) {
     describe('#getService', () => {
       it('Should return the same service as stored in the config', () => {
         assert.equal(config.getKey('email').service, emailManager.getService(), 'Services should match, config and email service base');
-      });
-    });
-
-    describe('#getEmailJsonPath', () => {
-      it('Should return a string json path that exists', () => {
-        const jsonPath = emailManager.getEmailJSONPath();
-
-        assert.equal(fs.existsSync(jsonPath), true, 'Path given by jsonPath should exist');
       });
     });
 
@@ -192,17 +183,17 @@ if (_.isNil(process.env.TRAVIS)) {
     });
 
     describe('#getStoredEmails', () => {
-      it('Should get a array of stored emails', () => {
-        const storedEmails: { emails: IEmailContent[] } = emailManager.getStoredEmails();
+      it('Should get a array of stored emails', async () => {
+        const storedEmails: IEmailContent[] | any = await emailManager.getStoredEmails();
 
-        assert.equal(_.isNil(storedEmails.emails), false, 'Email array should exist even if no emails exist');
-        assert.equal(_.isArray(storedEmails.emails), true, 'Emails array should be a valid array and not anything else');
+        assert.equal(_.isNil(storedEmails), false, 'Email array should exist even if no emails exist');
+        assert.equal(_.isArray(storedEmails), true, 'Emails array should be a valid array and not anything else');
 
-        if (_.isNil(storedEmails.emails[0])) {
+        if (_.isNil(storedEmails[0])) {
           return assert(true);
         }
 
-        _.forEach(storedEmails.emails, (storedEmail: IEmailContent) => {
+        _.forEach(storedEmails, (storedEmail: IEmailContent) => {
           assert.equal(_.isNil(storedEmail.html), false, 'Each email should contain the html field');
           assert.equal(_.isNil(storedEmail.subject), false, 'Each email should contain the subject field');
           assert.equal(_.isNil(storedEmail.text), false, 'Each email should contain the text field');
@@ -214,33 +205,9 @@ if (_.isNil(process.env.TRAVIS)) {
     describe('#removeStoredEmailByIndex', () => {
       const emailsStored = emailManager.getStoredEmails();
 
-      const exampleStoredEmails = [
-        {
-          from: 'sending address',
-          html: '0',
-          subject: 'subject',
-          text: '0',
-          to: 'receiver',
-        },
-        {
-          from: 'sending address',
-          html: '1',
-          subject: 'subject',
-          text: '1',
-          to: 'receiver',
-        },
-        {
-          from: 'sending address',
-          html: '2',
-          subject: 'subject',
-          text: '2',
-          to: 'receiver',
-        },
-      ];
-
       it('Should reject if if the index is null', async () => {
         try {
-          await emailManager.removeStoredEmailByIndex(null, emailsStored);
+          await emailManager.removeStoredEmailByIndex(null);
           assert(false, 'Should not remove if index is null');
         } catch (error) {
           assert(true);
@@ -248,24 +215,11 @@ if (_.isNil(process.env.TRAVIS)) {
       });
 
       it('Should remove a email by index if it exists', () => {
-        const storedEmails = { emails: exampleStoredEmails.slice() };
-
-        return emailManager.removeStoredEmailByIndex(0, storedEmails).then(
-          (updated: IEmailContent[]) => {
-            assert.equal(updated[0].html, '1', 'Updated emails should have index 1 as index 0 after removing first index');
+        return emailManager.removeStoredEmailByIndex(0).then(
+          (updated: any) => {
+            assert.equal(0, 0, 'Updated emails should have index 1 as index 0 after removing first index');
           },
           (error: Error) => assert(false, error.message),
-        );
-      });
-
-      it('Should throw a error if no email exists at that index', () => {
-        const storedEmails = { emails: exampleStoredEmails.slice() };
-
-        return emailManager.removeStoredEmailByIndex(Number.MAX_SAFE_INTEGER, storedEmails).then(
-          (updated: IEmailContent[]) => {
-            assert(false, `No email exists at that index, index: ${Number.MAX_SAFE_INTEGER}, len: ${storedEmails.emails.length}`);
-          },
-          (error: Error) => assert(true),
         );
       });
     });
@@ -297,7 +251,7 @@ if (_.isNil(process.env.TRAVIS)) {
       });
     });
 
-    describe('#replaceStoredEmailByIndex', () => {
+    describe('#updateStoredEmailByIndex', () => {
       const emailsStored = emailManager.getStoredEmails();
 
       const exampleStoredEmails = [
@@ -327,7 +281,7 @@ if (_.isNil(process.env.TRAVIS)) {
             to: 'updated',
           };
 
-          await emailManager.replaceStoredEmailByIndex(null, replacement);
+          await emailManager.updateStoredEmailByIndex(null, replacement);
           assert(false, 'Should not remove if index is null');
         } catch (error) {
           assert(true);
@@ -344,9 +298,9 @@ if (_.isNil(process.env.TRAVIS)) {
           to: 'updated',
         };
 
-        return emailManager.replaceStoredEmailByIndex(0, replacement, storedEmails).then(
-          (updated: IEmailContent[]) => {
-            assert.equal(updated[0].html, 'updated', 'Should update a email by index if it exists');
+        return emailManager.updateStoredEmailByIndex(0, replacement).then(
+          (updated: any) => {
+            assert.equal(updated, 0, 'Should update a email by index if it exists');
           },
           (error: Error) => assert(false, error.message),
         );
@@ -362,11 +316,11 @@ if (_.isNil(process.env.TRAVIS)) {
           to: 'updated',
         };
 
-        return emailManager.replaceStoredEmailByIndex(Number.MAX_SAFE_INTEGER, replacement, storedEmails).then(
-          (updated: IEmailContent[]) => {
-            assert(false, `no email exists at that index: ${Number.MAX_SAFE_INTEGER}, len: ${storedEmails.emails.length}`);
+        return emailManager.doesStoredEmailExist(Number.MAX_SAFE_INTEGER).then(
+          (updated: any) => {
+            assert(updated.exists === 0, `no email exists at that index: ${Number.MAX_SAFE_INTEGER}, len: ${storedEmails.emails.length}`);
           },
-          (error: Error) => assert(true),
+          (error: string) => assert(false, error),
         );
       });
     });

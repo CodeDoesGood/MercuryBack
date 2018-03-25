@@ -59,12 +59,14 @@ router[email.STORED.RETRIEVE.method](email.STORED.RETRIEVE.link, [
 router[email.STORED.REMOVE.method](email.STORED.REMOVE.link, [
   authentication.checkAuthenticationToken.bind(this),
   authentication.checkAdminPortalAccess.bind(this),
+  emailService.emailExistsById.bind(this),
   emailService.removeStoredEmailByIndex.bind(this),
 ]);
 
 router[email.STORED.UPDATE.method](email.STORED.UPDATE.link, [
   authentication.checkAuthenticationToken.bind(this),
   authentication.checkAdminPortalAccess.bind(this),
+  emailService.emailExistsById.bind(this),
   emailService.updateStoredEmailByIndex.bind(this),
 ]);
 

@@ -1,7 +1,6 @@
 {
-  "message": "Removed stored email 0",
+  "message": "Removed stored email 1",
   "content": {
-    "email_removed": 0,
-    "updated": []
+    "email_removed": 1
   }
 }

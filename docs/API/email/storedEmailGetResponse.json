@@ -1,11 +1,18 @@
 {
   "message": "string",
   "content": {
-    "emails": [{
-      "to": "string",
-      "subject": "string",
-      "text": "string",
-      "html": "string"
-    }]
+    "emails": [
+      {
+        "id": "number",
+        "to": "string",
+        "from": "string",
+        "subject": "string",
+        "text": "string",
+        "html": "string",
+        "retry_count": "number",
+        "created_datetime": "string",
+        "modified_datetime": "stringZ"
+      }
+    ]
   }
 }

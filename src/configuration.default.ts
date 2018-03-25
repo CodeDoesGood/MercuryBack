@@ -9,7 +9,6 @@ export interface IConfig {
     service: string;
     email: string;
     password: string;
-    stored: string;
   };
 
   slack: {
@@ -30,7 +29,6 @@ export const defaultConfig: IConfig = {
     email: 'contact@codedoesgood.org',
     password: null,
     service: 'gmail',
-    stored: '.stored.json',
   },
 
   database: {
