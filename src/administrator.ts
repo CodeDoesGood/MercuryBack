@@ -9,18 +9,22 @@ export class Administrator extends User {
   }
 
   /**
-   * checks to see if the administrator has a valid admin_portal_access within the database
+   * Returns a promsie of the accessability of the current user
    */
-  public async canAccessAdminPortal(): Promise<boolean | Error> {
-    if (_.isNil(this.adminPortalAccess)) {
-      return this.knex('volunteer').select('admin_portal_access').where('volunteer_id', this.userId).first()
-      .then((res: { admin_portal_access: number }) => {
-        this.adminPortalAccess = (res.admin_portal_access === 1);
+  public async canAccessAdminPortal(): Promise<boolean> {
+    if (!_.isNil(this.adminPortalAccess)) {
+      return Promise.resolve(this.adminPortalAccess);
+    }
+
+    return this.knex('volunteer')
+      .select('admin_portal_access AS access')
+      .where('volunteer_id', this.userId)
+      .first()
+      .then((res: { access: number }) => {
+        this.adminPortalAccess = res.access === 1;
         return Promise.resolve(this.adminPortalAccess);
       })
       .catch((error: Error) => Promise.reject(error));
-    }
-    return Promise.resolve(this.adminPortalAccess);
   }
 
   /**

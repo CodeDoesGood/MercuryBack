@@ -11,7 +11,7 @@ import indexRoute from './routes/index.route';
 dotenv.config();
 
 const app = express();
-const port = (process.env.PORT === undefined) ? 3000 : process.env.PORT;
+const port = process.env.PORT === undefined ? 3000 : process.env.PORT;
 
 const rateLimit = new ratelimit({
   delayMs: 0,

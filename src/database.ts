@@ -41,8 +41,24 @@ export class Database {
    */
   public async connect(): Promise<boolean> {
     return this.knex
-      .raw('select 1+1 as answer')
+      .raw('SELECT 1+1 AS answer')
       .then(() => Promise.resolve(true))
+      .catch((error: Error) => Promise.reject(error));
+  }
+
+  /**
+   * Checks to see if a item exists in the database
+   * @param table the table name
+   * @param index index to select
+   * @param column column to check for existing
+   * @param value the value to search
+   */
+  public async itemExists(table, index, column, value): Promise<number> {
+    return this.knex(table)
+      .select(`${index} AS exists`)
+      .where(column, value)
+      .first()
+      .then((result: { exists }) => Promise.resolve(result.exists))
       .catch((error: Error) => Promise.reject(error));
   }
 
@@ -55,12 +71,16 @@ export class Database {
       return Promise.reject(new Error(`email "${email}" passed is not a valid string`));
     }
 
+<<<<<<< HEAD
     return this.knex('volunteer')
       .select('volunteer_id')
       .where('email', email)
       .first()
       .then((result: IVolunteer) => Promise.resolve(result.volunteer_id))
       .catch((error: Error) => Promise.reject(error));
+=======
+    return this.itemExists('volunteer', 'volunteer_id', 'emal', email);
+>>>>>>> feature/apiDocumentationGeneration
   }
 
   /**
@@ -72,12 +92,16 @@ export class Database {
       return Promise.reject(new Error(`userId "${username}" passed is not a valid string`));
     }
 
+<<<<<<< HEAD
     return this.knex('volunteer')
       .select('volunteer_id')
       .where('username', username)
       .first()
       .then((result: IVolunteer) => Promise.resolve(result.volunteer_id))
       .catch((error: Error) => Promise.reject(error));
+=======
+    return await this.itemExists('volunteer', 'volunteer_id', 'username', username);
+>>>>>>> feature/apiDocumentationGeneration
   }
 
   // return the current online stauts of the database
