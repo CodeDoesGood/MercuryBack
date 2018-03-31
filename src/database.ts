@@ -71,16 +71,7 @@ export class Database {
       return Promise.reject(new Error(`email "${email}" passed is not a valid string`));
     }
 
-<<<<<<< HEAD
-    return this.knex('volunteer')
-      .select('volunteer_id')
-      .where('email', email)
-      .first()
-      .then((result: IVolunteer) => Promise.resolve(result.volunteer_id))
-      .catch((error: Error) => Promise.reject(error));
-=======
     return this.itemExists('volunteer', 'volunteer_id', 'emal', email);
->>>>>>> feature/apiDocumentationGeneration
   }
 
   /**
@@ -92,16 +83,7 @@ export class Database {
       return Promise.reject(new Error(`userId "${username}" passed is not a valid string`));
     }
 
-<<<<<<< HEAD
-    return this.knex('volunteer')
-      .select('volunteer_id')
-      .where('username', username)
-      .first()
-      .then((result: IVolunteer) => Promise.resolve(result.volunteer_id))
-      .catch((error: Error) => Promise.reject(error));
-=======
     return await this.itemExists('volunteer', 'volunteer_id', 'username', username);
->>>>>>> feature/apiDocumentationGeneration
   }
 
   // return the current online stauts of the database

@@ -38,11 +38,7 @@ if (_.isNil(process.env.TRAVIS)) {
         return projects.getAllActiveProjects().then(
           (gotProjects: any) => {
             _.forEach(gotProjects, (project: any) => {
-<<<<<<< HEAD
-              assert.equal(project.status === 'Online', true, 'Status should be marked as active for all active projects');
-=======
               assert.equal(project.status.toLowerCase() === 'online', true, 'Status should be marked as active for all active projects');
->>>>>>> feature/apiDocumentationGeneration
             });
           },
           (error: Error) => {
