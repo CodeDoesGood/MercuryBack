@@ -71,7 +71,7 @@ export class Database {
       return Promise.reject(new Error(`email "${email}" passed is not a valid string`));
     }
 
-    return this.itemExists('volunteer', 'volunteer_id', 'emal', email);
+    return this.itemExists('volunteer', 'volunteer_id', 'email', email);
   }
 
   /**
