@@ -28,7 +28,7 @@ export function validateConnectionStatus(req: Request, res: Response, next: Next
  * @param {string} req.volunteer.username The username of the volunteer
  */
 export async function validateUsernameDoesNotExist(req: Request, res: Response, next: NextFunction) {
-  const { username }: { username: string; } = req.body.volunteer;
+  const { username }: { username: string } = req.body.volunteer;
 
   try {
     if (_.isNil(username)) {
@@ -86,8 +86,8 @@ export async function validateUsernameDoesExist(req: Request, res: Response, nex
  * throws a bad request.
  */
 export async function validateEmailDoesExist(req: Request, res: Response, next: NextFunction) {
-  const { email: email1 }: { email: string; } = req.params;
-  const { email: email2 }: { email: string; } = req.body;
+  const { email: email1 }: { email: string } = req.params;
+  const { email: email2 }: { email: string } = req.body;
 
   let email: string;
 

@@ -91,7 +91,7 @@ export function validateVolunteerCreationDetails(req: Request, res: Response, ne
  * Validates that the user exists and that the email and username was passed.
  */
 export async function validateRequestResetDetails(req: Request, res: Response, next: NextFunction) {
-  const { username, email }: { username: string; email: string; } = req.params;
+  const { username, email }: { username: string; email: string } = req.params;
 
   if (_.isNil(username)) {
     res.status(400).send({ error: 'Username validation', description: constants.USERNAME_REQUIRED });
@@ -137,13 +137,16 @@ export async function createPasswordResetCode(req: Request, res: Response, next:
  * requirements otherwise sends 400.
  */
 export function validatePasswordDetails(req: Request, res: Response, next: NextFunction) {
-  const { password, oldPassword }: { password: string; oldPassword: string; } = req.body;
+  const { password, oldPassword }: { password: string; oldPassword: string } = req.body;
 
   if (_.isNil(password) || _.isNil(oldPassword)) {
     res.status(400).send({ error: 'Param not provided', description: constants.VOLUNTEER_UPDATE_PASSWORD_REQUIRE });
-
-  } else if (password.length < constants.PASSWORD_MIN_LENGTH || password.length > constants.PASSWORD_MAX_LENGTH
-    || oldPassword.length < constants.PASSWORD_MIN_LENGTH || password.length > constants.PASSWORD_MAX_LENGTH) {
+  } else if (
+    password.length < constants.PASSWORD_MIN_LENGTH ||
+    password.length > constants.PASSWORD_MAX_LENGTH ||
+    oldPassword.length < constants.PASSWORD_MIN_LENGTH ||
+    password.length > constants.PASSWORD_MAX_LENGTH
+  ) {
     res.status(400).send({ error: 'Invalid Credentials', description: constants.PASSWORD_MIN_LENGTH });
   } else {
     req.body.pasword = password;
@@ -156,7 +159,7 @@ export function validatePasswordDetails(req: Request, res: Response, next: NextF
  * Checks if the password (req.password) meets the required needs.
  */
 export function validatePasswordDetail(req: Request, res: Response, next: NextFunction) {
-  const { password }: { password: string; } = req.body;
+  const { password }: { password: string } = req.body;
 
   if (_.isNil(password)) {
     res.status(400).send({ error: 'Param not provided', description: constants.PASSWORD_REQUIRED });
@@ -195,7 +198,7 @@ export function validatePasswordResetDetails(req: Request, res: Response, next: 
  * the code used into trying to verify the account was not the correct code).
  */
 export async function validateVerifyCodeAuthenticity(req: Request, res: Response, next: NextFunction) {
-  const { code, volunteer }: { code: string; volunteer: Volunteer} = req.body;
+  const { code, volunteer }: { code: string; volunteer: Volunteer } = req.body;
 
   try {
     const verificationCode: IVerificationCode | Error | any = await volunteer.getVerificationCode();
@@ -256,18 +259,14 @@ export function validateNotificationId(req: Request, res: Response, next: NextFu
  * users id and then tells the client that there password has been updated.
  */
 export async function updateUsersPassword(req: Request, res: Response, next: NextFunction) {
-  const { volunteer, password }: { volunteer: Volunteer; password: string; } = req.body;
-  const { username }: { username: string; } = volunteer;
+  const { volunteer, password }: { volunteer: Volunteer; password: string } = req.body;
+  const { username }: { username: string } = volunteer;
 
   try {
     await volunteer.updatePassword(password);
     res.status(200).send({ message: `Volunteer ${username} password updated` });
   } catch (error) {
-    next(
-      new ApiError(
-        req, res, error, 500, 'Password updating',
-        constants.VOLUNTEER_FAILED_UPDATE_PASSWORD(username, error),
-      ));
+    next(new ApiError(req, res, error, 500, 'Password updating', constants.VOLUNTEER_FAILED_UPDATE_PASSWORD(username, error)));
   }
 }
 
@@ -276,7 +275,7 @@ export async function updateUsersPassword(req: Request, res: Response, next: Nex
  * set time period.
  */
 export async function verifyVolunteerAccount(req: Request, res: Response, next: NextFunction) {
-  const { username, volunteer }: { username: string; volunteer: Volunteer; } = req.body;
+  const { username, volunteer }: { username: string; volunteer: Volunteer } = req.body;
 
   try {
     await volunteer.removeVerificationCode();
@@ -295,7 +294,7 @@ export async function verifyVolunteerAccount(req: Request, res: Response, next: 
  * otherwise sends a bad request.
  */
 export async function validateVerifyCodeExists(req: Request, res: Response, next: NextFunction) {
-  const { code, username, id: userId }: { code: string; username: string; id: number; } = req.body;
+  const { code, username, id: userId }: { code: string; username: string; id: number } = req.body;
 
   if (_.isNil(code) || _.isNil(userId)) {
     res.status(500).send({ error: 'Validate Verify Code', description: constants.VERIFICATION_CODE_REQUIRED });
@@ -319,7 +318,7 @@ export async function validateVerifyCodeExists(req: Request, res: Response, next
  * Checks that the given code matches the code (if any) in the password_reset_code table
  */
 export async function validateResetCodeExists(req: Request, res: Response, next: NextFunction) {
-  const { username }: { username: string; } = req.body;
+  const { username }: { username: string } = req.body;
 
   const volunteer = new Volunteer(null, username);
   req.body.volunteer = volunteer;
@@ -337,7 +336,7 @@ export async function validateResetCodeExists(req: Request, res: Response, next:
  * Creates a new Volunteer within the database.
  */
 export async function createNewVolunteer(req: Request, res: Response, next: NextFunction) {
-  const vol: { username: string; name: string; email: string, password: string; } = req.body.volunteer;
+  const vol: { username: string; name: string; email: string; password: string } = req.body.volunteer;
 
   const volunteer = new Volunteer(null, vol.username);
 
@@ -377,8 +376,8 @@ export async function gatherActiveNotifications(req: Request, res: Response, nex
 export async function markNotificationAsRead(req: Request, res: Response, next: NextFunction) {
   const decodedToken: IToken = req.body.decoded;
 
-  const { notificationId }: { notificationId: number; } = req.body;
-  const { username }: { username: string; } = decodedToken;
+  const { notificationId }: { notificationId: number } = req.body;
+  const { username }: { username: string } = decodedToken;
   const userId = decodedToken.id;
 
   const volunteer = new Volunteer(userId, username);
@@ -399,7 +398,7 @@ export async function markNotificationAsRead(req: Request, res: Response, next: 
 export async function gatherVolunteerProfile(req: Request, res: Response, next: NextFunction) {
   const decodedToken: IToken = req.body.decoded;
 
-  const { username }: { username: string; } = decodedToken;
+  const { username }: { username: string } = decodedToken;
   const userId: number = decodedToken.id;
 
   const volunteer = new Volunteer(userId, username);
