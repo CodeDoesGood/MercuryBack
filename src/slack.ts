@@ -2,6 +2,7 @@ import { IncomingWebhook } from '@slack/client';
 
 import * as _ from 'lodash';
 import * as os from 'os';
+import { Configuration } from './configuration';
 
 /**
  * Send a message to slack via a slack webhook.
@@ -18,7 +19,6 @@ export function message(url: string, slackMessage: string | {}): Promise<boolean
       }
       resolve(res);
     });
-
   });
 }
 
@@ -30,19 +30,40 @@ export function serviceDownMessage(url: string, service: string): Promise<boolea
   const serviceMessage = {
     text: 'Service Update',
 
-    attachments: [{
-      color: '#FF0032',
-      fallback: 'Offline services',
-      fields: [{
-        short: false,
-        title: `${service} is currently down`,
-        value: `As of ${new Date().toLocaleDateString()} ${new Date().toLocaleTimeString()} the serice ${service} is down`,
-      }],
-    }],
+    attachments: [
+      {
+        color: '#FF0032',
+        fallback: 'Offline services',
+        fields: [
+          {
+            short: false,
+            title: `${service} is currently down`,
+            value: `As of ${new Date().toLocaleDateString()} ${new Date().toLocaleTimeString()} the serice ${service} is down`,
+          },
+        ],
+      },
+    ],
   };
 
   return message(url, serviceMessage);
+}
 
+/**
+ * Gets the current webhook from the configuration wrapper
+ * @param config the configuration wrapper
+ */
+export function getWebhookURL(config: Configuration): string {
+  if (_.isNil(config)) {
+    return null;
+  }
+
+  let webhookUrl: string = config.getKey('slack').mercury;
+
+  if (process.env.NODE_ENV !== 'production') {
+    webhookUrl = config.getKey('slack').debug;
+  }
+
+  return webhookUrl;
 }
 
 /**
@@ -55,28 +76,33 @@ export function healthCheck(url: string, email: boolean, database: boolean): Pro
   const online = [];
   const offline = [];
 
-  (email) ? online.push('Email') : offline.push('Email');
-  (database) ? online.push('Database') : offline.push('Database');
+  email ? online.push('Email') : offline.push('Email');
+  database ? online.push('Database') : offline.push('Database');
 
   const healthMessage = {
     text: 'Health Check',
 
-    attachments: [{
-      color: '#FF0032',
-      fallback: 'Offline services',
-      fields: [],
-    }, {
-      color: 'good',
-      fallback: 'Online services',
-      fields: [{
-        short: true,
-        title: 'Slack',
-        value: 'Online',
-      }],
-    }],
+    attachments: [
+      {
+        color: '#FF0032',
+        fallback: 'Offline services',
+        fields: [],
+      },
+      {
+        color: 'good',
+        fallback: 'Online services',
+        fields: [
+          {
+            short: true,
+            title: 'Slack',
+            value: 'Online',
+          },
+        ],
+      },
+    ],
   };
 
-  _.forEach(offline, (name) => {
+  _.forEach(offline, name => {
     healthMessage.attachments[0].fields.push({
       short: true,
       title: name,
@@ -84,7 +110,7 @@ export function healthCheck(url: string, email: boolean, database: boolean): Pro
     });
   });
 
-  _.forEach(online, (name) => {
+  _.forEach(online, name => {
     healthMessage.attachments[1].fields.push({
       short: true,
       title: name,
@@ -95,31 +121,33 @@ export function healthCheck(url: string, email: boolean, database: boolean): Pro
   healthMessage.attachments.push({
     color: '#0000FF',
     fallback: 'Extra information',
-    fields: [{
-      short: true,
-      title: 'Architecture',
-      value: os.arch(),
-    },
-    {
-      short: true,
-      title: 'CPU Usage',
-      value: `${cpuAverage()}%`,
-    },
-    {
-      short: true,
-      title: 'Memory',
-      value: `${formatBytes(os.totalmem)}`,
-    },
-    {
-      short: true,
-      title: 'Memory Usage',
-      value: `${formatBytes(os.freemem())}`,
-    },
-    {
-      short: true,
-      title: 'Uptime',
-      value: `${(Math.floor(os.uptime()) / 60).toFixed(2)} min`,
-    }],
+    fields: [
+      {
+        short: true,
+        title: 'Architecture',
+        value: os.arch(),
+      },
+      {
+        short: true,
+        title: 'CPU Usage',
+        value: `${cpuAverage()}%`,
+      },
+      {
+        short: true,
+        title: 'Memory',
+        value: `${formatBytes(os.totalmem)}`,
+      },
+      {
+        short: true,
+        title: 'Memory Usage',
+        value: `${formatBytes(os.freemem())}`,
+      },
+      {
+        short: true,
+        title: 'Uptime',
+        value: `${(Math.floor(os.uptime()) / 60).toFixed(2)} min`,
+      },
+    ],
   });
 
   return message(url, healthMessage);
