@@ -13,7 +13,7 @@ export function message(url: string, slackMessage: string | {}): Promise<boolean
   return new Promise((resolve, reject) => {
     const webhook = new IncomingWebhook(url);
 
-    webhook.send(slackMessage, (err: Error, res: boolean) => {
+    webhook.send(slackMessage, (err: Error, res: any) => {
       if (err !== null && err !== undefined) {
         reject(err);
       }
@@ -102,7 +102,7 @@ export function healthCheck(url: string, email: boolean, database: boolean): Pro
     ],
   };
 
-  _.forEach(offline, name => {
+  _.forEach(offline, (name) => {
     healthMessage.attachments[0].fields.push({
       short: true,
       title: name,
@@ -110,7 +110,7 @@ export function healthCheck(url: string, email: boolean, database: boolean): Pro
     });
   });
 
-  _.forEach(online, name => {
+  _.forEach(online, (name) => {
     healthMessage.attachments[1].fields.push({
       short: true,
       title: name,
