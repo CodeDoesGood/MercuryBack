@@ -1,4 +1,4 @@
-import * as knex from 'knex';
+import knex from 'knex';
 import * as _ from 'lodash';
 
 import { IVolunteer } from './user';
